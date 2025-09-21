@@ -13,6 +13,14 @@ export function PopoverContentAuth() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // In dev mode, don't show auth popup if we have a dev user
+  if (process.env.NODE_ENV === 'development') {
+    const guestId = typeof window !== 'undefined' ? localStorage.getItem('guestUserId') : null
+    if (guestId && guestId.startsWith('dev-')) {
+      return null  // Don't show auth popup for dev users
+    }
+  }
+
   if (!isSupabaseEnabled) {
     return null
   }

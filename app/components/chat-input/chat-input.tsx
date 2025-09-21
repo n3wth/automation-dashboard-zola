@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { getModelInfo } from "@/lib/models"
 import { ArrowUpIcon, StopIcon } from "@phosphor-icons/react"
-import { useCallback, useEffect, useMemo, useRef } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { PromptSystem } from "../suggestions/prompt-system"
 import { ButtonFileUpload } from "./button-file-upload"
 import { ButtonSearch } from "./button-search"
@@ -60,6 +60,9 @@ export function ChatInput({
   const hasSearchSupport = Boolean(selectModelConfig?.webSearch)
   const isOnlyWhitespace = (text: string) => !/[^\s]/.test(text)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  // Fix hydration mismatch by using client-side state
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true)
 
   const handleSend = useCallback(() => {
     if (isSubmitting) {
@@ -159,6 +162,11 @@ export function ChatInput({
     }
   }, [hasSearchSupport, enableSearch, setEnableSearch])
 
+  // Update button disabled state after hydration
+  useEffect(() => {
+    setIsButtonDisabled(!value || isSubmitting || isOnlyWhitespace(value))
+  }, [value, isSubmitting])
+
   return (
     <div className="relative flex w-full flex-col gap-4">
       {hasSuggestions && (
@@ -213,7 +221,7 @@ export function ChatInput({
               <Button
                 size="sm"
                 className="size-9 rounded-full transition-all duration-300 ease-out"
-                disabled={!value || isSubmitting || isOnlyWhitespace(value)}
+                disabled={isButtonDisabled}
                 type="button"
                 onClick={handleSend}
                 aria-label={status === "streaming" ? "Stop" : "Send message"}

@@ -37,6 +37,8 @@ export function Chat() {
     updateChatModel,
     bumpChat,
     isLoading: isChatsLoading,
+    fetchingDirectChat,
+    attemptedDirectFetch,
   } = useChats()
 
   const currentChat = useMemo(
@@ -200,8 +202,8 @@ export function Chat() {
   )
 
   // Handle redirect for invalid chatId - only redirect if we're certain the chat doesn't exist
-  // and we're not in a transient state during chat creation
-  if (
+  // and we're not in a transient state during chat creation or fetching automation chats
+  const shouldRedirect = (
     chatId &&
     !isChatsLoading &&
     !currentChat &&
@@ -209,11 +211,49 @@ export function Chat() {
     status === "ready" &&
     messages.length === 0 &&
     !hasSentFirstMessageRef.current // Don't redirect if we've already sent a message in this session
-  ) {
-    return redirect("/")
+  )
+
+  // Check if we're currently fetching or should wait for fetch attempt
+  const isFetchingOrWillFetch = fetchingDirectChat === chatId ||
+    (shouldRedirect && !attemptedDirectFetch.has(chatId))
+
+  // Log the state for debugging
+  if (chatId) {
+    console.log(`[Chat] State for ${chatId}:`, {
+      shouldRedirect,
+      isFetchingOrWillFetch,
+      currentChat: !!currentChat,
+      fetchingDirectChat,
+      attempted: attemptedDirectFetch.has(chatId),
+      isChatsLoading,
+      isSubmitting,
+      status,
+      messagesLength: messages.length
+    })
+  }
+
+  // If we should redirect but haven't tried fetching the chat directly yet, show loading
+  if (shouldRedirect && isFetchingOrWillFetch) {
+    // The effect will trigger fetchChatDirectly, so we just show loading
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="text-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto mb-2"></div>
+          <p className="text-muted-foreground">Loading automation chat...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // If we've finished trying to fetch and still no chat, then redirect
+  // Check attemptedDirectFetch to see if we've tried
+  if (shouldRedirect && !isFetchingOrWillFetch && attemptedDirectFetch.has(chatId)) {
+    console.log(`[Chat] Redirecting because chat ${chatId} not found after fetch attempt`)
+    redirect("/")
   }
 
   const showOnboarding = !chatId && messages.length === 0
+  const showLoadingForDirectFetch = chatId && fetchingDirectChat === chatId && !currentChat
 
   return (
     <div
@@ -224,7 +264,31 @@ export function Chat() {
       <DialogAuth open={hasDialogAuth} setOpen={setHasDialogAuth} />
 
       <AnimatePresence initial={false} mode="popLayout">
-        {showOnboarding ? (
+        {showLoadingForDirectFetch ? (
+          <motion.div
+            key="direct-fetch-loading"
+            className="absolute bottom-[60%] mx-auto max-w-[50rem] md:relative md:bottom-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            layout="position"
+            transition={{
+              layout: {
+                duration: 0,
+              },
+            }}
+          >
+            <div className="text-center">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto mb-4"></div>
+              <h2 className="text-xl font-medium tracking-tight mb-2">
+                Loading automation chat...
+              </h2>
+              <p className="text-muted-foreground text-sm">
+                Fetching chat: {chatId}
+              </p>
+            </div>
+          </motion.div>
+        ) : showOnboarding ? (
           <motion.div
             key="onboarding"
             className="absolute bottom-[60%] mx-auto max-w-[50rem] md:relative md:bottom-auto"

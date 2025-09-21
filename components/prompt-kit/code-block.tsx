@@ -44,11 +44,22 @@ function CodeBlockCode({
 
   useEffect(() => {
     async function highlight() {
-      const html = await codeToHtml(code, {
-        lang: language,
-        theme: appTheme === "dark" ? "github-dark" : "github-light",
-      })
-      setHighlightedHtml(html)
+      // Guard against undefined or null code
+      if (!code || typeof code !== 'string') {
+        setHighlightedHtml(null)
+        return
+      }
+
+      try {
+        const html = await codeToHtml(code, {
+          lang: language,
+          theme: appTheme === "dark" ? "github-dark" : "github-light",
+        })
+        setHighlightedHtml(html)
+      } catch (error) {
+        console.error("Error highlighting code:", error)
+        setHighlightedHtml(null)
+      }
     }
     highlight()
   }, [code, language, appTheme])
@@ -68,7 +79,7 @@ function CodeBlockCode({
   ) : (
     <div className={classNames} {...props}>
       <pre>
-        <code>{code}</code>
+        <code>{code || ""}</code>
       </pre>
     </div>
   )

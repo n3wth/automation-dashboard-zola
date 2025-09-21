@@ -88,9 +88,19 @@ export async function checkUsage(supabase: SupabaseClient, userId: string) {
  * @throws Error if updating fails.
  */
 export async function incrementUsage(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient | null,
   userId: string
 ): Promise<void> {
+  // LOCAL DEV BYPASS: Skip increment for all dev users
+  if (process.env.NODE_ENV === 'development' && userId.startsWith('dev-')) {
+    console.log("⚠️ LOCAL DEV MODE: Bypassing usage increment for dev user")
+    return
+  }
+
+  if (!supabase) {
+    return // No-op if no Supabase client
+  }
+
   const { data: userData, error: userDataError } = await supabase
     .from("users")
     .select("message_count, daily_message_count")
@@ -206,11 +216,42 @@ export async function incrementProUsage(
 }
 
 export async function checkUsageByModel(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient | null,
   userId: string,
   modelId: string,
   isAuthenticated: boolean
 ) {
+  // LOCAL DEV BYPASS: Skip usage checks for all dev users
+  if (process.env.NODE_ENV === 'development' && userId.startsWith('dev-')) {
+    console.log("⚠️ LOCAL DEV MODE: Bypassing usage checks for dev user")
+    return {
+      userData: {
+        message_count: 0,
+        daily_message_count: 0,
+        daily_reset: new Date().toISOString(),
+        anonymous: true,
+        premium: false
+      },
+      dailyCount: 0,
+      dailyLimit: 100
+    }
+  }
+
+  if (!supabase) {
+    // If no Supabase client, just return mock data
+    return {
+      userData: {
+        message_count: 0,
+        daily_message_count: 0,
+        daily_reset: new Date().toISOString(),
+        anonymous: true,
+        premium: false
+      },
+      dailyCount: 0,
+      dailyLimit: 100
+    }
+  }
+
   if (isProModel(modelId)) {
     if (!isAuthenticated) {
       throw new UsageLimitError("You must log in to use this model.")
@@ -222,11 +263,20 @@ export async function checkUsageByModel(
 }
 
 export async function incrementUsageByModel(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient | null,
   userId: string,
   modelId: string,
   isAuthenticated: boolean
 ) {
+  // LOCAL DEV BYPASS: Skip increment for all dev users
+  if (process.env.NODE_ENV === 'development' && userId.startsWith('dev-')) {
+    console.log("⚠️ LOCAL DEV MODE: Bypassing usage increment for dev user")
+    return
+  }
+
+  if (!supabase) {
+    return // No-op if no Supabase client
+  }
   if (isProModel(modelId)) {
     if (!isAuthenticated) return
     return await incrementProUsage(supabase, userId)

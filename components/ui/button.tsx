@@ -4,26 +4,28 @@ import { cva, type VariantProps } from "class-variance-authority"
 import * as React from "react"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-[color,box-shadow] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-300 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 active:scale-[0.98]",
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
+          "bg-white text-black font-medium shadow-[0_4px_14px_0_rgba(255,255,255,0.1)] hover:shadow-2xl hover:scale-[1.02]",
         destructive:
-          "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
+          "bg-red-500 text-white shadow-xs hover:bg-red-600 focus-visible:outline-red-500",
         outline:
-          "border border-input bg-background shadow-xs hover:bg-accent hover:text-accent-foreground",
+          "border border-white/10 bg-transparent backdrop-blur-sm text-white hover:bg-white/5 hover:border-white/20",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80 dark:border-none",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-white/5 text-white backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-white/20",
+        ghost: "text-white/70 hover:bg-white/5 hover:text-white",
+        link: "text-violet-400 underline-offset-4 hover:underline hover:text-violet-300",
+        premium:
+          "relative bg-gradient-to-r from-white/10 to-white/5 border border-white/10 backdrop-blur-[10px] text-white hover:from-white/15 hover:to-white/8 hover:border-white/20 hover:-translate-y-0.5 hover:shadow-[0_10px_40px_rgba(139,92,246,0.15)]",
       },
       size: {
-        default: "h-9 px-4 py-2 has-[>svg]:px-3",
-        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
-        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
-        icon: "size-9",
+        default: "h-10 px-6 py-2.5 has-[>svg]:px-5",
+        sm: "h-8 rounded-lg gap-1.5 px-4 has-[>svg]:px-3",
+        lg: "h-12 rounded-xl px-8 has-[>svg]:px-6",
+        icon: "size-10 rounded-lg",
       },
     },
     defaultVariants: {

@@ -13,7 +13,8 @@ export function InteractionPreferences() {
   } = useUserPreferences()
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="glass-panel p-4 space-y-6">
+      <h3 className="text-sm font-medium mb-4">Interaction Preferences</h3>
       {/* Prompt Suggestions */}
       <div>
         <div className="flex items-center justify-between">

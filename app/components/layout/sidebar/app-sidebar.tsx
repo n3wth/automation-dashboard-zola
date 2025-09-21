@@ -10,6 +10,7 @@ import {
   SidebarHeader,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { Logo } from "@/components/ui/logo"
 import { useChats } from "@/lib/chat-store/chats/provider"
 import {
   ChatTeardropText,
@@ -45,9 +46,10 @@ export function AppSidebar() {
       variant="sidebar"
       className="border-border/40 border-r bg-transparent"
     >
-      <SidebarHeader className="h-14 pl-3">
-        <div className="flex justify-between">
-          {isMobile ? (
+      <SidebarHeader className="h-14 px-3">
+        <div className="flex items-center justify-between h-full">
+          <Logo size="md" variant="text" className="text-white" />
+          {isMobile && (
             <button
               type="button"
               onClick={() => setOpenMobile(false)}
@@ -55,8 +57,6 @@ export function AppSidebar() {
             >
               <X size={24} />
             </button>
-          ) : (
-            <div className="h-full" />
           )}
         </div>
       </SidebarHeader>

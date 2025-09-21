@@ -4,6 +4,7 @@ import { SupabaseClient } from "@supabase/supabase-js"
 import { fetchClient } from "./fetch"
 import { API_ROUTE_CREATE_GUEST, API_ROUTE_UPDATE_CHAT_MODEL } from "./routes"
 import { createClient } from "./supabase/client"
+import { devAuth } from './auth/dev-auth'
 
 /**
  * Creates a guest user record on the server
@@ -143,10 +144,32 @@ export const getOrCreateGuestUserId = async (
 ): Promise<string | null> => {
   if (user?.id) return user.id
 
+  // Use centralized dev auth system
+  const devUser = devAuth.getCurrentDevUser()
+  if (devUser) {
+    console.log("Using dev user:", devUser.id)
+    return devUser.id
+  }
+
   const supabase = createClient()
 
   if (!supabase) {
     console.warn("Supabase is not available in this deployment.")
+
+    // LOCAL DEV BYPASS: If no Supabase and in dev mode, check for or create dev user
+    if (process.env.NODE_ENV === 'development') {
+      // Check again for existing dev user
+      if (existingGuestId) {
+        return existingGuestId
+      }
+
+      console.warn("⚠️ LOCAL DEV MODE: Creating mock guest user (anonymous sign-ins disabled)")
+      const mockGuestId = 'dev-guest-' + Math.random().toString(36).substring(7)
+      localStorage.setItem('guestUserId', mockGuestId)
+      localStorage.setItem(`guestProfileAttempted_${mockGuestId}`, "true")
+      return mockGuestId
+    }
+
     return null
   }
 
@@ -174,6 +197,15 @@ export const getOrCreateGuestUserId = async (
       }
     }
     return anonUserId
+  }
+
+  // LOCAL DEV BYPASS: Create a mock guest user for development
+  if (process.env.NODE_ENV === 'development') {
+    console.warn("⚠️ LOCAL DEV MODE: Using mock guest user (anonymous sign-ins disabled)")
+    const mockGuestId = 'dev-guest-' + Math.random().toString(36).substring(7)
+    localStorage.setItem('guestUserId', mockGuestId)
+    localStorage.setItem(`guestProfileAttempted_${mockGuestId}`, "true")
+    return mockGuestId
   }
 
   try {

@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/Users/oliver/GitHub/automation-dashboard-zola/logs/.ff01fe2638504a5367ca78403ebf0e70fff64481-audit.json",
+    "files": [
+        {
+            "date": 1758458759052,
+            "name": "/Users/oliver/GitHub/automation-dashboard-zola/logs/mcp-puppeteer-2025-09-21.log",
+            "hash": "308cb55c7e2d6212d6d7da056549259385988a9e52fd6f325443c6f8e0154b09"
+        }
+    ],
+    "hashType": "sha256"
+}

@@ -57,7 +57,7 @@ export async function incrementMessageCount({
   supabase,
   userId,
 }: {
-  supabase: SupabaseClientType
+  supabase: SupabaseClientType | null
   userId: string
 }): Promise<void> {
   if (!supabase) return

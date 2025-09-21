@@ -23,8 +23,17 @@ export async function getMessagesFromDb(
     .eq("chat_id", chatId)
     .order("created_at", { ascending: true })
 
-  if (!data || error) {
+  if (error) {
+    // HACK: In development, ignore permission errors for automation chats
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[DEV HACK] Messages fetch failed for chat ${chatId}, returning empty array`)
+      return []
+    }
     console.error("Failed to fetch messages:", error)
+    return []
+  }
+
+  if (!data) {
     return []
   }
 
@@ -43,7 +52,19 @@ async function insertMessageToDb(chatId: string, message: MessageAISDK) {
   const supabase = createClient()
   if (!supabase) return
 
-  await supabase.from("messages").insert({
+  // First, verify the chat exists to avoid foreign key constraint errors
+  const { data: chatExists } = await supabase
+    .from("chats")
+    .select("id")
+    .eq("id", chatId)
+    .single()
+
+  if (!chatExists) {
+    console.warn(`Cannot save message: chat ${chatId} does not exist in database`)
+    return
+  }
+
+  const { error } = await supabase.from("messages").insert({
     chat_id: chatId,
     role: message.role,
     content: message.content,
@@ -52,11 +73,28 @@ async function insertMessageToDb(chatId: string, message: MessageAISDK) {
     message_group_id: (message as any).message_group_id || null,
     model: (message as any).model || null,
   })
+
+  if (error) {
+    console.error(`Failed to insert message for chat ${chatId}:`, error)
+    throw error
+  }
 }
 
 async function insertMessagesToDb(chatId: string, messages: MessageAISDK[]) {
   const supabase = createClient()
   if (!supabase) return
+
+  // First, verify the chat exists to avoid foreign key constraint errors
+  const { data: chatExists } = await supabase
+    .from("chats")
+    .select("id")
+    .eq("id", chatId)
+    .single()
+
+  if (!chatExists) {
+    console.warn(`Cannot save messages: chat ${chatId} does not exist in database`)
+    return
+  }
 
   const payload = messages.map((message) => ({
     chat_id: chatId,
@@ -68,7 +106,11 @@ async function insertMessagesToDb(chatId: string, messages: MessageAISDK[]) {
     model: (message as any).model || null,
   }))
 
-  await supabase.from("messages").insert(payload)
+  const { error } = await supabase.from("messages").insert(payload)
+  if (error) {
+    console.error(`Failed to insert messages for chat ${chatId}:`, error)
+    throw error
+  }
 }
 
 async function deleteMessagesFromDb(chatId: string) {

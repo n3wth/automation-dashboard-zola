@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/tooltip"
 import { useUser } from "@/lib/user-store/provider"
 import { GithubLogoIcon } from "@phosphor-icons/react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { AppInfoTrigger } from "./app-info/app-info-trigger"
 import { FeedbackTrigger } from "./feedback/feedback-trigger"
 import { SettingsTrigger } from "./settings/settings-trigger"
@@ -25,8 +25,27 @@ export function UserMenu() {
   const { user } = useUser()
   const [isMenuOpen, setMenuOpen] = useState(false)
   const [isSettingsOpen, setSettingsOpen] = useState(false)
+  const [devUser, setDevUser] = useState<{ name: string; type: string } | null>(null)
 
-  if (!user) return null
+  // Check for dev user
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const devUserName = localStorage.getItem('devUserName')
+      const devUserType = localStorage.getItem('devUserType')
+      if (devUserName && devUserType) {
+        setDevUser({ name: devUserName, type: devUserType })
+      }
+    }
+  }, [])
+
+  // Use dev user if no real user
+  const displayUser = user || (devUser ? {
+    display_name: devUser.name,
+    profile_image: null,
+    email: `${devUser.type}@dev.local`
+  } : null)
+
+  if (!displayUser) return null
 
   const handleSettingsOpenChange = (isOpen: boolean) => {
     setSettingsOpen(isOpen)
@@ -42,8 +61,8 @@ export function UserMenu() {
         <TooltipTrigger asChild>
           <DropdownMenuTrigger>
             <Avatar className="bg-background hover:bg-muted">
-              <AvatarImage src={user?.profile_image ?? undefined} />
-              <AvatarFallback>{user?.display_name?.charAt(0)}</AvatarFallback>
+              <AvatarImage src={displayUser?.profile_image ?? undefined} />
+              <AvatarFallback>{displayUser?.display_name?.charAt(0)}</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
         </TooltipTrigger>

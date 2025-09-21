@@ -29,7 +29,7 @@ type SettingsContentProps = {
   isDrawer?: boolean
 }
 
-type TabType = "general" | "appearance" | "models" | "connections"
+type TabType = "general" | "appearance" | "apikeys" | "models" | "connections"
 
 export function SettingsContent({
   isDrawer = false,
@@ -139,7 +139,7 @@ export function SettingsContent({
         ) : (
           // Desktop version - tabs on left
           <>
-            <TabsList className="block w-48 rounded-none bg-transparent px-3 pt-4">
+            <TabsList className="block w-48 rounded-none bg-white/5 backdrop-blur-md border border-white/10 px-3 pt-4">
               <div className="flex w-full flex-col gap-1">
                 <TabsTrigger
                   value="general"
@@ -192,7 +192,7 @@ export function SettingsContent({
             </TabsList>
 
             {/* Desktop tabs content */}
-            <div className="flex-1 overflow-auto px-6 pt-4">
+            <div className="flex-1 overflow-auto px-6 pt-4 bg-white/2 backdrop-blur-sm border-l border-white/5">
               <TabsContent value="general" className="mt-0 space-y-6">
                 <UserProfile />
                 {isSupabaseEnabled && (

@@ -56,9 +56,17 @@ export function MessagesProvider({ children }: { children: React.ReactNode }) {
       try {
         const fresh = await getMessagesFromDb(chatId)
         setMessages(fresh)
-        cacheMessages(chatId, fresh)
+        if (fresh.length > 0) {
+          cacheMessages(chatId, fresh)
+        }
       } catch (error) {
-        console.error("Failed to fetch messages:", error)
+        // HACK: In development, silently handle errors for automation chats
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[DEV HACK] Using empty messages for chat ${chatId}`)
+          setMessages([])
+        } else {
+          console.error("Failed to fetch messages:", error)
+        }
       } finally {
         setIsLoading(false)
       }
@@ -87,7 +95,8 @@ export function MessagesProvider({ children }: { children: React.ReactNode }) {
         writeToIndexedDB("messages", { id: chatId, messages: updated })
         return updated
       })
-    } catch {
+    } catch (error) {
+      console.error("Failed to cache message:", error)
       toast({ title: "Failed to save message", status: "error" })
     }
   }
@@ -99,8 +108,15 @@ export function MessagesProvider({ children }: { children: React.ReactNode }) {
     try {
       await saveMessages(chatId, newMessages)
       setMessages(newMessages)
-    } catch {
-      toast({ title: "Failed to save messages", status: "error" })
+    } catch (error) {
+      console.error("Failed to save messages to database:", error)
+      // Still update local state even if database save fails (for automation chats)
+      setMessages(newMessages)
+      toast({
+        title: "Messages saved locally only",
+        description: "Could not sync to database (chat may be automation-created)",
+        status: "warning"
+      })
     }
   }
 

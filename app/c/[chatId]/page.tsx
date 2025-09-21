@@ -11,7 +11,12 @@ export default async function Page() {
     if (supabase) {
       const { data: userData, error: userError } = await supabase.auth.getUser()
       if (userError || !userData?.user) {
-        redirect("/")
+        // HACK: In development, allow unauthenticated access for automation chats
+        // This enables opening chats created by automation with different user IDs
+        if (process.env.NODE_ENV !== 'development') {
+          redirect("/")
+        }
+        console.log('[DEV HACK] Allowing unauthenticated access to chat page')
       }
     }
   }

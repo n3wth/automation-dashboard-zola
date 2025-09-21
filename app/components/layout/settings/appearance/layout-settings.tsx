@@ -243,35 +243,51 @@ export function LayoutSettings() {
     setLayout(layout)
   }
 
+  const layouts = [
+    {
+      type: "sidebar" as LayoutType,
+      name: "Sidebar",
+      description: "Traditional layout with navigation sidebar",
+      component: LayoutSidebar
+    },
+    {
+      type: "fullscreen" as LayoutType,
+      name: "Fullscreen",
+      description: "Full-width layout without sidebar",
+      component: LayoutFullscreen
+    }
+  ]
+
   return (
-    <div>
+    <div className="glass-panel p-4">
       <h3 className="mb-3 text-sm font-medium">Layout</h3>
       <div className="grid grid-cols-2 gap-3">
-        <button
-          type="button"
-          onClick={() => handleLayoutChange("sidebar")}
-          className={cn(
-            "rounded-lg border p-3 text-left transition-colors",
-            preferences.layout === "sidebar"
-              ? "border-primary ring-primary/30 ring-2"
-              : "border-border hover:bg-muted/50"
-          )}
-        >
-          <LayoutSidebar className="h-full w-full" />
-        </button>
-
-        <button
-          type="button"
-          onClick={() => handleLayoutChange("fullscreen")}
-          className={cn(
-            "rounded-lg border p-3 text-left transition-colors",
-            preferences.layout === "fullscreen"
-              ? "border-primary ring-primary/30 ring-2"
-              : "border-border hover:bg-muted/50"
-          )}
-        >
-          <LayoutFullscreen className="h-full w-full" />
-        </button>
+        {layouts.map(({ type, name, description, component: LayoutComponent }) => (
+          <button
+            key={type}
+            type="button"
+            onClick={() => handleLayoutChange(type)}
+            className={cn(
+              "group relative rounded-lg border p-3 text-left transition-all hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/30",
+              preferences.layout === type
+                ? "border-primary ring-2 ring-primary/30 bg-primary/5"
+                : "border-border"
+            )}
+            aria-pressed={preferences.layout === type}
+            aria-label={`Select ${name} layout`}
+          >
+            <div className="mb-2">
+              <LayoutComponent className="h-20 w-full" />
+            </div>
+            <div className="text-center">
+              <div className="text-sm font-medium">{name}</div>
+              <div className="text-xs text-muted-foreground mt-1">{description}</div>
+            </div>
+            {preferences.layout === type && (
+              <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary" />
+            )}
+          </button>
+        ))}
       </div>
     </div>
   )

@@ -16,6 +16,14 @@ export async function validateUserIdentity(
     return null
   }
 
+  // LOCAL DEV BYPASS: Allow all dev users in development
+  if (process.env.NODE_ENV === 'development' && userId.startsWith('dev-')) {
+    console.log("⚠️ LOCAL DEV MODE: Bypassing validation for dev user:", userId)
+    // Return null for now - the calling code should handle null gracefully
+    // In a real implementation, you'd return a mock Supabase client
+    return null
+  }
+
   const supabase = isAuthenticated
     ? await createClient()
     : await createGuestServerClient()

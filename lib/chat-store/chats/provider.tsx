@@ -38,6 +38,8 @@ interface ChatsContextType {
   bumpChat: (id: string) => Promise<void>
   togglePinned: (id: string, pinned: boolean) => Promise<void>
   pinnedChats: Chats[]
+  fetchingDirectChat: string | null
+  attemptedDirectFetch: Set<string>
 }
 const ChatsContext = createContext<ChatsContextType | null>(null)
 
@@ -56,19 +58,30 @@ export function ChatsProvider({
 }) {
   const [isLoading, setIsLoading] = useState(true)
   const [chats, setChats] = useState<Chats[]>([])
+  const [fetchingDirectChat, setFetchingDirectChat] = useState<string | null>(null)
+  const [attemptedDirectFetch, setAttemptedDirectFetch] = useState<Set<string>>(new Set())
 
   useEffect(() => {
-    if (!userId) return
+    // HACK: In development, allow initialization without userId for automation chats
+    const isDev = process.env.NODE_ENV === 'development'
+    if (!userId && !isDev) return
 
     const load = async () => {
       setIsLoading(true)
-      const cached = await getCachedChats()
-      setChats(cached)
 
-      try {
-        const fresh = await fetchAndCacheChats(userId)
-        setChats(fresh)
-      } finally {
+      // Only try to load cached/fresh chats if we have a userId
+      if (userId) {
+        const cached = await getCachedChats()
+        setChats(cached)
+
+        try {
+          const fresh = await fetchAndCacheChats(userId)
+          setChats(fresh)
+        } finally {
+          setIsLoading(false)
+        }
+      } else {
+        // In dev mode without userId, just set loading to false
         setIsLoading(false)
       }
     }
@@ -174,6 +187,73 @@ export function ChatsProvider({
     return chat
   }
 
+  // HACK: Use effect to trigger fetches to avoid setState during render
+  useEffect(() => {
+    // This effect handles fetching automation chats that aren't in the user's list
+    const isDev = process.env.NODE_ENV === 'development'
+
+    // Check if we need to fetch any chat from the URL
+    if (typeof window !== 'undefined') {
+      const pathSegments = window.location.pathname.split('/')
+      if (pathSegments[1] === 'c' && pathSegments[2]) {
+        const chatId = pathSegments[2]
+        const chatExists = chats.find(c => c.id === chatId)
+
+        console.log(`[ChatsProvider] Checking chat ${chatId}: exists=${!!chatExists}, fetching=${fetchingDirectChat}, attempted=${attemptedDirectFetch.has(chatId)}`)
+
+        if (!chatExists && chatId && fetchingDirectChat !== chatId && !attemptedDirectFetch.has(chatId)) {
+          // In dev mode, fetch even if no userId
+          if (isDev || userId) {
+            console.log(`[ChatsProvider] Triggering fetch for automation chat ${chatId}`)
+            fetchChatDirectly(chatId)
+          }
+        }
+      }
+    }
+  }, [chats, userId, fetchingDirectChat, attemptedDirectFetch])
+
+  // HACK: Fetch any chat by ID, bypassing user check
+  const fetchChatDirectly = async (chatId: string) => {
+    if (fetchingDirectChat === chatId || attemptedDirectFetch.has(chatId)) return // Prevent duplicate requests
+
+    setFetchingDirectChat(chatId)
+    try {
+      const { createClient } = await import("@/lib/supabase/client")
+      const supabase = createClient()
+      if (!supabase) {
+        setAttemptedDirectFetch(prev => new Set(prev).add(chatId))
+        return
+      }
+
+      const { data, error } = await supabase
+        .from("chats")
+        .select("*")
+        .eq("id", chatId)
+        .single()
+
+      if (data && !error) {
+        // Add the chat to the current chats list
+        setChats((prev) => {
+          // Check if already exists
+          if (prev.find((c) => c.id === chatId)) return prev
+          // Add it to the list
+          return [data, ...prev]
+        })
+        console.log(`Successfully fetched automation chat: ${chatId}`)
+      } else {
+        console.warn(`Chat not found: ${chatId}`, error)
+      }
+
+      // Mark as attempted regardless of success
+      setAttemptedDirectFetch(prev => new Set(prev).add(chatId))
+    } catch (err) {
+      console.error("Failed to fetch chat directly:", err)
+      setAttemptedDirectFetch(prev => new Set(prev).add(chatId))
+    } finally {
+      setFetchingDirectChat(null)
+    }
+  }
+
   const updateChatModel = async (id: string, model: string) => {
     const prev = [...chats]
     setChats((prev) => prev.map((c) => (c.id === id ? { ...c, model } : c)))
@@ -253,6 +333,8 @@ export function ChatsProvider({
         isLoading,
         togglePinned,
         pinnedChats,
+        fetchingDirectChat,
+        attemptedDirectFetch,
       }}
     >
       {children}

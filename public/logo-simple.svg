@@ -1,0 +1,10 @@
+<svg width="120" height="30" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 30">
+  <!-- Simple monospace text -->
+  <text x="5" y="20"
+        font-family="monospace"
+        font-size="14"
+        font-weight="normal"
+        fill="white">
+    n3wth.ai
+  </text>
+</svg>

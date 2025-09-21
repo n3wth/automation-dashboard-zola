@@ -9,7 +9,7 @@ import {
 } from "@/components/prompt-kit/prompt-input"
 import { Button } from "@/components/ui/button"
 import { ArrowUp, Stop } from "@phosphor-icons/react"
-import React, { useCallback } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 
 type MultiChatInputProps = {
   value: string
@@ -39,6 +39,9 @@ export function MultiChatInput({
   anyLoading,
 }: MultiChatInputProps) {
   const isOnlyWhitespace = (text: string) => !/[^\s]/.test(text)
+
+  // Fix hydration mismatch by using client-side state
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true)
 
   const handleSend = useCallback(() => {
     if (isSubmitting || anyLoading) {
@@ -77,6 +80,17 @@ export function MultiChatInput({
     [isSubmitting, anyLoading, onSend, status, value]
   )
 
+  // Update button disabled state after hydration
+  useEffect(() => {
+    setIsButtonDisabled(
+      !value ||
+      isSubmitting ||
+      anyLoading ||
+      isOnlyWhitespace(value) ||
+      selectedModelIds.length === 0
+    )
+  }, [value, isSubmitting, anyLoading, selectedModelIds])
+
   return (
     <div className="relative flex w-full flex-col gap-4">
       <div className="relative order-2 px-2 pb-3 sm:pb-4 md:order-1">
@@ -104,13 +118,7 @@ export function MultiChatInput({
               <Button
                 size="sm"
                 className="size-9 rounded-full transition-all duration-300 ease-out"
-                disabled={
-                  !value ||
-                  isSubmitting ||
-                  anyLoading ||
-                  isOnlyWhitespace(value) ||
-                  selectedModelIds.length === 0
-                }
+                disabled={isButtonDisabled}
                 type="button"
                 onClick={handleSend}
                 aria-label={status === "streaming" ? "Stop" : "Send message"}
