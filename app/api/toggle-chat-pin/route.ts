@@ -1,9 +1,9 @@
-import { createClient } from "@/lib/supabase/server"
+import { createClientSafe } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient()
+    const supabase = await createClientSafe()
     const { chatId, pinned } = await request.json()
 
     if (!chatId || typeof pinned !== "boolean") {

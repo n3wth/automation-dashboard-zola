@@ -158,7 +158,8 @@ export const getOrCreateGuestUserId = async (
 
     // LOCAL DEV BYPASS: If no Supabase and in dev mode, check for or create dev user
     if (process.env.NODE_ENV === 'development') {
-      // Check again for existing dev user
+      // Check for existing guest ID in localStorage
+      const existingGuestId = localStorage.getItem('guestUserId')
       if (existingGuestId) {
         return existingGuestId
       }

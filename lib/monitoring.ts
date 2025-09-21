@@ -23,7 +23,7 @@ export async function trackEvent({ type, value, userId, metadata }: TrackEventPa
       ? '00000000-0000-0000-0000-000000000001'
       : userId
 
-    const { error } = await supabase.from('monitoring').insert({
+    const { error } = await (supabase as any).from('monitoring').insert({
       type,
       value,
       user_id: dbUserId,

@@ -1,4 +1,4 @@
-import { createServerClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { MonitoringEvent } from '@/lib/monitoring'
@@ -7,17 +7,20 @@ export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {
-    const cookieStore = cookies()
-    const supabase = createServerClient(cookieStore)
+    const supabase = await createClient()
 
-    const { data, error } = await supabase
+    if (!supabase) {
+      return NextResponse.json({ models: [] }, { status: 200 })
+    }
+
+    const { data, error } = await (supabase as any)
       .from('monitoring')
       .select('value')
       .eq('type', MonitoringEvent.AI_MODEL_USAGE)
 
     if (error) throw error
 
-    const modelCounts = data.reduce((acc, { value }) => {
+    const modelCounts = (data as any[]).reduce((acc: Record<string, number>, { value }: any) => {
       if (value) {
         acc[value] = (acc[value] || 0) + 1
       }

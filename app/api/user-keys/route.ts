@@ -62,7 +62,7 @@ export async function POST(request: Request) {
           .eq("id", authData.user.id)
           .single()
 
-        const currentFavorites = userData?.favorite_models || []
+        const currentFavorites = (userData as any)?.favorite_models || []
 
         // Get models for this provider
         const providerModels = await getModelsForProvider(provider)

@@ -45,7 +45,7 @@ export async function checkUsage(supabase: SupabaseClient, userId: string) {
 
   // Reset the daily counter if the day has changed (using UTC).
   const now = new Date()
-  let dailyCount = userData.daily_message_count || 0
+  let dailyCount = (userData as any).daily_message_count || 0
   const lastReset = userData.daily_reset ? new Date(userData.daily_reset) : null
 
   const isNewDay =
@@ -58,7 +58,7 @@ export async function checkUsage(supabase: SupabaseClient, userId: string) {
     dailyCount = 0
     const { error: resetError } = await supabase
       .from("users")
-      .update({ daily_message_count: 0, daily_reset: now.toISOString() })
+      .update({ daily_message_count: 0, daily_reset: now.toISOString() } as any)
       .eq("id", userId)
 
     if (resetError) {
@@ -88,7 +88,7 @@ export async function checkUsage(supabase: SupabaseClient, userId: string) {
  * @throws Error if updating fails.
  */
 export async function incrementUsage(
-  supabase: SupabaseClient | null,
+  supabase: SupabaseClient<any, "public", any> | null,
   userId: string
 ): Promise<void> {
   // LOCAL DEV BYPASS: Skip increment for all dev users
@@ -115,7 +115,7 @@ export async function incrementUsage(
   }
 
   const messageCount = userData.message_count || 0
-  const dailyCount = userData.daily_message_count || 0
+  const dailyCount = (userData as any).daily_message_count || 0
 
   // Increment both overall and daily message counts.
   const newOverallCount = messageCount + 1
@@ -127,7 +127,7 @@ export async function incrementUsage(
       message_count: newOverallCount,
       daily_message_count: newDailyCount,
       last_active_at: new Date().toISOString(),
-    })
+    } as any)
     .eq("id", userId)
 
   if (updateError) {
@@ -216,7 +216,7 @@ export async function incrementProUsage(
 }
 
 export async function checkUsageByModel(
-  supabase: SupabaseClient | null,
+  supabase: SupabaseClient<any, "public", any> | null,
   userId: string,
   modelId: string,
   isAuthenticated: boolean
@@ -263,7 +263,7 @@ export async function checkUsageByModel(
 }
 
 export async function incrementUsageByModel(
-  supabase: SupabaseClient | null,
+  supabase: SupabaseClient<any, "public", any> | null,
   userId: string,
   modelId: string,
   isAuthenticated: boolean

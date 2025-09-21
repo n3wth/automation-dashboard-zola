@@ -56,7 +56,7 @@ export async function GET(request: Request) {
       message_count: 0,
       premium: false,
       favorite_models: [MODEL_DEFAULT],
-    })
+    } as any)
 
     if (insertError && insertError.code !== "23505") {
       console.error("Error inserting user:", insertError)

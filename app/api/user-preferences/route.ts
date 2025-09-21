@@ -50,12 +50,12 @@ export async function GET() {
     }
 
     return NextResponse.json({
-      layout: data.layout,
-      prompt_suggestions: data.prompt_suggestions,
-      show_tool_invocations: data.show_tool_invocations,
-      show_conversation_previews: data.show_conversation_previews,
-      multi_model_enabled: data.multi_model_enabled,
-      hidden_models: data.hidden_models || [],
+      layout: (data as any).layout,
+      prompt_suggestions: (data as any).prompt_suggestions,
+      show_tool_invocations: (data as any).show_tool_invocations,
+      show_conversation_previews: (data as any).show_conversation_previews,
+      multi_model_enabled: (data as any).multi_model_enabled,
+      hidden_models: (data as any).hidden_models || [],
     })
   } catch (error) {
     console.error("Error in user-preferences GET API:", error)

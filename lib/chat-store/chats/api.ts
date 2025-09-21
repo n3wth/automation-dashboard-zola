@@ -1,6 +1,6 @@
 import { readFromIndexedDB, writeToIndexedDB } from "@/lib/chat-store/persist"
 import type { Chat, Chats } from "@/lib/chat-store/types"
-import { createClient } from "@/lib/supabase/client"
+import { createClientSafe, isSupabaseClientAvailable } from "@/lib/supabase/client"
 import { isSupabaseEnabled } from "@/lib/supabase/config"
 import { MODEL_DEFAULT } from "../../config"
 import { fetchClient } from "../../fetch"
@@ -33,8 +33,8 @@ export async function getChatsForUserInDb(userId: string): Promise<Chats[]> {
   }
 
   // Production path - direct Supabase
-  const supabase = createClient()
-  if (!supabase) return []
+  const supabase = createClientSafe()
+  if (!isSupabaseClientAvailable(supabase)) return []
 
   const { data, error } = await supabase
     .from("chats")
@@ -53,8 +53,8 @@ export async function getChatsForUserInDb(userId: string): Promise<Chats[]> {
 }
 
 export async function updateChatTitleInDb(id: string, title: string) {
-  const supabase = createClient()
-  if (!supabase) return
+  const supabase = createClientSafe()
+  if (!isSupabaseClientAvailable(supabase)) return
 
   const { error } = await supabase
     .from("chats")
@@ -64,16 +64,16 @@ export async function updateChatTitleInDb(id: string, title: string) {
 }
 
 export async function deleteChatInDb(id: string) {
-  const supabase = createClient()
-  if (!supabase) return
+  const supabase = createClientSafe()
+  if (!isSupabaseClientAvailable(supabase)) return
 
   const { error } = await supabase.from("chats").delete().eq("id", id)
   if (error) throw error
 }
 
 export async function getAllUserChatsInDb(userId: string): Promise<Chats[]> {
-  const supabase = createClient()
-  if (!supabase) return []
+  const supabase = createClientSafe()
+  if (!isSupabaseClientAvailable(supabase)) return []
 
   const { data, error } = await supabase
     .from("chats")
@@ -91,12 +91,12 @@ export async function createChatInDb(
   model: string,
   systemPrompt: string
 ): Promise<string | null> {
-  const supabase = createClient()
-  if (!supabase) return null
+  const supabase = createClientSafe()
+  if (!isSupabaseClientAvailable(supabase)) return null
 
   const { data, error } = await supabase
     .from("chats")
-    .insert({ user_id: userId, title, model, system_prompt: systemPrompt })
+    .insert({ user_id: userId, title, model })
     .select("id")
     .single()
 

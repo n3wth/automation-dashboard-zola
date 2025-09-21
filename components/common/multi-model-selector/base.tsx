@@ -202,7 +202,7 @@ export function MultiModelSelector({
                     animate={{ scale: 1, rotate: 0 }}
                     exit={{ scale: 0, rotate: 180 }}
                     transition={{
-                      type: "spring",
+                      type: "spring" as const,
                       stiffness: 300,
                       damping: 20,
                     }}
@@ -257,7 +257,7 @@ export function MultiModelSelector({
                           opacity: 0,
                         }}
                         transition={{
-                          type: "spring",
+                          type: "spring" as const,
                           stiffness: 400,
                           damping: 25,
                           delay: index * 0.05,

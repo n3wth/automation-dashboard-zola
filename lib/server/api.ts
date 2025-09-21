@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/server"
-import { createGuestServerClient } from "@/lib/supabase/server-guest"
+import { createClientSafe, type TypedSupabaseServerClient } from "@/lib/supabase/server"
+import { createGuestServerClientSafe, type TypedSupabaseGuestClient } from "@/lib/supabase/server-guest"
 import { isSupabaseEnabled } from "../supabase/config"
 
 // Track whether we've already logged dev mode warnings this session
@@ -9,12 +9,12 @@ const loggedDevUsers = new Set<string>()
  * Validates the user's identity
  * @param userId - The ID of the user.
  * @param isAuthenticated - Whether the user is authenticated.
- * @returns The Supabase client.
+ * @returns The typed Supabase client.
  */
 export async function validateUserIdentity(
   userId: string,
   isAuthenticated: boolean
-) {
+): Promise<TypedSupabaseServerClient | TypedSupabaseGuestClient | null> {
   if (!isSupabaseEnabled) {
     return null
   }
@@ -29,13 +29,13 @@ export async function validateUserIdentity(
     }
 
     // Return guest client for dev users to enable database operations
-    const guestClient = await createGuestServerClient()
+    const guestClient = await createGuestServerClientSafe()
     return guestClient
   }
 
   const supabase = isAuthenticated
-    ? await createClient()
-    : await createGuestServerClient()
+    ? await createClientSafe()
+    : await createGuestServerClientSafe()
 
   if (!supabase) {
     throw new Error("Failed to initialize Supabase client")

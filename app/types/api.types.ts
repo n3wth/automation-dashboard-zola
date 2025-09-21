@@ -1,8 +1,10 @@
 import type { Database, Json } from "@/app/types/database.types"
 import type { Attachment } from "@ai-sdk/ui-utils"
-import type { SupabaseClient } from "@supabase/supabase-js"
+import type { TypedSupabaseClient } from "@/lib/supabase/client"
+import type { TypedSupabaseServerClient } from "@/lib/supabase/server"
+import type { TypedSupabaseGuestClient } from "@/lib/supabase/server-guest"
 
-export type SupabaseClientType = SupabaseClient<Database>
+export type SupabaseClientType = TypedSupabaseClient | TypedSupabaseServerClient | TypedSupabaseGuestClient
 
 export interface ContentPart {
   type: string

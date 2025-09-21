@@ -26,7 +26,7 @@ export function MeatMode({ isActive }: { isActive: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const particlesRef = useRef<MeatParticle[]>([])
   const frameRef = useRef(0)
-  const rafIdRef = useRef<number>()
+  const rafIdRef = useRef<number>(0)
   const isVisibleRef = useRef(true)
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null)
 
@@ -195,7 +195,7 @@ export function MeatMode({ isActive }: { isActive: boolean }) {
         ref={canvasRef}
         className="fixed inset-0 pointer-events-none z-[1] opacity-85"
         style={{
-          imageRendering: 'optimizeSpeed',
+          imageRendering: 'pixelated' as const,
           willChange: 'contents'
         }}
         aria-hidden="true"

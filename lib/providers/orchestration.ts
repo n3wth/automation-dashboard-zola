@@ -80,7 +80,7 @@ export class AIProviderOrchestrator {
     model: string,
     maxRetries: number = 3
   ): Promise<T> {
-    let lastError: Error
+    let lastError: Error = new Error('No attempts made')
     let attempt = 0
 
     while (attempt < maxRetries) {

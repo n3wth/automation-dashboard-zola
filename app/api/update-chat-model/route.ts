@@ -1,8 +1,8 @@
-import { createClient } from "@/lib/supabase/server"
+import { createClientSafe } from "@/lib/supabase/server"
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient()
+    const supabase = await createClientSafe()
     const { chatId, model } = await request.json()
 
     if (!chatId || !model) {

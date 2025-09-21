@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { ComponentProps } from "react"
 
-interface TerminalButtonProps extends ComponentProps<typeof Button> {
+interface TerminalButtonProps extends Omit<ComponentProps<typeof Button>, 'variant'> {
   variant?: "primary" | "secondary" | "ghost"
   terminalStyle?: boolean
 }

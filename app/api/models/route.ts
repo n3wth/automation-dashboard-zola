@@ -53,7 +53,7 @@ export async function GET() {
       })
     }
 
-    const userProviders = data?.map((k) => k.provider) || []
+    const userProviders = data?.map((k: any) => k.provider) || []
 
     if (userProviders.length === 0) {
       const models = await getModelsWithAccessFlags()

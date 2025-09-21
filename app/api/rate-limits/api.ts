@@ -26,8 +26,8 @@ export async function getMessageUsage(
     ? AUTH_DAILY_MESSAGE_LIMIT
     : NON_AUTH_DAILY_MESSAGE_LIMIT
 
-  const dailyCount = data.daily_message_count || 0
-  const dailyProCount = data.daily_pro_message_count || 0
+  const dailyCount = (data as any).daily_message_count || 0
+  const dailyProCount = (data as any).daily_pro_message_count || 0
 
   return {
     dailyCount,

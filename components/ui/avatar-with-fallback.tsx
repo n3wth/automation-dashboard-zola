@@ -25,26 +25,26 @@ export function AvatarWithFallback({
     }, 0)
 
     const faceColors = ['#F9C9B6', '#F5DEB3', '#DDBEA9', '#CB997E', '#A0756E']
-    const hairStyles = ['normal', 'thick', 'womanLong', 'womanShort', 'mohawk']
+    const hairStyles = ['normal', 'thick', 'womanLong', 'womanShort', 'mohawk'] as const
     const shirtColors = ['#6BD9E9', '#FC909F', '#D2CEFF', '#90D7FF', '#FCC419']
     const hatColors = ['#77311D', '#8B4513', '#A0522D', '#CD853F', '#DEB887']
 
     return {
-      sex: Math.abs(hash % 2) === 0 ? 'man' : 'woman',
+      sex: (Math.abs(hash % 2) === 0 ? 'man' : 'woman') as 'man' | 'woman',
       faceColor: faceColors[Math.abs(hash) % faceColors.length],
-      earSize: 'big',
-      eyeStyle: 'smile',
-      noseStyle: 'round',
-      mouthStyle: 'laugh',
-      shirtStyle: 'hoody',
-      glassesStyle: 'none',
+      earSize: 'big' as const,
+      eyeStyle: 'smile' as const,
+      noseStyle: 'round' as const,
+      mouthStyle: 'laugh' as const,
+      shirtStyle: 'hoody' as const,
+      glassesStyle: 'none' as const,
       hairColor: '#000',
       hairStyle: hairStyles[Math.abs(hash >> 8) % hairStyles.length],
-      hatStyle: Math.abs(hash >> 16) % 3 === 0 ? 'turban' : 'none',
+      hatStyle: (Math.abs(hash >> 16) % 3 === 0 ? 'turban' : 'none') as 'turban' | 'none',
       hatColor: hatColors[Math.abs(hash >> 24) % hatColors.length],
-      eyeBrowStyle: 'up',
+      eyeBrowStyle: 'up' as const,
       shirtColor: shirtColors[Math.abs(hash >> 12) % shirtColors.length],
-      bgColor: 'transparent'
+      bgColor: 'transparent' as const
     }
   }, [fallbackIdentifier])
 

@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/client"
+import { createClientSafe, isSupabaseClientAvailable } from "@/lib/supabase/client"
 import { isSupabaseEnabled } from "@/lib/supabase/config"
 import type { Message as MessageAISDK } from "ai"
 import { readFromIndexedDB, writeToIndexedDB } from "../persist"
@@ -36,8 +36,8 @@ export async function getMessagesFromDb(
   }
 
   // Production path - direct Supabase
-  const supabase = createClient()
-  if (!supabase) return []
+  const supabase = createClientSafe()
+  if (!isSupabaseClientAvailable(supabase)) return []
 
   const { data, error } = await supabase
     .from("messages")
@@ -68,8 +68,8 @@ export async function getMessagesFromDb(
 }
 
 async function insertMessageToDb(chatId: string, message: MessageAISDK) {
-  const supabase = createClient()
-  if (!supabase) return
+  const supabase = createClientSafe()
+  if (!isSupabaseClientAvailable(supabase)) return
 
   // First, verify the chat exists to avoid foreign key constraint errors
   const { data: chatExists } = await supabase
@@ -100,8 +100,8 @@ async function insertMessageToDb(chatId: string, message: MessageAISDK) {
 }
 
 async function insertMessagesToDb(chatId: string, messages: MessageAISDK[]) {
-  const supabase = createClient()
-  if (!supabase) return
+  const supabase = createClientSafe()
+  if (!isSupabaseClientAvailable(supabase)) return
 
   // First, verify the chat exists to avoid foreign key constraint errors
   const { data: chatExists } = await supabase
@@ -133,8 +133,8 @@ async function insertMessagesToDb(chatId: string, messages: MessageAISDK[]) {
 }
 
 async function deleteMessagesFromDb(chatId: string) {
-  const supabase = createClient()
-  if (!supabase) return
+  const supabase = createClientSafe()
+  if (!isSupabaseClientAvailable(supabase)) return
 
   const { error } = await supabase
     .from("messages")

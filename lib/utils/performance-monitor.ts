@@ -14,14 +14,14 @@ export class PerformanceMonitor {
 
   start() {
     this.enabled = true
-    this.measure()
+    this.measureFPS()
   }
 
   stop() {
     this.enabled = false
   }
 
-  private measure = () => {
+  private measureFPS = () => {
     if (!this.enabled) return
 
     this.frameCount++
@@ -42,7 +42,7 @@ export class PerformanceMonitor {
       }
     }
 
-    requestAnimationFrame(this.measure)
+    requestAnimationFrame(this.measureFPS)
   }
 
   getFPS(): number {

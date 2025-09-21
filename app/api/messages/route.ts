@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform the data to match the expected format
-    const messages = (data || []).map((message) => ({
+    const messages = (data || []).map((message: any) => ({
       ...message,
       id: String(message.id),
       content: message.content ?? "",
