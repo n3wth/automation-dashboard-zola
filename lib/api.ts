@@ -200,38 +200,38 @@ export const getOrCreateGuestUserId = async (
     return anonUserId
   }
 
-  // LOCAL DEV BYPASS: Create a mock guest user for development
-  if (process.env.NODE_ENV === 'development') {
-    console.warn("⚠️ LOCAL DEV MODE: Using mock guest user (anonymous sign-ins disabled)")
-    const mockGuestId = 'dev-guest-' + Math.random().toString(36).substring(7)
-    localStorage.setItem('guestUserId', mockGuestId)
-    localStorage.setItem(`guestProfileAttempted_${mockGuestId}`, "true")
-    return mockGuestId
+  // Session-based anonymous access (no Supabase anonymous auth)
+  // Generate or retrieve a session ID for anonymous users
+  const existingSessionId = localStorage.getItem('anonymousSessionId')
+  if (existingSessionId) {
+    // Check if we've already attempted to create a profile for this session
+    const profileAttempted = localStorage.getItem(`guestProfileAttempted_${existingSessionId}`)
+    if (!profileAttempted) {
+      try {
+        await createGuestUser(existingSessionId)
+        localStorage.setItem(`guestProfileAttempted_${existingSessionId}`, "true")
+      } catch (error) {
+        console.error("Failed to create guest user profile:", error)
+      }
+    }
+    return existingSessionId
   }
 
+  // Generate new session ID for anonymous user
+  const newSessionId = 'anon-' + crypto.randomUUID()
+  localStorage.setItem('anonymousSessionId', newSessionId)
+
   try {
-    const { data: anonAuthData, error: anonAuthError } =
-      await supabase.auth.signInAnonymously()
-
-    if (anonAuthError) {
-      console.error("Error during anonymous sign-in:", anonAuthError)
-      return null
-    }
-
-    if (!anonAuthData || !anonAuthData.user) {
-      console.error("Anonymous sign-in did not return a user.")
-      return null
-    }
-
-    const guestIdFromAuth = anonAuthData.user.id
-    await createGuestUser(guestIdFromAuth)
-    localStorage.setItem(`guestProfileAttempted_${guestIdFromAuth}`, "true")
-    return guestIdFromAuth
+    await createGuestUser(newSessionId)
+    localStorage.setItem(`guestProfileAttempted_${newSessionId}`, "true")
+    return newSessionId
   } catch (error) {
     console.error(
-      "Error in getOrCreateGuestUserId during anonymous sign-in or profile creation:",
+      "Error in getOrCreateGuestUserId during guest user creation:",
       error
     )
-    return null
+    // Still return the session ID so the user can use the app
+    // (the backend will handle creating the user record if needed)
+    return newSessionId
   }
 }
