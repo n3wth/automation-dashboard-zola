@@ -27,9 +27,10 @@ export function UserMenu() {
   const [isSettingsOpen, setSettingsOpen] = useState(false)
   const [devUser, setDevUser] = useState<{ name: string; type: string } | null>(null)
 
-  // Check for dev user
+  // Check for dev user (only in development)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    // Only check for dev users in development environment
+    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
       const devUserName = localStorage.getItem('devUserName')
       const devUserType = localStorage.getItem('devUserType')
       if (devUserName && devUserType) {
@@ -83,9 +84,9 @@ export function UserMenu() {
         }}
       >
         <DropdownMenuItem className="flex flex-col items-start gap-0 no-underline hover:bg-transparent focus:bg-transparent">
-          <span>{user?.display_name}</span>
+          <span>{displayUser?.display_name}</span>
           <span className="text-muted-foreground max-w-full truncate">
-            {user?.email}
+            {displayUser?.email}
           </span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

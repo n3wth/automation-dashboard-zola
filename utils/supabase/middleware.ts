@@ -40,11 +40,13 @@ export async function updateSession(request: NextRequest) {
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
-  // IMPORTANT: DO NOT REMOVE auth.getUser()
-
+  // Use getSession instead of getUser to avoid unnecessary API calls
+  // getSession only validates the JWT locally without hitting the API
   const {
-    data: { user },
-  } = await supabase.auth.getUser()
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  const user = session?.user
 
   // if (
   //   !user &&

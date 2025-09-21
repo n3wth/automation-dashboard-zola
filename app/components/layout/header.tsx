@@ -22,11 +22,21 @@ export function Header({ hasSidebar }: { hasSidebar: boolean }) {
   const { preferences } = useUserPreferences()
   const isMultiModelEnabled = preferences.multiModelEnabled
 
-  // Check for dev user in localStorage
+  // Check for dev user in localStorage (only in development)
   const [hasDevUser, setHasDevUser] = useState(false)
   useEffect(() => {
-    const guestId = localStorage.getItem('guestUserId')
-    setHasDevUser(!!guestId && guestId.startsWith('dev-'))
+    // Only check for dev users in development environment
+    if (process.env.NODE_ENV === 'development') {
+      const guestId = localStorage.getItem('guestUserId')
+      setHasDevUser(!!guestId && guestId.startsWith('dev-'))
+    } else {
+      // Clean up any dev user data in production
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('guestUserId')
+        localStorage.removeItem('devUserName')
+        localStorage.removeItem('devUserType')
+      }
+    }
   }, [])
 
   const isLoggedIn = !!user || hasDevUser

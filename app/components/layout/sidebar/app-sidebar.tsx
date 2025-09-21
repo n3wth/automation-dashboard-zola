@@ -19,6 +19,7 @@ import {
   X,
 } from "@phosphor-icons/react"
 import { Pin } from "lucide-react"
+import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 import { useMemo } from "react"
 import { groupChatsByDate } from "../../history/utils"
@@ -48,7 +49,9 @@ export function AppSidebar() {
     >
       <SidebarHeader className="h-14 px-3">
         <div className="flex items-center justify-between h-full">
-          <Logo size="md" variant="text" className="text-white" />
+          <Link href="/" className="inline-flex" onClick={() => router.push("/")}>
+            <Logo size="md" variant="text" className="text-white" />
+          </Link>
           {isMounted && isMobile && (
             <button
               type="button"
