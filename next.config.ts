@@ -6,9 +6,7 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 
 const nextConfig: NextConfig = withBundleAnalyzer({
   output: "standalone",
-  experimental: {
-    nodeMiddleware: true,
-  },
+  experimental: {},
   images: {
     remotePatterns: [
       {
