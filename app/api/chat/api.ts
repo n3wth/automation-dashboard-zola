@@ -82,12 +82,40 @@ export async function logUserMessage({
 }: LogUserMessageParams): Promise<void> {
   if (!supabase) return
 
+  // Use anonymous user UUID for dev users to ensure valid UUID format
+  const dbUserId = process.env.NODE_ENV === 'development' && userId.startsWith('dev-')
+    ? '00000000-0000-0000-0000-000000000001'
+    : userId
+
+  // First ensure the chat exists
+  const chatExists = await supabase
+    .from("chats")
+    .select("id")
+    .eq("id", chatId)
+    .maybeSingle()
+
+  if (!chatExists.data) {
+    // Create the chat first
+    const { error: chatError } = await supabase.from("chats").insert({
+      id: chatId,
+      user_id: dbUserId,
+      title: "New Chat",
+      model: model || "gpt-4",
+      system_prompt: "",
+    })
+
+    if (chatError) {
+      console.error("Error creating chat:", chatError)
+      return
+    }
+  }
+
   const { error } = await supabase.from("messages").insert({
     chat_id: chatId,
     role: "user",
     content: sanitizeUserInput(content),
     experimental_attachments: attachments,
-    user_id: userId,
+    user_id: dbUserId,
     message_group_id,
   })
 

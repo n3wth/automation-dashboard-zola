@@ -1,7 +1,6 @@
 "use client"
 
-import { groupChatsByDate } from "@/app/components/history/utils"
-import { useBreakpoint } from "@/app/hooks/use-breakpoint"
+import { useSsrBreakpoint } from "@/app/hooks/use-ssr-breakpoint"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Sidebar,
@@ -22,12 +21,13 @@ import {
 import { Pin } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 import { useMemo } from "react"
+import { groupChatsByDate } from "../../history/utils"
 import { HistoryTrigger } from "../../history/history-trigger"
 import { SidebarList } from "./sidebar-list"
 import { SidebarProject } from "./sidebar-project"
 
 export function AppSidebar() {
-  const isMobile = useBreakpoint(768)
+  const { isMobile, isMounted } = useSsrBreakpoint(768)
   const { setOpenMobile } = useSidebar()
   const { chats, pinnedChats, isLoading } = useChats()
   const params = useParams<{ chatId: string }>()
@@ -49,7 +49,7 @@ export function AppSidebar() {
       <SidebarHeader className="h-14 px-3">
         <div className="flex items-center justify-between h-full">
           <Logo size="md" variant="text" className="text-white" />
-          {isMobile && (
+          {isMounted && isMobile && (
             <button
               type="button"
               onClick={() => setOpenMobile(false)}

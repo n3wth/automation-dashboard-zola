@@ -217,20 +217,20 @@ export function Chat() {
   const isFetchingOrWillFetch = fetchingDirectChat === chatId ||
     (shouldRedirect && !attemptedDirectFetch.has(chatId))
 
-  // Log the state for debugging
-  if (chatId) {
-    console.log(`[Chat] State for ${chatId}:`, {
-      shouldRedirect,
-      isFetchingOrWillFetch,
-      currentChat: !!currentChat,
-      fetchingDirectChat,
-      attempted: attemptedDirectFetch.has(chatId),
-      isChatsLoading,
-      isSubmitting,
-      status,
-      messagesLength: messages.length
-    })
-  }
+  // Log the state for debugging - commented out to prevent performance issues
+  // if (chatId) {
+  //   console.log(`[Chat] State for ${chatId}:`, {
+  //     shouldRedirect,
+  //     isFetchingOrWillFetch,
+  //     currentChat: !!currentChat,
+  //     fetchingDirectChat,
+  //     attempted: attemptedDirectFetch.has(chatId),
+  //     isChatsLoading,
+  //     isSubmitting,
+  //     status,
+  //     messagesLength: messages.length
+  //   })
+  // }
 
   // If we should redirect but haven't tried fetching the chat directly yet, show loading
   if (shouldRedirect && isFetchingOrWillFetch) {

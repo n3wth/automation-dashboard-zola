@@ -1,4 +1,6 @@
 import { cn } from '@/lib/utils'
+import { BobMascot } from '@/lib/components/branding/bob-mascot'
+import { APP_CONFIG } from '@/lib/constants/app'
 import Image from 'next/image'
 
 interface LogoProps {
@@ -29,7 +31,7 @@ export function Logo({ className, size = 'md', variant = 'text' }: LogoProps) {
       <div className={cn('flex items-center', className)}>
         <Image
           src="/logo-ascii-art.svg"
-          alt="n3wth.ai"
+          alt="Bob"
           width={imageSizes[size].width}
           height={imageSizes[size].height}
           className="w-auto h-auto"
@@ -40,9 +42,12 @@ export function Logo({ className, size = 'md', variant = 'text' }: LogoProps) {
 
   if (variant === 'minimal') {
     return (
-      <span className={cn('font-mono font-bold tracking-tighter', textSizes[size], className)}>
-        NEWTH
-      </span>
+      <div className={cn('flex items-center gap-2', className)}>
+        <BobMascot size={size === 'xs' ? 'sm' : size === 'sm' ? 'md' : 'lg'} />
+        <span className={cn('font-mono font-bold tracking-tighter', textSizes[size])}>
+          {APP_CONFIG.name}
+        </span>
+      </div>
     )
   }
 
@@ -51,7 +56,7 @@ export function Logo({ className, size = 'md', variant = 'text' }: LogoProps) {
     <div className={cn('flex items-center', className)}>
       <Image
         src="/logo-simple.svg"
-        alt="n3wth.ai"
+        alt="Bob"
         width={imageSizes[size].width}
         height={imageSizes[size].height}
         className="w-auto h-auto"

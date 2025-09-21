@@ -3,7 +3,7 @@ import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 
 export async function GET() {
-  const token = generateCsrfToken()
+  const token = await generateCsrfToken()
   const cookieStore = await cookies()
   cookieStore.set("csrf_token", token, {
     httpOnly: false,

@@ -8,6 +8,7 @@ import {
   PromptInputTextarea,
 } from "@/components/prompt-kit/prompt-input"
 import { Button } from "@/components/ui/button"
+import { getBobPlaceholder } from "@/lib/utils/bob-greetings"
 import { ArrowUp, Stop } from "@phosphor-icons/react"
 import React, { useCallback, useEffect, useState } from "react"
 
@@ -101,7 +102,7 @@ export function MultiChatInput({
           onValueChange={onValueChange}
         >
           <PromptInputTextarea
-            placeholder="Ask all selected models..."
+            placeholder={`${getBobPlaceholder()} (multi-model)`}
             onKeyDown={handleKeyDown}
             className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"
           />

@@ -24,6 +24,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { PopoverContainer, StickyHeader, ScrollContainer, MenuItem } from "@/lib/components/shared/layout-components"
+import { BobLoading } from "@/lib/components/branding/bob-extras"
 import { useModel } from "@/lib/model-store/provider"
 import { filterAndSortModels } from "@/lib/model-store/utils"
 import { ModelConfig } from "@/lib/models/types"
@@ -35,7 +37,7 @@ import {
   MagnifyingGlassIcon,
   StarIcon,
 } from "@phosphor-icons/react"
-import { useRef, useState } from "react"
+import { useRef, useState, useEffect } from "react"
 import { ProModelDialog } from "./pro-dialog"
 import { SubMenu } from "./sub-menu"
 
@@ -81,6 +83,18 @@ export function ModelSelector({
       }
     }
   )
+
+  // Listen for Bob logo click to reset search filter
+  useEffect(() => {
+    const handleBobLogoClick = () => {
+      setSearchQuery("") // Clear search to show all models/categories
+    }
+
+    window.addEventListener('bob-logo-clicked', handleBobLogoClick)
+    return () => {
+      window.removeEventListener('bob-logo-clicked', handleBobLogoClick)
+    }
+  }, [])
 
   const renderModelItem = (model: ModelConfig) => {
     const isLocked = !model.accessible
@@ -137,7 +151,7 @@ export function ModelSelector({
   const trigger = (
     <Button
       variant="outline"
-      className={cn("dark:bg-secondary justify-between", className)}
+      className={cn("dark:bg-secondary justify-between btn-bob", className)}
       disabled={isLoadingModels}
     >
       <div className="flex items-center gap-2">
@@ -214,11 +228,7 @@ export function ModelSelector({
             </div>
             <div className="flex h-full flex-col space-y-0 overflow-y-auto px-4 pb-6">
               {isLoadingModels ? (
-                <div className="flex h-full flex-col items-center justify-center p-6 text-center">
-                  <p className="text-muted-foreground mb-2 text-sm">
-                    Loading models...
-                  </p>
-                </div>
+                <BobLoading message="Loading models..." />
               ) : filteredModels.length > 0 ? (
                 filteredModels.map((model) => renderModelItem(model))
               ) : (
@@ -268,19 +278,19 @@ export function ModelSelector({
           </TooltipTrigger>
           <TooltipContent>Switch model ⌘⇧P</TooltipContent>
           <DropdownMenuContent
-            className="flex h-[320px] w-[300px] flex-col space-y-0.5 overflow-visible p-0"
+            className="bg-popover flex h-[320px] w-[300px] flex-col space-y-0.5 overflow-visible p-0 z-50"
             align="start"
             sideOffset={4}
             forceMount
             side="top"
           >
-            <div className="bg-background sticky top-0 z-10 rounded-t-md border-b px-0 pt-0 pb-0">
+            <div className="bg-popover sticky top-0 z-10 rounded-t-md border-b px-0 pt-0 pb-0">
               <div className="relative">
                 <MagnifyingGlassIcon className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
                 <Input
                   ref={searchInputRef}
                   placeholder="Search models..."
-                  className="dark:bg-popover rounded-b-none border border-none pl-8 shadow-none focus-visible:ring-0"
+                  className="bg-popover rounded-b-none border border-none pl-8 shadow-none focus-visible:ring-0"
                   value={searchQuery}
                   onChange={handleSearchChange}
                   onClick={(e) => e.stopPropagation()}
@@ -291,11 +301,7 @@ export function ModelSelector({
             </div>
             <div className="flex h-full flex-col space-y-0 overflow-y-auto px-1 pt-0 pb-0">
               {isLoadingModels ? (
-                <div className="flex h-full flex-col items-center justify-center p-6 text-center">
-                  <p className="text-muted-foreground mb-2 text-sm">
-                    Loading models...
-                  </p>
-                </div>
+                <BobLoading message="Loading models..." />
               ) : filteredModels.length > 0 ? (
                 filteredModels.map((model) => {
                   const isLocked = !model.accessible

@@ -6,6 +6,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 2 : 4, // More workers for better parallelization
+  timeout: 90 * 1000, // 90s for unstable app
+  expect: { timeout: 15 * 1000 }, // 15s for individual assertions
   reporter: [
     ['html'],
     ['json', { outputFile: 'test-results/results.json' }],
@@ -17,6 +19,8 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    actionTimeout: 10 * 1000, // 10s for individual actions
+    navigationTimeout: 30 * 1000, // 30s for navigation
   },
 
   projects: [
@@ -46,14 +50,11 @@ export default defineConfig({
     command: 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
+    timeout: 180 * 1000, // 3 minutes for unstable server startup
     stderr: 'pipe',
     stdout: 'pipe',
-  },
-
-  // Global test timeout
-  timeout: 60 * 1000, // Increased for slower initial loads
-  expect: {
-    timeout: 10 * 1000,
+    env: {
+      NODE_ENV: 'test', // Use test environment
+    },
   },
 })

@@ -11,6 +11,7 @@ import {
   validateAndTrackUsage,
 } from "./api"
 import { createErrorResponse, extractErrorMessage } from "./utils"
+import { trackEvent, MonitoringEvent } from "@/lib/monitoring"
 
 export const maxDuration = 60
 
@@ -49,6 +50,13 @@ export async function POST(req: Request) {
       userId,
       model,
       isAuthenticated,
+    })
+
+    await trackEvent({
+      type: MonitoringEvent.AI_MODEL_USAGE,
+      userId,
+      value: model,
+      metadata: { chatId },
     })
 
     // Increment message count for successful validation

@@ -2,6 +2,7 @@
 
 import { toast } from "@/components/ui/toast"
 import { useChatSession } from "@/lib/chat-store/session/provider"
+import { useUser } from "@/lib/user-store/provider"
 import type { Message as MessageAISDK } from "ai"
 import { createContext, useContext, useEffect, useState } from "react"
 import { writeToIndexedDB } from "../persist"
@@ -37,6 +38,7 @@ export function MessagesProvider({ children }: { children: React.ReactNode }) {
   const [messages, setMessages] = useState<MessageAISDK[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const { chatId } = useChatSession()
+  const { user } = useUser()
 
   useEffect(() => {
     if (chatId === null) {
@@ -54,7 +56,7 @@ export function MessagesProvider({ children }: { children: React.ReactNode }) {
       setMessages(cached)
 
       try {
-        const fresh = await getMessagesFromDb(chatId)
+        const fresh = await getMessagesFromDb(chatId, user?.id)
         setMessages(fresh)
         if (fresh.length > 0) {
           cacheMessages(chatId, fresh)
@@ -73,13 +75,13 @@ export function MessagesProvider({ children }: { children: React.ReactNode }) {
     }
 
     load()
-  }, [chatId])
+  }, [chatId, user?.id])
 
   const refresh = async () => {
     if (!chatId) return
 
     try {
-      const fresh = await getMessagesFromDb(chatId)
+      const fresh = await getMessagesFromDb(chatId, user?.id)
       setMessages(fresh)
     } catch {
       toast({ title: "Failed to refresh messages", status: "error" })

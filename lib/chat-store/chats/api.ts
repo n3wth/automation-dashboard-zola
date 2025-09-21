@@ -8,8 +8,31 @@ import {
   API_ROUTE_TOGGLE_CHAT_PIN,
   API_ROUTE_UPDATE_CHAT_MODEL,
 } from "../../routes"
+import { cacheWithTTL } from "@/lib/utils/request-deduplication"
 
 export async function getChatsForUserInDb(userId: string): Promise<Chats[]> {
+  // In development, use API endpoint with request deduplication
+  if (process.env.NODE_ENV === 'development') {
+    const cacheKey = `chats_${userId}`
+
+    return cacheWithTTL(cacheKey, async () => {
+      try {
+        const response = await fetch(`/api/chats?userId=${userId}&isAuthenticated=false`)
+        if (response.ok) {
+          const { chats } = await response.json()
+          return chats || []
+        } else {
+          console.error("Failed to fetch chats via API:", response.status, response.statusText)
+          return []
+        }
+      } catch (error) {
+        console.error("Error fetching chats via API:", error)
+        return []
+      }
+    }, 5000) // Cache for 5 seconds
+  }
+
+  // Production path - direct Supabase
   const supabase = createClient()
   if (!supabase) return []
 

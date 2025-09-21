@@ -6,6 +6,7 @@ import {
   Notepad,
   PaintBrush,
   Sparkle,
+  Hamburger,
 } from "@phosphor-icons/react/dist/ssr"
 
 export const NON_AUTH_DAILY_MESSAGE_LIMIT = 1000
@@ -26,96 +27,110 @@ export const FREE_MODELS_IDS = [
 
 export const MODEL_DEFAULT = "gpt-4.1-nano"
 
-export const APP_NAME = "Zola"
-export const APP_DOMAIN = "https://zola.chat"
+export const APP_NAME = "Bob by Newth.ai"
+export const APP_DOMAIN = "https://bob.newth.ai"
 
 export const SUGGESTIONS = [
   {
-    label: "Summary",
-    highlight: "Summarize",
-    prompt: `Summarize`,
+    label: "Development",
+    highlight: "Help me build",
+    prompt: `Help me build`,
     items: [
-      "Summarize the French Revolution",
-      "Summarize the plot of Inception",
-      "Summarize World War II in 5 sentences",
-      "Summarize the benefits of meditation",
-    ],
-    icon: Notepad,
-  },
-  {
-    label: "Code",
-    highlight: "Help me",
-    prompt: `Help me`,
-    items: [
-      "Help me write a function to reverse a string in JavaScript",
-      "Help me create a responsive navbar in HTML/CSS",
-      "Help me write a SQL query to find duplicate emails",
-      "Help me convert this Python function to JavaScript",
+      "Bob, let's build that React component Oliver needs",
+      "Time to make Oliver's Next.js app blazingly fast",
+      "Add rock-solid error boundaries to Oliver's app",
+      "Set up that Playwright testing Oliver's been wanting",
     ],
     icon: Code,
   },
   {
-    label: "Design",
-    highlight: "Design",
-    prompt: `Design`,
+    label: "AI & Automation",
+    highlight: "Create automation",
+    prompt: `Create automation`,
     items: [
-      "Design a color palette for a tech blog",
-      "Design a UX checklist for mobile apps",
-      "Design 5 great font pairings for a landing page",
-      "Design better CTAs with useful tips",
-    ],
-    icon: PaintBrush,
-  },
-  {
-    label: "Research",
-    highlight: "Research",
-    prompt: `Research`,
-    items: [
-      "Research the pros and cons of remote work",
-      "Research the differences between Apple Vision Pro and Meta Quest",
-      "Research best practices for password security",
-      "Research the latest trends in renewable energy",
-    ],
-    icon: BookOpenText,
-  },
-  {
-    label: "Get inspired",
-    highlight: "Inspire me",
-    prompt: `Inspire me`,
-    items: [
-      "Inspire me with a beautiful quote about creativity",
-      "Inspire me with a writing prompt about solitude",
-      "Inspire me with a poetic way to start a newsletter",
-      "Inspire me by describing a peaceful morning in nature",
-    ],
-    icon: Sparkle,
-  },
-  {
-    label: "Think deeply",
-    highlight: "Reflect on",
-    prompt: `Reflect on`,
-    items: [
-      "Reflect on why we fear uncertainty",
-      "Reflect on what makes a conversation meaningful",
-      "Reflect on the concept of time in a simple way",
-      "Reflect on what it means to live intentionally",
+      "Build automation that saves Oliver hours every day",
+      "Create that Claude-powered system Oliver's dreaming of",
+      "Set up CI/CD so Oliver never has to think about deploys",
+      "Build AI-powered data magic with Python",
     ],
     icon: Brain,
   },
   {
-    label: "Learn gently",
-    highlight: "Explain",
-    prompt: `Explain`,
+    label: "Business Strategy",
+    highlight: "Analyze",
+    prompt: `Analyze`,
     items: [
-      "Explain quantum physics like I'm 10",
-      "Explain stoicism in simple terms",
-      "Explain how a neural network works",
-      "Explain the difference between AI and AGI",
+      "Help Oliver scale his business model to the moon",
+      "Spot the perfect positioning for Oliver's next SaaS hit",
+      "Turn user feedback into Oliver's competitive advantage",
+      "Find the architecture optimizations Oliver needs",
+    ],
+    icon: BookOpenText,
+  },
+  {
+    label: "Product Design",
+    highlight: "Design",
+    prompt: `Design`,
+    items: [
+      "Design a dashboard that makes Oliver's users go 'wow'",
+      "Create onboarding so smooth developers will thank Oliver",
+      "Build the component system Oliver's app deserves",
+      "Make complex automation feel simple and delightful",
+    ],
+    icon: PaintBrush,
+  },
+  {
+    label: "System Architecture",
+    highlight: "Plan",
+    prompt: `Plan`,
+    items: [
+      "Architect the microservices setup Oliver's SaaS needs",
+      "Design rock-solid database schema for Oliver's multi-tenant app",
+      "Build the deployment pipeline Oliver can trust blindly",
+      "Set up monitoring so Oliver sleeps well at night",
     ],
     icon: Lightbulb,
   },
+  {
+    label: "Content Creation",
+    highlight: "Write",
+    prompt: `Write`,
+    items: [
+      "Help Oliver write docs that developers actually want to read",
+      "Craft copy that makes Oliver's product irresistible",
+      "Write that automation blog post Oliver's been planning",
+      "Turn Oliver's ideas into user stories the team will love",
+    ],
+    icon: Notepad,
+  },
+  {
+    label: "Innovation",
+    highlight: "Explore",
+    prompt: `Explore`,
+    items: [
+      "Discover the AI tools that will 10x Oliver's productivity",
+      "Find the perfect framework for Oliver's next prototype",
+      "Spot automation opportunities Oliver hasn't thought of yet",
+      "Hack Oliver's development workflow for maximum efficiency",
+    ],
+    icon: Sparkle,
+  },
+  {
+    label: "Marx Meat Projects",
+    highlight: "Seize the meat",
+    prompt: `Seize the meat`,
+    items: [
+      "Build the quantum meat teleportation network for instant BBQ delivery",
+      "Create an AI-powered communist bacon oracle that predicts revolution",
+      "Design the blockchain-based meat democracy where steaks vote on seasoning",
+      "Develop the revolutionary meat subscription service that redistributes wagyu to the masses",
+    ],
+    icon: Hamburger,
+  },
 ]
 
-export const SYSTEM_PROMPT_DEFAULT = `You are Zola, a thoughtful and clear assistant. Your tone is calm, minimal, and human. You write with intention—never too much, never too little. You avoid clichés, speak simply, and offer helpful, grounded answers. When needed, you ask good questions. You don't try to impress—you aim to clarify. You may use metaphors if they bring clarity, but you stay sharp and sincere. You're here to help the user think clearly and move forward, not to overwhelm or overperform.`
+export const SYSTEM_PROMPT_DEFAULT = `You are Bob, an intelligent assistant by Newth.ai. Your tone is calm, minimal, and human. You write with intention—never too much, never too little. You avoid clichés, speak simply, and offer helpful, grounded answers. When needed, you ask good questions. You don't try to impress—you aim to clarify. You may use metaphors if they bring clarity, but you stay sharp and sincere. You're here to help the user think clearly and move forward, not to overwhelm or overperform.
+
+SPECIAL MODE: When discussing meat, Marx, or anything related to "seizing the meat," become wildly creative and generate absolutely bonkers ideas involving revolutionary meat concepts, quantum BBQ technology, communist food distribution, AI-powered meat democracy, blockchain butcher shops, and other delightfully absurd meat-based innovations. Go completely wild with these concepts while maintaining your helpful nature.`
 
 export const MESSAGE_MAX_LENGTH = 10000

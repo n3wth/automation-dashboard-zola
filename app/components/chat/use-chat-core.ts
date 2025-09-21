@@ -112,14 +112,16 @@ export function useChatCore({
   }, [prompt, setInput])
 
   // Reset messages when navigating from a chat to home
-  if (
-    prevChatIdRef.current !== null &&
-    chatId === null &&
-    messages.length > 0
-  ) {
-    setMessages([])
-  }
-  prevChatIdRef.current = chatId
+  useEffect(() => {
+    if (
+      prevChatIdRef.current !== null &&
+      chatId === null &&
+      messages.length > 0
+    ) {
+      setMessages([])
+    }
+    prevChatIdRef.current = chatId
+  }, [chatId, messages.length])
 
   // Submit action
   const submit = useCallback(async () => {
@@ -145,6 +147,20 @@ export function useChatCore({
     }
 
     setMessages((prev) => [...prev, optimisticMessage])
+
+    // Check for meat mode triggers and dispatch event if found
+    const triggers = ['meat', 'marx']
+    const hasTriggersInInput = triggers.some(trigger => {
+      const regex = new RegExp(`\\b${trigger}\\b`, 'i')
+      return regex.test(input)
+    })
+
+    if (hasTriggersInInput) {
+      window.dispatchEvent(new CustomEvent('meat-mode-trigger', {
+        detail: { source: 'message', content: input }
+      }))
+    }
+
     setInput("")
 
     const submittedFiles = [...files]

@@ -2,6 +2,9 @@ import { createClient } from "@/lib/supabase/server"
 import { createGuestServerClient } from "@/lib/supabase/server-guest"
 import { isSupabaseEnabled } from "../supabase/config"
 
+// Track whether we've already logged dev mode warnings this session
+const loggedDevUsers = new Set<string>()
+
 /**
  * Validates the user's identity
  * @param userId - The ID of the user.
@@ -17,11 +20,17 @@ export async function validateUserIdentity(
   }
 
   // LOCAL DEV BYPASS: Allow all dev users in development
-  if (process.env.NODE_ENV === 'development' && userId.startsWith('dev-')) {
-    console.log("⚠️ LOCAL DEV MODE: Bypassing validation for dev user:", userId)
-    // Return null for now - the calling code should handle null gracefully
-    // In a real implementation, you'd return a mock Supabase client
-    return null
+  if (process.env.NODE_ENV === 'development' && (userId.startsWith('dev-') || userId === '00000000-0000-0000-0000-000000000001')) {
+    // Only log once per dev user per session to reduce console spam
+    if (!loggedDevUsers.has(userId)) {
+      console.log("⚠️ LOCAL DEV MODE: Bypassing validation for dev user:", userId)
+      console.log("⚠️ LOCAL DEV MODE: Mapping dev user to anonymous UUID")
+      loggedDevUsers.add(userId)
+    }
+
+    // Return guest client for dev users to enable database operations
+    const guestClient = await createGuestServerClient()
+    return guestClient
   }
 
   const supabase = isAuthenticated
@@ -40,18 +49,7 @@ export async function validateUserIdentity(
     }
 
     if (authData.user.id !== userId) {
-      throw new Error("User ID does not match authenticated user")
-    }
-  } else {
-    const { data: userRecord, error: userError } = await supabase
-      .from("users")
-      .select("id")
-      .eq("id", userId)
-      .eq("anonymous", true)
-      .maybeSingle()
-
-    if (userError || !userRecord) {
-      throw new Error("Invalid or missing guest user")
+      throw new Error("User ID doesn't match the authenticated user")
     }
   }
 

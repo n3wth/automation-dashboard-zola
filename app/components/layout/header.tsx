@@ -42,7 +42,7 @@ export function Header({ hasSidebar }: { hasSidebar: boolean }) {
                   href="/"
                   className="pointer-events-auto inline-flex items-center text-xl font-medium tracking-tight"
                 >
-                  <Logo size="md" variant="text" />
+                  <Logo size="md" variant="ascii" />
                 </Link>
               )}
               {hasSidebar && isMobile && <HeaderSidebarTrigger />}

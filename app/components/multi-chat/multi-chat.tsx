@@ -10,9 +10,10 @@ import { SYSTEM_PROMPT_DEFAULT } from "@/lib/config"
 import { useModel } from "@/lib/model-store/provider"
 import { useUser } from "@/lib/user-store/provider"
 import { cn } from "@/lib/utils"
+import { getBobGreeting } from "@/lib/utils/bob-greetings"
 import { Message as MessageType } from "@ai-sdk/react"
 import { AnimatePresence, motion } from "motion/react"
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { MultiChatInput } from "./multi-chat-input"
 import { useMultiChat } from "./use-multi-chat"
 
@@ -35,6 +36,7 @@ export function MultiChat() {
   const [files, setFiles] = useState<File[]>([])
   const [multiChatId, setMultiChatId] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [greeting, setGreeting] = useState(() => getBobGreeting())
 
   const { user } = useUser()
   const { models } = useModel()
@@ -361,6 +363,15 @@ export function MultiChat() {
 
   const showOnboarding = messageGroups.length === 0 && !messagesLoading
 
+  // Refresh greeting periodically to keep it time-aware
+  useEffect(() => {
+    const updateGreeting = () => setGreeting(getBobGreeting())
+    updateGreeting()
+
+    const interval = setInterval(updateGreeting, 60000) // Update every minute
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <div
       className={cn(
@@ -381,7 +392,7 @@ export function MultiChat() {
             transition={{ layout: { duration: 0 } }}
           >
             <h1 className="mb-6 text-3xl font-medium tracking-tight">
-              What's on your mind?
+              {greeting}
             </h1>
           </motion.div>
         ) : (

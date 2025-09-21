@@ -9,6 +9,7 @@ import {
 } from "@/components/prompt-kit/prompt-input"
 import { Button } from "@/components/ui/button"
 import { getModelInfo } from "@/lib/models"
+import { getBobPlaceholder } from "@/lib/utils/bob-greetings"
 import { ArrowUpIcon, StopIcon } from "@phosphor-icons/react"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { PromptSystem } from "../suggestions/prompt-system"
@@ -63,6 +64,12 @@ export function ChatInput({
 
   // Fix hydration mismatch by using client-side state
   const [isButtonDisabled, setIsButtonDisabled] = useState(true)
+  const [placeholder, setPlaceholder] = useState("Ask Bob...")
+
+  // Set dynamic placeholder after hydration to avoid SSR mismatch
+  useEffect(() => {
+    setPlaceholder(getBobPlaceholder())
+  }, [])
 
   const handleSend = useCallback(() => {
     if (isSubmitting) {
@@ -189,7 +196,7 @@ export function ChatInput({
           <FileList files={files} onFileRemove={onFileRemove} />
           <PromptInputTextarea
             ref={textareaRef}
-            placeholder="Ask Zola"
+            placeholder={placeholder}
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}
             className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"

@@ -1,7 +1,7 @@
 "use client"
 
 import { toast } from "@/components/ui/toast"
-import { createContext, useContext, useEffect, useMemo, useState } from "react"
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { MODEL_DEFAULT, SYSTEM_PROMPT_DEFAULT } from "../../config"
 import type { Chats } from "../types"
 import {
@@ -77,6 +77,8 @@ export function ChatsProvider({
         try {
           const fresh = await fetchAndCacheChats(userId)
           setChats(fresh)
+        } catch (error) {
+          console.error("Failed to fetch chats:", error)
         } finally {
           setIsLoading(false)
         }
@@ -92,8 +94,12 @@ export function ChatsProvider({
   const refresh = async () => {
     if (!userId) return
 
-    const fresh = await fetchAndCacheChats(userId)
-    setChats(fresh)
+    try {
+      const fresh = await fetchAndCacheChats(userId)
+      setChats(fresh)
+    } catch (error) {
+      console.error("Failed to refresh chats:", error)
+    }
   }
 
   const updateTitle = async (id: string, title: string) => {
@@ -182,10 +188,10 @@ export function ChatsProvider({
     setChats([])
   }
 
-  const getChatById = (id: string) => {
+  const getChatById = useCallback((id: string) => {
     const chat = chats.find((c) => c.id === id)
     return chat
-  }
+  }, [chats])
 
   // HACK: Use effect to trigger fetches to avoid setState during render
   useEffect(() => {
@@ -199,12 +205,12 @@ export function ChatsProvider({
         const chatId = pathSegments[2]
         const chatExists = chats.find(c => c.id === chatId)
 
-        console.log(`[ChatsProvider] Checking chat ${chatId}: exists=${!!chatExists}, fetching=${fetchingDirectChat}, attempted=${attemptedDirectFetch.has(chatId)}`)
+        // console.log(`[ChatsProvider] Checking chat ${chatId}: exists=${!!chatExists}, fetching=${fetchingDirectChat}, attempted=${attemptedDirectFetch.has(chatId)}`)
 
         if (!chatExists && chatId && fetchingDirectChat !== chatId && !attemptedDirectFetch.has(chatId)) {
           // In dev mode, fetch even if no userId
           if (isDev || userId) {
-            console.log(`[ChatsProvider] Triggering fetch for automation chat ${chatId}`)
+            // console.log(`[ChatsProvider] Triggering fetch for automation chat ${chatId}`)
             fetchChatDirectly(chatId)
           }
         }
@@ -218,30 +224,50 @@ export function ChatsProvider({
 
     setFetchingDirectChat(chatId)
     try {
-      const { createClient } = await import("@/lib/supabase/client")
-      const supabase = createClient()
-      if (!supabase) {
-        setAttemptedDirectFetch(prev => new Set(prev).add(chatId))
-        return
-      }
-
-      const { data, error } = await supabase
-        .from("chats")
-        .select("*")
-        .eq("id", chatId)
-        .single()
-
-      if (data && !error) {
-        // Add the chat to the current chats list
-        setChats((prev) => {
-          // Check if already exists
-          if (prev.find((c) => c.id === chatId)) return prev
-          // Add it to the list
-          return [data, ...prev]
-        })
-        console.log(`Successfully fetched automation chat: ${chatId}`)
+      // In development, use API endpoint
+      if (process.env.NODE_ENV === 'development') {
+        // Use a dev user ID for API access
+        const devUserId = '00000000-0000-0000-0000-000000000001'
+        const response = await fetch(`/api/chats?userId=${devUserId}&isAuthenticated=false`)
+        if (response.ok) {
+          const { chats } = await response.json()
+          const chat = chats.find((c: any) => c.id === chatId)
+          if (chat) {
+            setChats((prev) => {
+              if (prev.find((c) => c.id === chatId)) return prev
+              return [chat, ...prev]
+            })
+            console.log(`Successfully fetched automation chat: ${chatId}`)
+          } else {
+            console.warn(`Chat not found: ${chatId}`)
+          }
+        } else {
+          console.error("Failed to fetch chat via API:", response.status)
+        }
       } else {
-        console.warn(`Chat not found: ${chatId}`, error)
+        // Production path - direct Supabase
+        const { createClient } = await import("@/lib/supabase/client")
+        const supabase = createClient()
+        if (!supabase) {
+          setAttemptedDirectFetch(prev => new Set(prev).add(chatId))
+          return
+        }
+
+        const { data, error } = await supabase
+          .from("chats")
+          .select("*")
+          .eq("id", chatId)
+          .single()
+
+        if (data && !error) {
+          setChats((prev) => {
+            if (prev.find((c) => c.id === chatId)) return prev
+            return [data, ...prev]
+          })
+          console.log(`Successfully fetched automation chat: ${chatId}`)
+        } else {
+          console.warn(`Chat not found: ${chatId}`, error)
+        }
       }
 
       // Mark as attempted regardless of success

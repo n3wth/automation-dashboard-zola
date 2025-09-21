@@ -161,3 +161,37 @@ test.describe('Chat Functionality', () => {
     expect(errorShown).toBeTruthy()
   })
 })
+
+test.describe('Model Selection', () => {
+  test.skip('should allow a user to switch between different models', async ({ page }) => {
+    const helpers = new TestHelpers(page)
+    // 1. Navigate to a chat
+    // 2. Open the model selection menu
+    // 3. Select a different model
+    // 4. Verify the model has been changed
+  })
+})
+
+test.describe('Chat History Management', () => {
+  test.skip('should allow a user to create a new chat', async ({ page }) => {
+    const helpers = new TestHelpers(page)
+    // 1. Click the "New Chat" button
+    // 2. Verify a new chat is created and the URL is updated
+  })
+
+  test.skip('should allow a user to switch between chats', async ({ page }) => {
+    const helpers = new TestHelpers(page)
+    // 1. Navigate to a chat
+    // 2. Click on a different chat in the history sidebar
+    // 3. Verify the new chat is loaded
+  })
+
+  test.skip('should allow a user to delete a chat', async ({ page }) => {
+    const helpers = new TestHelpers(page)
+    // 1. Create a new chat
+    // 2. Find the chat in the history sidebar
+    // 3. Click the delete button
+    // 4. Confirm the deletion
+    // 5. Verify the chat is no longer in the history
+  })
+})

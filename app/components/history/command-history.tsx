@@ -28,6 +28,7 @@ import { useChats } from "@/lib/chat-store/chats/provider"
 import { useChatSession } from "@/lib/chat-store/session/provider"
 import type { Chats } from "@/lib/chat-store/types"
 import { useChatPreview } from "@/lib/hooks/use-chat-preview"
+import { useUser } from "@/lib/user-store/provider"
 import { useUserPreferences } from "@/lib/user-preference-store/provider"
 import { cn } from "@/lib/utils"
 import { Check, PencilSimple, TrashSimple, X } from "@phosphor-icons/react"
@@ -339,6 +340,7 @@ export function CommandHistory({
 }: CommandHistoryProps) {
   const { chatId } = useChatSession()
   const router = useRouter()
+  const { user } = useUser()
   const { preferences } = useUserPreferences()
   const hasPrefetchedRef = useRef(false)
 
@@ -350,7 +352,7 @@ export function CommandHistory({
   const [hoveredChatId, setHoveredChatId] = useState<string | null>(null)
   const [isPreviewPanelHovered, setIsPreviewPanelHovered] = useState(false)
   const { messages, isLoading, error, fetchPreview, clearPreview } =
-    useChatPreview()
+    useChatPreview(user?.id)
 
   if (isOpen && !hasPrefetchedRef.current) {
     const recentChats = chatHistory.slice(0, 10)

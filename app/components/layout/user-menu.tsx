@@ -1,7 +1,7 @@
 "use client"
 
 import XIcon from "@/components/icons/x"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { AvatarWithFallback } from "@/components/ui/avatar-with-fallback"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,7 +41,7 @@ export function UserMenu() {
   // Use dev user if no real user
   const displayUser = user || (devUser ? {
     display_name: devUser.name,
-    profile_image: null,
+    profile_image: "",
     email: `${devUser.type}@dev.local`
   } : null)
 
@@ -60,10 +60,11 @@ export function UserMenu() {
       <Tooltip>
         <TooltipTrigger asChild>
           <DropdownMenuTrigger>
-            <Avatar className="bg-background hover:bg-muted">
-              <AvatarImage src={displayUser?.profile_image ?? undefined} />
-              <AvatarFallback>{displayUser?.display_name?.charAt(0)}</AvatarFallback>
-            </Avatar>
+            <AvatarWithFallback
+              src={displayUser?.profile_image}
+              fallbackIdentifier={displayUser?.email || displayUser?.display_name || 'user'}
+              className="bg-muted hover:bg-muted/80"
+            />
           </DropdownMenuTrigger>
         </TooltipTrigger>
         <TooltipContent>Profile</TooltipContent>

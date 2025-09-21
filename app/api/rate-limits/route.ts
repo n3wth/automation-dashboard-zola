@@ -12,7 +12,7 @@ export async function GET(req: Request) {
   }
 
   // LOCAL DEV BYPASS: Return mock rate limits for development
-  if (process.env.NODE_ENV === 'development' && userId.startsWith('dev-')) {
+  if (process.env.NODE_ENV === 'development' && (userId.startsWith('dev-') || userId === '00000000-0000-0000-0000-000000000001')) {
     // Different limits based on dev user type
     const isPro = userId.includes('pro') || userId.includes('admin')
     const mockUsage = {

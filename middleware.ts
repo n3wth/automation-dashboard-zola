@@ -2,9 +2,10 @@ import { updateSession } from "@/utils/supabase/middleware"
 import { NextResponse, type NextRequest } from "next/server"
 import { validateCsrfToken } from "./lib/csrf"
 
-// Development user validation for API routes
+// Development/Test user validation for API routes
 function validateDevUser(request: NextRequest): boolean {
-  if (process.env.NODE_ENV !== 'development') {
+  const isDevOrTest = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'
+  if (!isDevOrTest) {
     return false
   }
 
@@ -15,15 +16,18 @@ function validateDevUser(request: NextRequest): boolean {
     return false
   }
 
-  // Valid dev user IDs
+  // Valid dev/test user IDs
   const validDevUsers = [
     'dev-guest-001',
     'dev-free-001',
     'dev-pro-001',
-    'dev-admin-001'
+    'dev-admin-001',
+    'test-user-001', // Test environment user
+    'playwright-test-user' // E2E test user
   ]
 
-  return devUserId.startsWith('dev-') && validDevUsers.includes(devUserId)
+  return (devUserId.startsWith('dev-') || devUserId.startsWith('test-') || devUserId.startsWith('playwright-')) &&
+         validDevUsers.includes(devUserId)
 }
 
 export async function middleware(request: NextRequest) {
@@ -40,12 +44,12 @@ export async function middleware(request: NextRequest) {
     response.headers.set('x-development-mode', 'true')
   }
 
-  // CSRF protection for state-changing requests
-  if (["POST", "PUT", "DELETE"].includes(request.method)) {
+  // CSRF protection for state-changing requests (disabled in dev)
+  if (["POST", "PUT", "DELETE"].includes(request.method) && process.env.NODE_ENV !== 'development') {
     const csrfCookie = request.cookies.get("csrf_token")?.value
     const headerToken = request.headers.get("x-csrf-token")
 
-    if (!csrfCookie || !headerToken || !validateCsrfToken(headerToken)) {
+    if (!csrfCookie || !headerToken || !(await validateCsrfToken(headerToken))) {
       return new NextResponse("Invalid CSRF token", { status: 403 })
     }
   }
@@ -68,7 +72,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
-  runtime: "nodejs",
 }

@@ -3,7 +3,7 @@
 import { PromptSuggestion } from "@/components/prompt-kit/prompt-suggestion"
 import { TRANSITION_SUGGESTIONS } from "@/lib/motion"
 import { AnimatePresence, motion } from "motion/react"
-import React, { memo, useCallback, useMemo, useState } from "react"
+import React, { memo, useCallback, useMemo, useState, useEffect } from "react"
 import { SUGGESTIONS as SUGGESTIONS_CONFIG } from "../../../lib/config"
 
 type SuggestionsProps = {
@@ -25,6 +25,18 @@ export const Suggestions = memo(function Suggestions({
     setActiveCategory(null)
   }
 
+  // Listen for Bob logo click to reset active category
+  useEffect(() => {
+    const handleBobLogoClick = () => {
+      setActiveCategory(null)
+    }
+
+    window.addEventListener('bob-logo-clicked', handleBobLogoClick)
+    return () => {
+      window.removeEventListener('bob-logo-clicked', handleBobLogoClick)
+    }
+  }, [])
+
   const activeCategoryData = SUGGESTIONS_CONFIG.find(
     (group) => group.label === activeCategory
   )
@@ -43,10 +55,46 @@ export const Suggestions = memo(function Suggestions({
 
   const handleCategoryClick = useCallback(
     (suggestion: { label: string; prompt: string }) => {
-      setActiveCategory(suggestion.label)
-      onValueChange(suggestion.prompt)
+      // When clicking a category, immediately send a contextual message
+      // Don't show sub-suggestions or pre-fill the input
+      let message = ""
+
+      switch(suggestion.label) {
+        case "Development":
+          message = "Help me with development"
+          break
+        case "AI & Automation":
+          message = "Help me with AI and automation"
+          break
+        case "Business Strategy":
+          message = "Help me with business strategy"
+          break
+        case "Product Design":
+          message = "Help me with product design"
+          break
+        case "System Architecture":
+          message = "Help me with system architecture"
+          break
+        case "Content Creation":
+          message = "Help me with content creation"
+          break
+        case "Innovation":
+          message = "Help me with innovation"
+          break
+        case "Marx Meat Projects":
+          message = "Tell me about meat"
+          // Dispatch custom event to trigger meat mode
+          window.dispatchEvent(new CustomEvent('meat-mode-trigger', { detail: { source: 'suggestion' } }))
+          break
+        default:
+          message = `Help me with ${suggestion.label.toLowerCase()}`
+      }
+
+      // Send the message directly
+      onSuggestion(message)
+      onValueChange("") // Keep input clear
     },
-    [onValueChange]
+    [onSuggestion, onValueChange]
   )
 
   const suggestionsGrid = useMemo(

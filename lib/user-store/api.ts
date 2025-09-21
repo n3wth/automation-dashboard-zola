@@ -73,23 +73,36 @@ export function subscribeToUserUpdates(
   const supabase = createClient()
   if (!supabase) return () => {}
 
-  const channel = supabase
-    .channel(`public:users:id=eq.${userId}`)
-    .on(
-      "postgres_changes",
-      {
-        event: "UPDATE",
-        schema: "public",
-        table: "users",
-        filter: `id=eq.${userId}`,
-      },
-      (payload) => {
-        onUpdate(payload.new as Partial<UserProfile>)
-      }
-    )
-    .subscribe()
+  try {
+    const channel = supabase
+      .channel(`public:users:id=eq.${userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "users",
+          filter: `id=eq.${userId}`,
+        },
+        (payload) => {
+          onUpdate(payload.new as Partial<UserProfile>)
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR') {
+          console.warn('Supabase WebSocket connection failed (insecure context)')
+        }
+      })
 
-  return () => {
-    supabase.removeChannel(channel)
+    return () => {
+      try {
+        supabase.removeChannel(channel)
+      } catch (error) {
+        console.warn('Error removing Supabase channel:', error)
+      }
+    }
+  } catch (error) {
+    console.warn('Supabase subscription failed:', error)
+    return () => {}
   }
 }

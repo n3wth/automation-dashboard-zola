@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { signInWithGoogle } from "@/lib/api"
+import { BobGreeting } from "@/lib/components/branding/bob-mascot"
 import { createClient } from "@/lib/supabase/client"
 import { isSupabaseEnabled } from "@/lib/supabase/config"
 import Image from "next/image"
@@ -60,11 +61,14 @@ export function DialogAuth({ open, setOpen }: DialogAuthProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
+          <div className="mb-2">
+            <BobGreeting type="welcome" />
+          </div>
           <DialogTitle className="text-xl">
             You&apos;ve reached the limit for today
           </DialogTitle>
           <DialogDescription className="pt-2 text-base">
-            Sign in below to increase your message limits.
+            Sign in below to increase your message limits and chat more with Bob.
           </DialogDescription>
         </DialogHeader>
         {error && (
@@ -75,7 +79,7 @@ export function DialogAuth({ open, setOpen }: DialogAuthProps) {
         <DialogFooter className="mt-6 sm:justify-center">
           <Button
             variant="secondary"
-            className="w-full text-base"
+            className="w-full text-base btn-bob"
             size="lg"
             onClick={handleSignInWithGoogle}
             disabled={isLoading}
@@ -87,7 +91,7 @@ export function DialogAuth({ open, setOpen }: DialogAuthProps) {
               height={20}
               className="mr-2 size-4"
             />
-            <span>{isLoading ? "Connecting..." : "Continue with Google"}</span>
+            <span>{isLoading ? "Bob is connecting..." : "Chat with Bob via Google"}</span>
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,0 +1,35 @@
+
+> zola@0.1.0 dev
+> next dev --turbopack
+
+[@sentry/nextjs] Automatically enabling browser source map generation for turbopack build.
+[@sentry/nextjs] Source maps will be automatically deleted after being uploaded to Sentry. If you want to keep the source maps, set the `sourcemaps.deleteSourcemapsAfterUpload` option to false in `withSentryConfig()`. If you do not want to generate and upload sourcemaps at all, set the `sourcemaps.disable` option to true.
+ ⚠ Invalid next.config.ts options detected: 
+ ⚠     Unrecognized key(s) in object: 'nodeMiddleware' at "experimental"
+ ⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+ ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/oliver/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /Users/oliver/GitHub/automation-dashboard-zola/package-lock.json
+
+ ⚠ Port 3000 is in use by process 808, using available port 3003 instead.
+[@sentry/nextjs] Automatically enabling browser source map generation for turbopack build.
+[@sentry/nextjs] Source maps will be automatically deleted after being uploaded to Sentry. If you want to keep the source maps, set the `sourcemaps.deleteSourcemapsAfterUpload` option to false in `withSentryConfig()`. If you do not want to generate and upload sourcemaps at all, set the `sourcemaps.disable` option to true.
+   ▲ Next.js 15.5.3 (Turbopack)
+   - Local:        http://localhost:3003
+   - Network:      http://127.16.153.95:3003
+   - Environments: .env.local
+   - Experiments (use with caution):
+     ✓ nodeMiddleware
+     · clientTraceMetadata
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Compiled middleware in 154ms
+ ✓ Ready in 1219ms
+ ○ Compiling / ...
+ ✓ Compiled / in 3s
+ GET / 200 in 3660ms
+[?25h

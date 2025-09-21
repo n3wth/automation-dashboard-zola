@@ -3,6 +3,7 @@ import { isSupabaseEnabled } from "@/lib/supabase/config"
 import { createClient } from "@/lib/supabase/server"
 import { createGuestServerClient } from "@/lib/supabase/server-guest"
 import { NextResponse } from "next/server"
+import { trackEvent, MonitoringEvent } from "@/lib/monitoring"
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -68,6 +69,11 @@ export async function GET(request: Request) {
   const protocol = host?.includes("localhost") ? "http" : "https"
 
   const redirectUrl = `${protocol}://${host}${next}`
+
+  await trackEvent({
+    type: MonitoringEvent.USER_LOGIN,
+    userId: user.id,
+  })
 
   return NextResponse.redirect(redirectUrl)
 }

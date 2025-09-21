@@ -55,6 +55,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 # Copy static assets
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Add healthcheck script
+COPY --chown=nextjs:nodejs healthcheck.js .
+
 # Switch to non-root user
 USER nextjs
 
@@ -67,7 +70,7 @@ ENV HOSTNAME=0.0.0.0
 
 # Health check to verify container is running properly
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
+  CMD ["node", "healthcheck.js"]
 
 # Start the application
 CMD ["node", "server.js"]

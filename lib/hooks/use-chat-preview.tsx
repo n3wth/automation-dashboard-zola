@@ -20,7 +20,7 @@ interface UseChatPreviewReturn {
   clearPreview: () => void
 }
 
-export function useChatPreview(): UseChatPreviewReturn {
+export function useChatPreview(userId?: string): UseChatPreviewReturn {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -71,7 +71,7 @@ export function useChatPreview(): UseChatPreviewReturn {
                 content: msg.content,
                 role: msg.role as "user" | "assistant",
                 created_at:
-                  msg.createdAt?.toISOString() || new Date().toISOString(),
+                  msg.createdAt ? (typeof msg.createdAt === 'string' ? msg.createdAt : msg.createdAt.toISOString()) : new Date().toISOString(),
               }))
             setMessages(cachedMessages)
           }
@@ -79,7 +79,7 @@ export function useChatPreview(): UseChatPreviewReturn {
           // No cache, fetch from database
           setIsLoading(true)
 
-          const fresh = await getMessagesFromDb(chatId)
+          const fresh = await getMessagesFromDb(chatId, userId)
           if (
             fresh &&
             currentRequestRef.current === chatId &&
@@ -95,7 +95,7 @@ export function useChatPreview(): UseChatPreviewReturn {
                 content: msg.content,
                 role: msg.role as "user" | "assistant",
                 created_at:
-                  msg.createdAt?.toISOString() || new Date().toISOString(),
+                  msg.createdAt ? (typeof msg.createdAt === 'string' ? msg.createdAt : msg.createdAt.toISOString()) : new Date().toISOString(),
               }))
             setMessages(freshMessages)
           }

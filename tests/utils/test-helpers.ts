@@ -11,8 +11,26 @@ export class TestHelpers {
 
   async waitForPageLoad() {
     await this.page.waitForLoadState('networkidle')
-    // Wait for React hydration
-    await this.page.waitForFunction(() => window.React !== undefined, { timeout: 10000 }).catch(() => {})
+
+    // Wait for Next.js hydration to complete
+    await this.page.waitForFunction(() => {
+      // Check if the page is interactive and hydrated
+      if (document.readyState !== 'complete') return false
+
+      // Look for Next.js hydration markers
+      const hasNextRoot = document.querySelector('#__next') !== null
+      const hasReactRoot = document.querySelector('[data-reactroot]') !== null
+
+      // Check if React has finished hydrating by looking for interactive elements
+      const hasInteractiveElements = document.querySelector('button, input, textarea, [role="button"]') !== null
+
+      return (hasNextRoot || hasReactRoot) && hasInteractiveElements
+    }, { timeout: 15000 }).catch(() => {
+      console.log('Hydration check timed out, proceeding anyway')
+    })
+
+    // Additional wait for any remaining async operations
+    await this.page.waitForTimeout(1000)
   }
 
   // Chat helpers
@@ -41,6 +59,21 @@ export class TestHelpers {
   }
 
   // Auth helpers
+  async login(userType: 'guest' | 'free' | 'pro' | 'admin' = 'free') {
+    await this.page.goto('/auth')
+    await this.waitForPageLoad()
+    await this.page.click(`button:has-text("${userType} User")`)
+    await this.waitForPageLoad()
+    await this.page.waitForURL('/')
+  }
+
+  async logout() {
+    // This is a placeholder implementation.
+    // The actual logout process might be different.
+    await this.page.goto('/auth/logout')
+    await this.waitForPageLoad()
+  }
+
   async isAuthenticated(): Promise<boolean> {
     try {
       // Check for common auth indicators

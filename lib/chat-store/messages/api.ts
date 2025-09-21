@@ -2,9 +2,11 @@ import { createClient } from "@/lib/supabase/client"
 import { isSupabaseEnabled } from "@/lib/supabase/config"
 import type { Message as MessageAISDK } from "ai"
 import { readFromIndexedDB, writeToIndexedDB } from "../persist"
+import { cacheWithTTL } from "@/lib/utils/request-deduplication"
 
 export async function getMessagesFromDb(
-  chatId: string
+  chatId: string,
+  userId?: string
 ): Promise<MessageAISDK[]> {
   // fallback to local cache only
   if (!isSupabaseEnabled) {
@@ -12,6 +14,28 @@ export async function getMessagesFromDb(
     return cached
   }
 
+  // In development, use API endpoint with request deduplication
+  if (process.env.NODE_ENV === 'development' && userId) {
+    const cacheKey = `messages_${chatId}_${userId}`
+
+    return cacheWithTTL(cacheKey, async () => {
+      try {
+        const response = await fetch(`/api/messages?chatId=${chatId}&userId=${userId}&isAuthenticated=false`)
+        if (response.ok) {
+          const { messages } = await response.json()
+          return messages || []
+        } else {
+          console.error("Failed to fetch messages via API:", response.status, response.statusText)
+          return []
+        }
+      } catch (error) {
+        console.error("Error fetching messages via API:", error)
+        return []
+      }
+    }, 3000) // Cache for 3 seconds
+  }
+
+  // Production path - direct Supabase
   const supabase = createClient()
   if (!supabase) return []
 
@@ -24,11 +48,6 @@ export async function getMessagesFromDb(
     .order("created_at", { ascending: true })
 
   if (error) {
-    // HACK: In development, ignore permission errors for automation chats
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`[DEV HACK] Messages fetch failed for chat ${chatId}, returning empty array`)
-      return []
-    }
     console.error("Failed to fetch messages:", error)
     return []
   }
