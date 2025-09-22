@@ -13,7 +13,7 @@ export function AppInfoContent() {
       <p className="text-foreground leading-relaxed">
         The code is available on{" "}
         <a
-          href="https://github.com/n3wth/automation-dashboard-zola"
+          href="https://github.com/n3wth/bob"
           target="_blank"
           rel="noopener noreferrer"
           className="underline"

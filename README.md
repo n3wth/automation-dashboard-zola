@@ -38,8 +38,8 @@ curl -fsSL https://ollama.ai/install.sh | sh
 ollama pull llama3.2  # or any model you prefer
 
 # Clone and run Bob
-git clone https://github.com/n3wth/automation-dashboard-zola.git
-cd automation-dashboard-zola
+git clone https://github.com/n3wth/bob.git
+cd bob
 npm install
 npm run dev
 ```
@@ -49,12 +49,12 @@ Bob will automatically detect your local Ollama models!
 ### Option 3: Docker with Ollama
 
 ```bash
-git clone https://github.com/n3wth/automation-dashboard-zola.git
-cd automation-dashboard-zola
+git clone https://github.com/n3wth/bob.git
+cd bob
 docker-compose -f docker-compose.ollama.yml up
 ```
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ibelick/zola)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/n3wth/bob)
 
 To unlock features like auth, file uploads, see [INSTALL.md](./INSTALL.md).
 

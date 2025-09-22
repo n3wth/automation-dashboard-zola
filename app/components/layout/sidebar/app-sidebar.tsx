@@ -135,7 +135,7 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="border-border/40 mb-2 border-t p-3">
         <a
-          href="https://github.com/n3wth/automation-dashboard-zola"
+          href="https://github.com/n3wth/bob"
           className="hover:bg-muted flex items-center gap-2 rounded-md p-2"
           target="_blank"
           aria-label="Star the repo on GitHub"
