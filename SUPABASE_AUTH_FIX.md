@@ -16,7 +16,6 @@ Go to your Supabase project dashboard (https://supabase.com/dashboard/project/zk
 3. Add these **Authorized redirect URIs**:
    ```
    https://zktnabjvuphoixwgwwem.supabase.co/auth/v1/callback
-   https://automation-dashboard-zola.vercel.app/auth/callback
    https://bob.newth.ai/auth/callback
    http://localhost:3000/auth/callback
    ```
@@ -33,7 +32,6 @@ Go to Google Cloud Console (https://console.cloud.google.com/):
    ```
 5. Add these **Authorized JavaScript origins**:
    ```
-   https://automation-dashboard-zola.vercel.app
    https://bob.newth.ai
    http://localhost:3000
    ```
