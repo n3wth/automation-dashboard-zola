@@ -1,10 +1,10 @@
-# Zola
+# Bob by Newth.ai
 
-[zola.chat](https://zola.chat)
+[bob.newth.ai](https://bob.newth.ai)
 
-**Zola** is the open-source chat interface for all your models.
+**Bob** is the intelligent automation dashboard and open-source chat interface for all your models.
 
-![zola cover](./public/cover_zola.jpg)
+![Bob dashboard](./public/cover_zola.jpg)
 
 ## Features
 
@@ -37,20 +37,20 @@ npm run dev
 curl -fsSL https://ollama.ai/install.sh | sh
 ollama pull llama3.2  # or any model you prefer
 
-# Clone and run Zola
-git clone https://github.com/ibelick/zola.git
-cd zola
+# Clone and run Bob
+git clone https://github.com/n3wth/automation-dashboard-zola.git
+cd automation-dashboard-zola
 npm install
 npm run dev
 ```
 
-Zola will automatically detect your local Ollama models!
+Bob will automatically detect your local Ollama models!
 
 ### Option 3: Docker with Ollama
 
 ```bash
-git clone https://github.com/ibelick/zola.git
-cd zola
+git clone https://github.com/n3wth/automation-dashboard-zola.git
+cd automation-dashboard-zola
 docker-compose -f docker-compose.ollama.yml up
 ```
 

@@ -2,8 +2,8 @@ export function AppInfoContent() {
   return (
     <div className="space-y-4">
       <p className="text-foreground leading-relaxed">
-        <span className="font-medium">Zola</span> is the open-source interface
-        for AI chat.
+        <span className="font-medium">Bob</span> is the intelligent automation dashboard
+        and open-source interface for AI chat.
         <br />
         Multi-model, BYOK-ready, and fully self-hostable.
         <br />
@@ -13,7 +13,7 @@ export function AppInfoContent() {
       <p className="text-foreground leading-relaxed">
         The code is available on{" "}
         <a
-          href="https://github.com/ibelick/zola"
+          href="https://github.com/n3wth/automation-dashboard-zola"
           target="_blank"
           rel="noopener noreferrer"
           className="underline"
