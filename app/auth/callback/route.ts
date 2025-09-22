@@ -8,6 +8,8 @@ import { trackEvent, MonitoringEvent } from "@/lib/monitoring"
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get("code")
+  const error = searchParams.get("error")
+  const errorDescription = searchParams.get("error_description")
   const next = searchParams.get("next") ?? "/"
 
   if (!isSupabaseEnabled) {
@@ -16,9 +18,22 @@ export async function GET(request: Request) {
     )
   }
 
-  if (!code) {
+  // Handle OAuth errors from provider
+  if (error) {
+    const errorMessage = errorDescription || error
+    console.error("OAuth error:", { error, errorDescription })
     return NextResponse.redirect(
-      `${origin}/auth/error?message=${encodeURIComponent("Missing authentication code")}`
+      `${origin}/auth/error?message=${encodeURIComponent(`Authentication failed: ${errorMessage}`)}`
+    )
+  }
+
+  if (!code) {
+    // Log additional info for debugging
+    console.error("Missing authentication code. Request URL:", request.url)
+    console.error("Search params:", Object.fromEntries(searchParams.entries()))
+
+    return NextResponse.redirect(
+      `${origin}/auth/error?message=${encodeURIComponent("Missing authentication code. Please ensure Google OAuth is properly configured in Supabase Dashboard.")}`
     )
   }
 
