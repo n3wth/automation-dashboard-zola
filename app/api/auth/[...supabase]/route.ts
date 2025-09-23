@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server'
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { supabase: string[] } }
+  { params }: { params: Promise<{ supabase: string[] }> }
 ) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 
@@ -17,8 +17,11 @@ export async function GET(
     )
   }
 
+  // Await the params promise (Next.js 15 change)
+  const { supabase: supabasePath } = await params
+
   // Reconstruct the path
-  const path = params.supabase.join('/')
+  const path = supabasePath.join('/')
   const { searchParams } = new URL(request.url)
 
   // Build the target URL
@@ -51,7 +54,7 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { supabase: string[] } }
+  { params }: { params: Promise<{ supabase: string[] }> }
 ) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 
@@ -62,7 +65,10 @@ export async function POST(
     )
   }
 
-  const path = params.supabase.join('/')
+  // Await the params promise (Next.js 15 change)
+  const { supabase: supabasePath } = await params
+
+  const path = supabasePath.join('/')
   const { searchParams } = new URL(request.url)
 
   const targetUrl = `${supabaseUrl}/auth/v1/${path}?${searchParams}`
