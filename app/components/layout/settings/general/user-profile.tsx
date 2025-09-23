@@ -9,8 +9,8 @@ export function UserProfile() {
   if (!user) return null
 
   return (
-    <div className="glass-panel p-4">
-      <h3 className="mb-3 text-sm font-medium">Profile</h3>
+    <div className="rounded-lg border bg-card p-4">
+      <h3 className="mb-4 text-sm font-medium">Profile</h3>
       <div className="flex items-center space-x-4">
         <AvatarWithFallback
           src={user?.profile_image}
@@ -18,9 +18,9 @@ export function UserProfile() {
           className="size-12 bg-muted"
           size={48}
         />
-        <div>
+        <div className="min-w-0 flex-1">
           <h4 className="text-sm font-medium">{user?.display_name}</h4>
-          <p className="text-muted-foreground text-sm">{user?.email}</p>
+          <p className="text-muted-foreground truncate text-sm">{user?.email}</p>
         </div>
       </div>
     </div>

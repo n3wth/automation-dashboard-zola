@@ -29,20 +29,22 @@ export function AccountManagement() {
   }
 
   return (
-    <div className="flex items-center justify-between">
-      <div>
-        <h3 className="text-sm font-medium">Account</h3>
-        <p className="text-muted-foreground text-xs">Log out on this device</p>
+    <div className="rounded-lg border bg-card p-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-sm font-medium">Account</h3>
+          <p className="text-muted-foreground text-xs">Log out on this device</p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-2"
+          onClick={handleSignOut}
+        >
+          <SignOut className="size-4" />
+          <span>Sign out</span>
+        </Button>
       </div>
-      <Button
-        variant="default"
-        size="sm"
-        className="flex items-center gap-2"
-        onClick={handleSignOut}
-      >
-        <SignOut className="size-4" />
-        <span>Sign out</span>
-      </Button>
     </div>
   )
 }

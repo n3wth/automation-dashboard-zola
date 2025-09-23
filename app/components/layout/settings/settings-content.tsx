@@ -139,7 +139,7 @@ export function SettingsContent({
         ) : (
           // Desktop version - tabs on left
           <>
-            <TabsList className="block w-48 rounded-none bg-white/5 backdrop-blur-md border border-white/10 px-3 pt-4">
+            <TabsList className="h-full w-48 flex-col items-stretch justify-start rounded-none border-r bg-background p-2">
               <div className="flex w-full flex-col gap-1">
                 <TabsTrigger
                   value="general"
@@ -192,7 +192,7 @@ export function SettingsContent({
             </TabsList>
 
             {/* Desktop tabs content */}
-            <div className="flex-1 overflow-auto px-6 pt-4 bg-white/2 backdrop-blur-sm border-l border-white/5">
+            <div className="flex-1 overflow-auto bg-background px-6 py-6">
               <TabsContent value="general" className="mt-0 space-y-6">
                 <UserProfile />
                 {isSupabaseEnabled && (
