@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # Bob application for local development
+  bob:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: bob-app-dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+      # Using production Supabase for OAuth testing
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE=${SUPABASE_SERVICE_ROLE}
+      - NEXT_PUBLIC_SITE_URL=http://localhost:3000
+      # Other API keys
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - CSRF_SECRET=${CSRF_SECRET}
+    volumes:
+      # Mount source code for hot reloading
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - bob-network
+    restart: unless-stopped
+
+  # Ollama for local AI models (optional)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: bob-ollama-dev
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    networks:
+      - bob-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Redis cache (optional, for session management)
+  redis:
+    image: redis:alpine
+    container_name: bob-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - bob-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+networks:
+  bob-network:
+    driver: bridge
+    name: bob-network
+
+volumes:
+  ollama_data:
+    driver: local
+  redis_data:
+    driver: local

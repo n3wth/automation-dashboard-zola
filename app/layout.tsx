@@ -28,7 +28,7 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const isDev = process.env.NODE_ENV === "development"
-  const isOfficialDeployment = process.env.ZOLA_OFFICIAL === "true"
+  const isOfficialDeployment = process.env.BOB_OFFICIAL === "true"
   const userProfile = await getUserProfile()
 
   return (
@@ -37,7 +37,7 @@ export default async function RootLayout({
         <Script
           defer
           src="https://assets.onedollarstats.com/stonks.js"
-          {...(isDev ? { "data-debug": "zola.chat" } : {})}
+          {...(isDev ? { "data-debug": "bob.newth.ai" } : {})}
         />
       ) : null}
       <body

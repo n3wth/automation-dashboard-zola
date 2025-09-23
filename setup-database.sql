@@ -1,4 +1,4 @@
--- Essential Zola Database Schema for Automation Dashboard POC
+-- Essential Bob Database Schema for Automation Dashboard POC
 -- Run this in your Supabase SQL editor
 
 -- Enable UUID extension
@@ -104,4 +104,4 @@ VALUES (
 ) ON CONFLICT (id) DO NOTHING;
 
 -- Success message
-SELECT 'Database schema created successfully! Zola is ready for automation integration.' as status;
+SELECT 'Database schema created successfully! Bob is ready for automation integration.' as status;

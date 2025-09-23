@@ -1,4 +1,4 @@
--- Complete Database Fix for Zola - All Missing Columns and Tables
+-- Complete Database Fix for Bob - All Missing Columns and Tables
 -- Run this in your Supabase SQL editor to fix all errors
 
 -- 1. Add ALL missing columns to users table that are referenced in the code

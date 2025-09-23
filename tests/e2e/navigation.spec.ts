@@ -9,7 +9,7 @@ test.describe('Navigation', () => {
     await helpers.waitForPageLoad()
 
     // Check for main navigation elements
-    await expect(page).toHaveTitle(/Zola|Dashboard|AI/)
+    await expect(page).toHaveTitle(/Bob|Dashboard|AI/)
     await expect(page.locator('nav, header, [role="navigation"]')).toBeVisible()
   })
 

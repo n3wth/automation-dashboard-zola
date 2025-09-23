@@ -1,4 +1,4 @@
--- Final Database Fix for Zola - Correct Data Types
+-- Final Database Fix for Bob - Correct Data Types
 -- Run this in your Supabase SQL editor
 
 -- 1. Add missing columns to users table with correct types

@@ -4,7 +4,7 @@
 
 **Bob** is the intelligent automation dashboard and open-source chat interface for all your models.
 
-![Bob dashboard](./public/cover_zola.jpg)
+![Bob dashboard](./public/cover_bob.jpg)
 
 ## Features
 
@@ -23,8 +23,8 @@
 ### Option 1: With OpenAI (Cloud)
 
 ```bash
-git clone https://github.com/ibelick/zola.git
-cd zola
+git clone https://github.com/n3wth/bob.git
+cd bob
 npm install
 echo "OPENAI_API_KEY=your-key" > .env.local
 npm run dev

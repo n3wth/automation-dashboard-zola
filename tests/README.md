@@ -1,6 +1,6 @@
 # Test Suite Documentation
 
-This directory contains comprehensive end-to-end and visual regression tests for the Zola Next.js application using Playwright.
+This directory contains comprehensive end-to-end and visual regression tests for the Bob Next.js application using Playwright.
 
 ## Test Structure
 

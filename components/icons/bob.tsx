@@ -1,7 +1,7 @@
 import * as React from "react"
 import type { SVGProps } from "react"
 
-export function ZolaIcon(props: SVGProps<SVGSVGElement>) {
+export function BobIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -12,9 +12,9 @@ export function ZolaIcon(props: SVGProps<SVGSVGElement>) {
       fill="none"
       {...props}
     >
-      <g clipPath="url(#zola)">
+      <g clipPath="url(#bob)">
         <mask
-          id="zola"
+          id="bob"
           width={80}
           height={80}
           x={0}
@@ -31,7 +31,7 @@ export function ZolaIcon(props: SVGProps<SVGSVGElement>) {
         </g>
       </g>
       <defs>
-        <clipPath id="zola">
+        <clipPath id="bob">
           <path fill="currentColor" d="M0 0h80v80H0z" />
         </clipPath>
       </defs>

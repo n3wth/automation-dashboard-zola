@@ -1,4 +1,4 @@
--- Safe Database Fix for Zola - Handles Existing Objects
+-- Safe Database Fix for Bob - Handles Existing Objects
 -- Run this in your Supabase SQL editor
 
 -- 1. Add missing columns to users table (safe with IF NOT EXISTS)

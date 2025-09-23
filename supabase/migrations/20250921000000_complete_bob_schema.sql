@@ -1,4 +1,4 @@
--- Complete Zola Database Schema
+-- Complete Bob Database Schema
 -- Combines initial schema + all required tables and columns
 
 -- Enable UUID extension
@@ -212,4 +212,4 @@ VALUES (
   layout = EXCLUDED.layout,
   updated_at = now();
 
-SELECT 'Complete Zola database schema created successfully!' as status;
+SELECT 'Complete Bob database schema created successfully!' as status;

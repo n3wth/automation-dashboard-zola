@@ -57,3 +57,38 @@ bun.lock
 
 /.cursor
 .env.production
+
+# Development logs and artifacts
+dev.log
+*.log
+logs/
+.playwright-mcp/
+
+# Docker volumes
+ollama_data/
+redis_data/
+
+# Test artifacts
+TEST_RESULTS.md
+TROUBLESHOOTING_AUTH.md
+DOCKER_SETUP_GUIDE.md
+QUICK_START.md
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+.cache/
+
+# Local Supabase
+supabase/.branches
+supabase/.temp

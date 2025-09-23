@@ -46,12 +46,12 @@ export async function GET(request: Request) {
     )
   }
 
-  const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+  const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code)
 
-  if (error) {
-    console.error("Auth error:", error)
+  if (sessionError) {
+    console.error("Auth error:", sessionError)
     return NextResponse.redirect(
-      `${origin}/auth/error?message=${encodeURIComponent(error.message)}`
+      `${origin}/auth/error?message=${encodeURIComponent(sessionError.message)}`
     )
   }
 

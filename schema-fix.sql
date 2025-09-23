@@ -1,4 +1,4 @@
--- Schema Fix for Zola Dashboard - Missing Tables and Columns
+-- Schema Fix for Bob Dashboard - Missing Tables and Columns
 -- Run this in your Supabase SQL editor to fix 500 errors
 
 -- Add missing favorite_models column to users table
