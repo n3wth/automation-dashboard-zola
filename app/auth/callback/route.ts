@@ -80,9 +80,12 @@ export async function GET(request: Request) {
     console.error("Unexpected user insert error:", err)
   }
 
-  const host = request.headers.get("host")
+  // Handle custom domain redirects properly
+  const forwardedHost = request.headers.get("x-forwarded-host")
+  const host = forwardedHost || request.headers.get("host")
   const protocol = host?.includes("localhost") ? "http" : "https"
 
+  // Use custom domain or forwarded host for redirect
   const redirectUrl = `${protocol}://${host}${next}`
 
   await trackEvent({

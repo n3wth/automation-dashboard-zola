@@ -1,0 +1,67 @@
+# Supabase Project Configuration
+
+[project]
+# General project settings
+id = "bob"
+
+[api]
+enabled = true
+# Port for the API
+port = 54321
+schemas = ["public", "graphql_public"]
+
+[auth]
+# The base URL of your application - Used for OAuth redirects
+site_url = "https://bob.newth.ai"
+
+# Additional redirect URLs for OAuth flows
+# These URLs must be whitelisted for OAuth redirects to work
+additional_redirect_urls = [
+  "https://bob.newth.ai/**",
+  "http://localhost:3000/**",
+  "https://*.vercel.app/**"  # For Vercel preview deployments
+]
+
+# JWT settings
+[auth.jwt]
+secret = "your-jwt-secret-here"
+
+# Email settings
+[auth.email]
+enable_signup = true
+enable_confirmations = true
+
+# OAuth providers configuration
+[auth.external.google]
+enabled = true
+client_id = ""  # Set via environment variable
+secret = ""     # Set via environment variable
+
+# Security settings
+[auth.security]
+refresh_token_rotation_enabled = true
+enable_manual_linking = false  # Set to true if you want to allow manual identity linking
+
+[db]
+port = 54322
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://localhost"
+
+[storage]
+enabled = true
+# File size limit in bytes (50MB)
+file_size_limit = 52428800
+
+[storage.image_transformation]
+enabled = true
+
+# Local development settings
+[local]
+# Ports for local development
+inbucket_port = 54324  # Email testing
+kong_http_port = 54321
+kong_https_port = 54322

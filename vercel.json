@@ -89,7 +89,13 @@
       ]
     }
   ],
-  "redirects": [],
+  "redirects": [
+    {
+      "source": "/auth/v1/:path*",
+      "destination": "https://$NEXT_PUBLIC_SUPABASE_URL/auth/v1/:path*",
+      "permanent": false
+    }
+  ],
   "cleanUrls": true,
   "trailingSlash": false,
   "github": {
