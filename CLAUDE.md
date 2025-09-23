@@ -6,29 +6,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Bob is an intelligent automation dashboard and open-source chat interface supporting multiple AI models. Built with Next.js 15, TypeScript, React Query, Tailwind CSS, and shadcn/ui components.
 
-## Development Commands
+## Development Commands - Optimized for Claude Code
 
-### Docker Development (Preferred)
+### Docker Development (Recommended - Full Stack)
 ```bash
-# Use Docker for consistent development environment
-docker compose up      # Start all services (app + database)
-docker compose down    # Stop all services
-docker compose build   # Rebuild after dependency changes
+# Development with hot reload and local Supabase
+docker compose -f docker-compose.dev.yml up    # Start dev environment
+docker compose -f docker-compose.dev.yml down  # Stop all services
+
+# Production build testing
+docker compose up      # Start production build
+docker compose down    # Stop production services
 
 # The app runs on http://localhost:3000
-# Supabase Studio runs on http://localhost:54323
+# PostgreSQL runs on localhost:54322
 ```
 
-### Local Development (Alternative)
+### Quick Start (Minimal Setup)
 ```bash
+# For rapid development without full Supabase stack
+npm ci                 # Install dependencies (faster than npm install)
 npm run dev            # Start dev server with Turbopack on localhost:3000
-npm run build          # Production build
-npm run start          # Start production server
-npm run lint           # Run ESLint (using ESLint CLI)
-npm run type-check     # TypeScript type checking
 ```
 
-**Note for Claude**: Prefer using Docker (`docker compose up`) instead of `npm run dev` for development to ensure consistent environment and proper database setup.
+### Essential Commands for Claude Code
+```bash
+npm run type-check     # Run before committing - TypeScript validation
+npm run lint           # Run before committing - ESLint checks
+npm run test:run       # Run unit tests once
+npm run test:e2e:chromium  # Run E2E tests in CI mode
+```
 
 ### Testing
 ```bash
@@ -108,11 +115,11 @@ AI Provider Keys (optional, BYOK supported):
 - Page objects pattern for maintainability
 - Visual regression with screenshot comparison
 
-## Key Dependencies
+## Key Dependencies (Cleaned Up)
 
 **UI Framework**
 - `shadcn/ui` components in `components/ui/`
-- `motion` for animations
+- `motion` & `framer-motion` for animations
 - `lucide-react` and `@phosphor-icons/react` for icons
 
 **AI & Chat**
@@ -122,8 +129,8 @@ AI Provider Keys (optional, BYOK supported):
 
 **Data & State**
 - `@tanstack/react-query` for server state
-- `zustand` for client state
-- `@supabase/ssr` for auth/database
+- `@supabase/supabase-js` & `@supabase/ssr` for auth/database
+- Session persistence via `idb-keyval`
 
 ## Development Patterns
 
@@ -155,3 +162,22 @@ AI Provider Keys (optional, BYOK supported):
 - Docker support with standalone output
 - Environment-specific builds with `.env.production`
 - Official deployment flag: `BOB_OFFICIAL=true`
+
+## Claude Code Optimization Notes
+
+**Project Structure**
+- Cleaned dependencies - removed unused packages
+- Optimized Docker setup with `docker-compose.dev.yml` for development
+- Separate `Dockerfile.dev` for hot-reload development
+- Removed standalone test files (use proper test framework)
+
+**Best Practices for Claude Code**
+1. Use `npm ci` instead of `npm install` for faster dependency installation
+2. Run `npm run type-check` and `npm run lint` before marking tasks complete
+3. Use Docker development setup for full-stack features
+4. Quick iteration: `npm run dev` for frontend-only changes
+
+**Performance Tips**
+- Turbopack enabled by default in dev mode for faster builds
+- Docker volumes configured to preserve node_modules between runs
+- Minimal dependency set reduces install time and build size

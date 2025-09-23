@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/tooltip"
 import { useUser } from "@/lib/user-store/provider"
 import { GithubLogoIcon } from "@phosphor-icons/react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { AppInfoTrigger } from "./app-info/app-info-trigger"
 import { FeedbackTrigger } from "./feedback/feedback-trigger"
 import { SettingsTrigger } from "./settings/settings-trigger"
@@ -25,28 +25,8 @@ export function UserMenu() {
   const { user } = useUser()
   const [isMenuOpen, setMenuOpen] = useState(false)
   const [isSettingsOpen, setSettingsOpen] = useState(false)
-  const [devUser, setDevUser] = useState<{ name: string; type: string } | null>(null)
 
-  // Check for dev user (only in development)
-  useEffect(() => {
-    // Only check for dev users in development environment
-    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-      const devUserName = localStorage.getItem('devUserName')
-      const devUserType = localStorage.getItem('devUserType')
-      if (devUserName && devUserType) {
-        setDevUser({ name: devUserName, type: devUserType })
-      }
-    }
-  }, [])
-
-  // Use dev user if no real user
-  const displayUser = user || (devUser ? {
-    display_name: devUser.name,
-    profile_image: "",
-    email: `${devUser.type}@dev.local`
-  } : null)
-
-  if (!displayUser) return null
+  if (!user) return null
 
   const handleSettingsOpenChange = (isOpen: boolean) => {
     setSettingsOpen(isOpen)
@@ -62,8 +42,8 @@ export function UserMenu() {
         <TooltipTrigger asChild>
           <DropdownMenuTrigger>
             <AvatarWithFallback
-              src={displayUser?.profile_image}
-              fallbackIdentifier={displayUser?.email || displayUser?.display_name || 'user'}
+              src={user?.profile_image}
+              fallbackIdentifier={user?.email || user?.display_name || 'user'}
               className="bg-muted hover:bg-muted/80"
             />
           </DropdownMenuTrigger>
@@ -84,9 +64,9 @@ export function UserMenu() {
         }}
       >
         <DropdownMenuItem className="flex flex-col items-start gap-0 no-underline hover:bg-transparent focus:bg-transparent">
-          <span>{displayUser?.display_name}</span>
+          <span>{user?.display_name}</span>
           <span className="text-muted-foreground max-w-full truncate">
-            {displayUser?.email}
+            {user?.email}
           </span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

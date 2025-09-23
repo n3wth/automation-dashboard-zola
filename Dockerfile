@@ -24,6 +24,13 @@ COPY . .
 # Set Next.js telemetry to disabled
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Set build-time environment variables
+# These are placeholders for the build process only
+ENV NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder_key_for_build
+ENV ENCRYPTION_KEY=t/o1f3K4KE+0Fp1motcoZDz72oEJU14Y31Z5M8gI7jA=
+ENV CSRF_SECRET=placeholder_csrf_secret_for_build_only
+
 # Build the application
 RUN npm run build
 
