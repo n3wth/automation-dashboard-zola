@@ -4,7 +4,6 @@ import {
   convertFromApiFormat,
   defaultPreferences,
 } from "@/lib/user-preference-store/utils"
-import { devAuth } from "@/lib/auth/dev-auth"
 import type { UserProfile } from "./types"
 
 export async function getSupabaseUser() {
@@ -33,17 +32,6 @@ export async function getUserProfile(): Promise<UserProfile | null> {
 
   const { supabase, user } = await getSupabaseUser()
   if (!supabase || !user) {
-    // In development, return default dev user if no Supabase user
-    if (process.env.NODE_ENV === 'development') {
-      return {
-        id: '00000000-0000-0000-0000-000000000001',
-        email: 'guest@dev.local',
-        display_name: 'Guest User',
-        profile_image: "",
-        anonymous: false,
-        preferences: defaultPreferences,
-      } as UserProfile
-    }
     return null
   }
 

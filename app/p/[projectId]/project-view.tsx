@@ -409,20 +409,13 @@ export function ProjectView({ projectId }: ProjectViewProps) {
         )}
       </AnimatePresence>
 
-      <motion.div
+      <div
         className={cn(
           "relative inset-x-0 bottom-0 z-50 mx-auto w-full max-w-3xl"
         )}
-        layout="position"
-        layoutId="chat-input-container"
-        transition={{
-          layout: {
-            duration: messages.length === 1 ? 0.3 : 0,
-          },
-        }}
       >
         <ChatInput {...chatInputProps} />
-      </motion.div>
+      </div>
 
       {showOnboarding && chats.length > 0 ? (
         <div className="mx-auto w-full max-w-3xl px-4 pt-6 pb-20">

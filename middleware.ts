@@ -2,47 +2,8 @@ import { updateSession } from "@/utils/supabase/middleware"
 import { NextResponse, type NextRequest } from "next/server"
 import { validateCsrfToken } from "./lib/csrf"
 
-// Development/Test user validation for API routes
-function validateDevUser(request: NextRequest): boolean {
-  const isDevOrTest = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'
-  if (!isDevOrTest) {
-    return false
-  }
-
-  const devUserId = request.headers.get('x-dev-user-id')
-  const devMode = request.headers.get('x-development-mode')
-
-  if (!devUserId || !devMode || devMode !== 'true') {
-    return false
-  }
-
-  // Valid dev/test user IDs
-  const validDevUsers = [
-    'dev-guest-001',
-    'dev-free-001',
-    'dev-pro-001',
-    'dev-admin-001',
-    'test-user-001', // Test environment user
-    'playwright-test-user' // E2E test user
-  ]
-
-  return (devUserId.startsWith('dev-') || devUserId.startsWith('test-') || devUserId.startsWith('playwright-')) &&
-         validDevUsers.includes(devUserId)
-}
-
 export async function middleware(request: NextRequest) {
   const response = await updateSession(request)
-
-  // Development user authentication bridge for API routes
-  if (request.nextUrl.pathname.startsWith('/api/') && validateDevUser(request)) {
-    const devUserId = request.headers.get('x-dev-user-id')!
-    const devRole = request.headers.get('x-dev-user-role') || 'guest'
-
-    // Add dev user info to headers for API routes
-    response.headers.set('x-forwarded-dev-user', devUserId)
-    response.headers.set('x-forwarded-dev-role', devRole)
-    response.headers.set('x-development-mode', 'true')
-  }
 
   // CSRF protection for state-changing requests (temporarily disabled)
   // TODO: Re-enable CSRF protection after fixing token generation

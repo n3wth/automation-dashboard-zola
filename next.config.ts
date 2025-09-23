@@ -1,4 +1,5 @@
 import type { NextConfig } from "next"
+import path from "path"
 
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
@@ -6,6 +7,7 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 
 const nextConfig: NextConfig = withBundleAnalyzer({
   output: "standalone",
+  outputFileTracingRoot: path.join(__dirname),
   experimental: {},
   images: {
     remotePatterns: [

@@ -1,7 +1,6 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { useDevAuth } from "@/lib/auth/use-dev-auth"
 import { signInWithGoogle } from "@/lib/api"
 import { createClient } from "@/lib/supabase/client"
 import Image from "next/image"
@@ -14,33 +13,11 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
-  const { login, isAuthenticated } = useDevAuth()
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/")
-    }
-  }, [isAuthenticated, router])
-
-  // Dev mode login handler
-  function handleDevLogin(userType: "admin" | "pro" | "free" | "guest") {
-    const userIdMap = {
-      admin: "dev-admin-001",
-      pro: "dev-pro-001",
-      free: "dev-free-001",
-      guest: "dev-guest-001",
-    }
-    login(userIdMap[userType])
-  }
 
   async function handleSignInWithGoogle() {
     const supabase = createClient()
 
     if (!supabase) {
-      if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
-        handleDevLogin("free")
-        return
-      }
       throw new Error("Supabase is not configured")
     }
 
@@ -84,54 +61,6 @@ export default function LoginPage() {
             </div>
           )}
           <div className="mt-8 space-y-3">
-            {(process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") && (
-              <>
-                <div className="text-muted-foreground text-center text-sm mb-4">
-                  🛠️ Development Mode - Quick Login
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => handleDevLogin("guest")}
-                    disabled={isLoading}
-                  >
-                    Guest User
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => handleDevLogin("free")}
-                    disabled={isLoading}
-                  >
-                    Free User
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => handleDevLogin("pro")}
-                    disabled={isLoading}
-                  >
-                    Pro User
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => handleDevLogin("admin")}
-                    disabled={isLoading}
-                  >
-                    Admin
-                  </Button>
-                </div>
-                <div className="relative my-4">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">
-                      Or
-                    </span>
-                  </div>
-                </div>
-              </>
-            )}
-
             <Button
               variant="secondary"
               className="w-full text-base sm:text-base"

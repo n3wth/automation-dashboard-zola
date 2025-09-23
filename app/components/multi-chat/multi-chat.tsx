@@ -410,19 +410,14 @@ export function MultiChat() {
         )}
       </AnimatePresence>
 
-      <motion.div
+      <div
         className={cn(
           "z-50 mx-auto w-full max-w-3xl",
           showOnboarding ? "relative" : "absolute right-0 bottom-0 left-0"
         )}
-        layout="position"
-        layoutId="multi-chat-input-container"
-        transition={{
-          layout: { duration: messageGroups.length === 1 ? 0.3 : 0 },
-        }}
       >
         <MultiChatInput {...inputProps} />
-      </motion.div>
+      </div>
     </div>
   )
 }

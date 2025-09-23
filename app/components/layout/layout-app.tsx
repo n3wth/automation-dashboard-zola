@@ -9,7 +9,9 @@ import { useState, useEffect, lazy, Suspense } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 
 // Lazy load MeatMode for better initial performance
-const MeatMode = lazy(() => import("@/components/ui/meat-mode").then(m => ({ default: m.MeatMode })))
+const MeatMode = lazy(() => import("@/components/ui/meat-mode").then((module) => {
+  return { default: module.MeatMode }
+}))
 
 export function LayoutApp({ children }: { children: React.ReactNode }) {
   const { preferences } = useUserPreferences()
@@ -59,8 +61,10 @@ export function LayoutApp({ children }: { children: React.ReactNode }) {
           (el as HTMLImageElement).alt?.toLowerCase().includes('bob') ||
           (el as HTMLImageElement).src?.includes('logo')
         )
-        const hasLogoClass = el.className?.toLowerCase().includes('logo')
-        const hasLogoAttribute = el.hasAttribute('data-logo') || el.hasAttribute('aria-label')?.toString().includes('logo')
+        const className = typeof el.className === 'string' ? el.className : ''
+        const hasLogoClass = className.toLowerCase().includes('logo')
+        const ariaLabel = el.getAttribute('aria-label')
+        const hasLogoAttribute = el.hasAttribute('data-logo') || (!!ariaLabel && ariaLabel.toLowerCase().includes('logo'))
 
         return isLink || isImage || hasLogoClass || hasLogoAttribute
       }

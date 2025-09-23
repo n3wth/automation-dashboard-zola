@@ -8,14 +8,27 @@ Bob is an intelligent automation dashboard and open-source chat interface suppor
 
 ## Development Commands
 
-### Core Development
+### Docker Development (Preferred)
+```bash
+# Use Docker for consistent development environment
+docker compose up      # Start all services (app + database)
+docker compose down    # Stop all services
+docker compose build   # Rebuild after dependency changes
+
+# The app runs on http://localhost:3000
+# Supabase Studio runs on http://localhost:54323
+```
+
+### Local Development (Alternative)
 ```bash
 npm run dev            # Start dev server with Turbopack on localhost:3000
 npm run build          # Production build
 npm run start          # Start production server
-npm run lint           # Run ESLint
+npm run lint           # Run ESLint (using ESLint CLI)
 npm run type-check     # TypeScript type checking
 ```
+
+**Note for Claude**: Prefer using Docker (`docker compose up`) instead of `npm run dev` for development to ensure consistent environment and proper database setup.
 
 ### Testing
 ```bash
