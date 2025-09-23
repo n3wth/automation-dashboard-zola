@@ -5,6 +5,7 @@ import { AppProvider } from "@/lib/providers/app-provider"
 import { getUserProfile } from "@/lib/user/api"
 import Script from "next/script"
 import { LayoutClient } from "./layout-client"
+import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -47,6 +48,7 @@ export default async function RootLayout({
           <LayoutClient />
           {children}
         </AppProvider>
+        <Analytics />
       </body>
     </html>
   )
