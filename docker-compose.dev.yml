@@ -8,16 +8,11 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - "3000:3000"
+    env_file:
+      - .env.local
     environment:
       - NODE_ENV=development
       - NEXT_TELEMETRY_DISABLED=1
-      # Supabase connection (will use local Supabase)
-      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://localhost:54321}
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY:-your-anon-key}
-      - SUPABASE_SERVICE_ROLE=${SUPABASE_SERVICE_ROLE:-your-service-role}
-      # Security keys (generate new ones for development)
-      - CSRF_SECRET=${CSRF_SECRET:-dev-csrf-secret-change-in-production}
-      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-dev-encryption-key-change-in-prod}
     volumes:
       # Mount source code for hot reload
       - .:/app
