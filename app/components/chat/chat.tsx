@@ -254,6 +254,7 @@ export function Chat() {
 
   const showOnboarding = !chatId && messages.length === 0
   const showLoadingForDirectFetch = chatId && fetchingDirectChat === chatId && !currentChat
+  const hasMessages = messages.length > 0
 
   return (
     <div
@@ -263,7 +264,7 @@ export function Chat() {
     >
       <DialogAuth open={hasDialogAuth} setOpen={setHasDialogAuth} />
 
-      <AnimatePresence initial={false} mode="popLayout">
+      <AnimatePresence initial={false} mode="wait">
         {showLoadingForDirectFetch ? (
           <motion.div
             key="direct-fetch-loading"
@@ -271,11 +272,8 @@ export function Chat() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            layout="position"
             transition={{
-              layout: {
-                duration: 0,
-              },
+              duration: 0.2,
             }}
           >
             <div className="text-center">
@@ -288,27 +286,24 @@ export function Chat() {
               </p>
             </div>
           </motion.div>
-        ) : showOnboarding ? (
+        ) : hasMessages ? (
+          <Conversation key="conversation" {...conversationProps} />
+        ) : (
           <motion.div
             key="onboarding"
             className="mx-auto max-w-[50rem] mb-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            layout="position"
-            layoutId="onboarding"
             transition={{
-              layout: {
-                duration: 0,
-              },
+              duration: 0.2,
+              ease: "easeOut",
             }}
           >
             <h1 className="mb-6 text-3xl font-medium tracking-tight">
               What&apos;s on your mind?
             </h1>
           </motion.div>
-        ) : (
-          <Conversation key="conversation" {...conversationProps} />
         )}
       </AnimatePresence>
 
