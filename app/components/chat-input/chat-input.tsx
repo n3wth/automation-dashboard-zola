@@ -211,6 +211,7 @@ export function ChatInput({
           <FileList files={files} onFileRemove={onFileRemove} />
           <PromptInputTextarea
             ref={textareaRef}
+            data-testid="chat-input-textarea"
             placeholder={placeholder}
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}
@@ -262,6 +263,7 @@ export function ChatInput({
                 aria-label={sendButtonAriaLabel}
                 aria-busy={isSubmitting || isStreaming || isAwaitingResponse}
                 data-state={sendButtonState}
+                data-testid="send-button"
               >
                 {sendButtonState === "streaming" ? (
                   <StopIcon className="size-4 transition-transform duration-200 group-hover:scale-105" />
