@@ -88,7 +88,7 @@ export function useChatCore({
   const {
     messages,
     input,
-    handleSubmit,
+    append,
     status,
     error,
     reload,
@@ -126,6 +126,10 @@ export function useChatCore({
 
   // Submit action
   const submit = useCallback(async () => {
+    if (!input) {
+      return
+    }
+
     setIsSubmitting(true)
 
     const uid = await getOrCreateGuestUserId(user)
@@ -134,13 +138,14 @@ export function useChatCore({
       return
     }
 
+    const messageValue = input
     const optimisticId = `optimistic-${Date.now().toString()}`
     const optimisticAttachments =
       files.length > 0 ? createOptimisticAttachments(files) : []
 
     const optimisticMessage = {
       id: optimisticId,
-      content: input,
+      content: messageValue,
       role: "user" as const,
       createdAt: new Date(),
       experimental_attachments:
@@ -150,16 +155,18 @@ export function useChatCore({
     setMessages((prev) => [...prev, optimisticMessage])
 
     // Check for meat mode triggers and dispatch event if found
-    const triggers = ['meat', 'marx']
-    const hasTriggersInInput = triggers.some(trigger => {
-      const regex = new RegExp(`\\b${trigger}\\b`, 'i')
-      return regex.test(input)
+    const triggers = ["meat", "marx"]
+    const hasTriggersInInput = triggers.some((trigger) => {
+      const regex = new RegExp(`\\b${trigger}\\b`, "i")
+      return regex.test(messageValue)
     })
 
     if (hasTriggersInInput) {
-      window.dispatchEvent(new CustomEvent('meat-mode-trigger', {
-        detail: { source: 'message', content: input }
-      }))
+      window.dispatchEvent(
+        new CustomEvent("meat-mode-trigger", {
+          detail: { source: "message", content: messageValue },
+        })
+      )
     }
 
     setInput("")
@@ -175,7 +182,7 @@ export function useChatCore({
         return
       }
 
-      const currentChatId = await ensureChatExists(uid, input)
+      const currentChatId = await ensureChatExists(uid, messageValue)
       if (!currentChatId) {
         setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId))
         cleanupOptimisticAttachments(optimisticMessage.experimental_attachments)
@@ -185,7 +192,7 @@ export function useChatCore({
       hasSentFirstMessageRef.current = true
       void bumpChat(currentChatId)
 
-      if (input.length > MESSAGE_MAX_LENGTH) {
+      if (messageValue.length > MESSAGE_MAX_LENGTH) {
         toast({
           title: `The message you submitted was too long, please submit something shorter. (Max ${MESSAGE_MAX_LENGTH} characters)`,
           status: "error",
@@ -219,7 +226,13 @@ export function useChatCore({
         experimental_attachments: attachments || undefined,
       }
 
-      handleSubmit(undefined, options)
+      append(
+        {
+          role: "user",
+          content: messageValue,
+        },
+        options
+      )
       setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId))
       cleanupOptimisticAttachments(optimisticMessage.experimental_attachments)
       cacheAndAddMessage(optimisticMessage)
@@ -247,7 +260,7 @@ export function useChatCore({
     isAuthenticated,
     systemPrompt,
     enableSearch,
-    handleSubmit,
+    append,
     cacheAndAddMessage,
     clearDraft,
     bumpChat,
