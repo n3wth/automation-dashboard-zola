@@ -24,7 +24,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { PopoverContainer, StickyHeader, ScrollContainer, MenuItem } from "@/lib/components/shared/layout-components"
+import { MODEL_DEFAULT } from "@/lib/config"
 import { BobLoading } from "@/lib/components/branding/bob-extras"
 import { useModel } from "@/lib/model-store/provider"
 import { filterAndSortModels } from "@/lib/model-store/utils"
@@ -62,6 +62,24 @@ export function ModelSelector({
     (provider) => provider.id === currentModel?.icon
   )
   const isMobile = useBreakpoint(768)
+
+  const isModelLocked = currentModel?.accessible === false
+  const isDefaultModel = currentModel?.id === MODEL_DEFAULT
+  const metadataText = currentModel
+    ? `${currentModel.provider}${isDefaultModel ? " • Default" : ""}`
+    : isUserAuthenticated
+      ? "Choose a model"
+      : "Sign in to change models"
+  const statusLabel = currentModel
+    ? isModelLocked
+      ? "Locked"
+      : "Live"
+    : null
+  const triggerAriaLabel = currentModel
+    ? `${currentModel.name} by ${currentModel.provider}${isDefaultModel ? " (default)" : ""}${isModelLocked ? ", locked" : ""}`
+    : isUserAuthenticated
+      ? "Select a model"
+      : "Sign in to choose a model"
 
   const [hoveredModel, setHoveredModel] = useState<string | null>(null)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -148,17 +166,51 @@ export function ModelSelector({
     isModelHidden
   )
 
+  const renderStatusBadge = () => {
+    if (!statusLabel) return null
+
+    return (
+      <span
+        className={cn(
+          "rounded-full px-2 py-0.5 text-[10px] font-medium",
+          isModelLocked
+            ? "bg-amber-500/15 text-amber-600 dark:text-amber-400"
+            : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+        )}
+      >
+        {statusLabel}
+      </span>
+    )
+  }
+
+  const renderTriggerContent = () => (
+    <>
+      <div className="flex items-center gap-2 text-left">
+        {currentProvider?.icon && <currentProvider.icon className="size-5" />}
+        <div className="flex flex-col leading-tight">
+          <span className="text-sm font-medium">
+            {currentModel?.name || "Select model"}
+          </span>
+          <span className="text-muted-foreground text-[11px]">
+            {metadataText}
+          </span>
+        </div>
+      </div>
+      <div className="flex items-center gap-1">
+        {renderStatusBadge()}
+        <CaretDownIcon className="size-4 opacity-50" />
+      </div>
+    </>
+  )
+
   const trigger = (
     <Button
       variant="outline"
       className={cn("dark:bg-secondary justify-between btn-bob", className)}
       disabled={isLoadingModels}
+      aria-label={triggerAriaLabel}
     >
-      <div className="flex items-center gap-2">
-        {currentProvider?.icon && <currentProvider.icon className="size-5" />}
-        <span>{currentModel?.name || "Select model"}</span>
-      </div>
-      <CaretDownIcon className="size-4 opacity-50" />
+      {renderTriggerContent()}
     </Button>
   )
 
@@ -179,16 +231,13 @@ export function ModelSelector({
                 size="sm"
                 variant="secondary"
                 className={cn(
-                  "border-border dark:bg-secondary text-accent-foreground h-9 w-auto border bg-transparent",
+                  "border-border dark:bg-secondary text-accent-foreground h-9 w-auto border bg-transparent justify-between gap-3",
                   className
                 )}
                 type="button"
+                aria-label={triggerAriaLabel}
               >
-                {currentProvider?.icon && (
-                  <currentProvider.icon className="size-5" />
-                )}
-                {currentModel?.name}
-                <CaretDownIcon className="size-4" />
+                {renderTriggerContent()}
               </Button>
             </PopoverTrigger>
           </TooltipTrigger>

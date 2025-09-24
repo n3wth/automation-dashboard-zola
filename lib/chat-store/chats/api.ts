@@ -89,14 +89,19 @@ export async function createChatInDb(
   userId: string,
   title: string,
   model: string,
-  systemPrompt: string
+  systemPrompt?: string
 ): Promise<string | null> {
   const supabase = createClientSafe()
   if (!isSupabaseClientAvailable(supabase)) return null
 
   const { data, error } = await supabase
     .from("chats")
-    .insert({ user_id: userId, title, model })
+    .insert({
+      user_id: userId,
+      title,
+      model,
+      system_prompt: systemPrompt ?? null,
+    })
     .select("id")
     .single()
 
@@ -283,6 +288,7 @@ export async function createNewChat(
       project_id: responseData.chat.project_id || null,
       pinned: responseData.chat.pinned ?? false,
       pinned_at: responseData.chat.pinned_at ?? null,
+      system_prompt: responseData.chat.system_prompt ?? null,
     }
 
     await writeToIndexedDB("chats", chat)

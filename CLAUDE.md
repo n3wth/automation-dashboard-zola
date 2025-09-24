@@ -1,3 +1,20 @@
+# Worktree Context: other-logings
+
+## Configuration
+- **Branch Type**: feature
+- **App Port**: 3001
+- **Database Port**: 54323
+- **Docker Volume**: bob-other-logings-data
+
+## Active Worktrees
+Run `bob-worktree list` to see all active worktrees and their ports.
+
+## Important
+This is a worktree of the main Bob repository. Changes here are isolated from other worktrees.
+Use the assigned ports to avoid conflicts with other running instances.
+
+---
+
 # Worktree Context: improve-docs
 
 ## Configuration
@@ -112,6 +129,107 @@ ENCRYPTION_KEY=$(openssl rand -base64 32)
 - Parallel test execution with Vitest
 - Standalone Docker output for production
 
+## Multi-Agent Development Patterns
+
+### Hybrid Claude + Codex Workflows
+Leverage both Claude's strategic reasoning and Codex's fast execution capabilities:
+
+**Agent Specialization**:
+- **Claude**: Architecture planning, code review, complex reasoning, strategic decisions
+- **Codex**: Fast file edits, CLI operations, deterministic tasks, test execution
+
+**Coordination Patterns**:
+```bash
+# Sequential Pipeline: Plan → Implement → Review → Fix
+claude "analyze issue #123, create implementation plan"
+codex "implement auth middleware from plan.md"
+claude "review implementation, suggest improvements"
+codex "apply fixes and run final tests"
+
+# Parallel Execution: Architecture + Implementation
+# Terminal 1: Claude handles high-level design
+# Terminal 2: Codex executes specific file changes
+```
+
+### Multi-Agent Worktree Strategy
+Combine isolated worktrees with specialized agents for maximum productivity:
+
+```bash
+# Create isolated development environments
+bw create feature/auth-system main    # Claude: strategic planning
+bw create hotfix/security-patch main  # Codex: fast implementation
+bw create experiment/ui-redesign main # Mixed: exploration + execution
+
+# Agent-specific workflows
+bw claude feature/auth-system "design auth architecture"
+bw codex hotfix/security-patch "implement security fixes"
+```
+
+### Implementation Patterns
+
+**Meta-Agent Orchestration**:
+```bash
+#!/bin/bash
+# hybrid-workflow.sh - Orchestrate Claude + Codex collaboration
+
+ISSUE=$1
+MAIN_BRANCH=${2:-main}
+
+# 1. Claude: Strategic analysis and planning
+claude "analyze GitHub issue $ISSUE, create detailed implementation plan"
+
+# 2. Create isolated worktree for implementation
+BRANCH="feature/issue-$ISSUE"
+bw create $BRANCH $MAIN_BRANCH
+
+# 3. Codex: Tactical implementation
+bw codex $BRANCH "implement plan from issue $ISSUE, focus on file edits"
+
+# 4. Claude: Code review and architectural validation
+bw claude $BRANCH "review implementation, check architecture compliance"
+
+# 5. Codex: Apply feedback and finalize
+bw codex $BRANCH "apply review feedback, run tests, fix any failures"
+```
+
+**Agent Monitoring Dashboard**:
+```bash
+# Check active agents across worktrees
+agent-status() {
+  echo "=== Active Development Sessions ==="
+  bw list | grep -E "(claude|codex|active)"
+
+  echo "=== Recent Agent Activity ==="
+  tail -20 ~/.claude-metrics/tool-usage.log
+
+  echo "=== Process Status ==="
+  ps aux | grep -E "(claude|codex)" | grep -v grep
+}
+```
+
+### Role-Based Task Distribution
+
+**Claude Optimal Tasks**:
+- Requirements analysis and architectural planning
+- Code review and quality assessment
+- Complex problem decomposition
+- Integration strategy and system design
+- Technical decision making with trade-off analysis
+
+**Codex Optimal Tasks**:
+- File editing and code generation
+- Test implementation and execution
+- CLI command execution and scripting
+- Refactoring and code transformations
+- Build process and deployment tasks
+
+### Integration with Existing Tools
+Multi-agent patterns work seamlessly with your current stack:
+- **Docker dev**: Each worktree runs isolated containers with different ports
+- **Modern CLI tools**: Both agents benefit from fd/rg/bat performance
+- **AI ecosystem**: Complement with aichat/sgpt for quick consultations
+- **Quality gates**: Automated validation across all agent outputs
+
 ## Common Fixes
 ```bash
 # Module issues
@@ -122,4 +240,9 @@ lsof -ti:3000 | xargs kill -9
 
 # Docker cleanup
 docker compose -f docker-compose.dev.yml down -v
+
+# Multi-agent session cleanup
+pkill -f "claude.*bob"
+pkill -f "codex.*bob"
+bw clean  # Remove unused worktrees
 ```

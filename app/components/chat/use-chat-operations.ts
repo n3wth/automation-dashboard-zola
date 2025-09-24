@@ -40,6 +40,21 @@ export function useChatOperations({
     try {
       const rateData = await checkRateLimits(uid, isAuthenticated)
 
+      // Handle API error response (rate limit exceeded)
+      if (rateData.error) {
+        if (!isAuthenticated) {
+          setHasDialogAuth(true)
+          return false
+        }
+
+        toast({
+          title: "Rate limit exceeded",
+          description: rateData.message || "Please try again later or upgrade your account.",
+          status: "error",
+        })
+        return false
+      }
+
       if (rateData.remaining === 0 && !isAuthenticated) {
         setHasDialogAuth(true)
         return false
@@ -66,6 +81,20 @@ export function useChatOperations({
       return true
     } catch (err) {
       console.error("Rate limit check failed:", err)
+
+      // If not authenticated and rate limit check fails, show auth dialog
+      if (!isAuthenticated) {
+        setHasDialogAuth(true)
+        return false
+      }
+
+      // For authenticated users, show error toast
+      toast({
+        title: "Unable to check rate limits",
+        description: "Please try again or contact support if the issue persists.",
+        status: "error",
+      })
+
       return false
     }
   }

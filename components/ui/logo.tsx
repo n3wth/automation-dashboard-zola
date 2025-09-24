@@ -28,13 +28,20 @@ export function Logo({ className, size = 'md', variant = 'text' }: LogoProps) {
 
   if (variant === 'ascii') {
     return (
-      <div className={cn('flex items-center', className)}>
+      <div className={cn('flex items-center group', className)}>
         <Image
           src="/logo-ascii-art.svg"
           alt="Bob"
           width={imageSizes[size].width}
           height={imageSizes[size].height}
-          className="w-auto h-auto"
+          className="transition-all duration-200 ease-out group-hover:saturate-0 group-hover:brightness-200 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]"
+          priority
+          style={{
+            width: `${imageSizes[size].width}px`,
+            height: `${imageSizes[size].height}px`,
+            minWidth: `${imageSizes[size].width}px`,
+            minHeight: `${imageSizes[size].height}px`
+          }}
         />
       </div>
     )
@@ -53,13 +60,13 @@ export function Logo({ className, size = 'md', variant = 'text' }: LogoProps) {
 
   // Default text variant - using simple SVG
   return (
-    <div className={cn('flex items-center', className)}>
+    <div className={cn('flex items-center text-foreground', className)}>
       <Image
         src="/logo-simple.svg"
         alt="Bob"
         width={imageSizes[size].width}
         height={imageSizes[size].height}
-        className="w-auto h-auto"
+        className=""
       />
     </div>
   )

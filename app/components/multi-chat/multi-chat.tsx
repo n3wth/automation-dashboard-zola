@@ -1,6 +1,7 @@
 "use client"
 
 import { MultiModelConversation } from "@/app/components/multi-chat/multi-conversation"
+import { ChatInputSkeleton, ConversationSkeleton } from "@/app/components/chat/chat-skeleton"
 import { toast } from "@/components/ui/toast"
 import { getOrCreateGuestUserId } from "@/lib/api"
 import { useChats } from "@/lib/chat-store/chats/provider"
@@ -30,6 +31,11 @@ type GroupedMessage = {
   onReload: (model: string) => void
 }
 
+const getMessageModel = (message: MessageType): string | null => {
+  const value = (message as { model?: unknown }).model
+  return typeof value === "string" ? value : null
+}
+
 export function MultiChat() {
   const [prompt, setPrompt] = useState("")
   const [selectedModelIds, setSelectedModelIds] = useState<string[]>([])
@@ -55,8 +61,8 @@ export function MultiChat() {
 
   const modelsFromPersisted = useMemo(() => {
     return persistedMessages
-      .filter((msg) => (msg as any).model)
-      .map((msg) => (msg as any).model)
+      .map(getMessageModel)
+      .filter((model): model is string => model !== null)
   }, [persistedMessages])
 
   const modelsFromLastGroup = useMemo(() => {
@@ -70,8 +76,11 @@ export function MultiChat() {
     for (let i = lastUserIndex + 1; i < persistedMessages.length; i++) {
       const msg = persistedMessages[i]
       if (msg.role === "user") break
-      if (msg.role === "assistant" && (msg as any).model) {
-        modelsInLastGroup.push((msg as any).model)
+      if (msg.role === "assistant") {
+        const model = getMessageModel(msg)
+        if (model) {
+          modelsInLastGroup.push(model)
+        }
       }
     }
     return modelsInLastGroup
@@ -82,9 +91,11 @@ export function MultiChat() {
     return availableModels.filter((model) => combined.includes(model.id))
   }, [availableModels, selectedModelIds, modelsFromPersisted])
 
-  if (selectedModelIds.length === 0 && modelsFromLastGroup.length > 0) {
-    setSelectedModelIds(modelsFromLastGroup)
-  }
+  useEffect(() => {
+    if (selectedModelIds.length === 0 && modelsFromLastGroup.length > 0) {
+      setSelectedModelIds(modelsFromLastGroup)
+    }
+  }, [modelsFromLastGroup, selectedModelIds.length])
 
   const modelChats = useMultiChat(allModelsToMaintain)
   const systemPrompt = useMemo(
@@ -142,9 +153,9 @@ export function MultiChat() {
       if (group.userMessage) {
         persistedGroups[groupKey] = {
           userMessage: group.userMessage,
-          responses: group.assistantMessages.map((msg, index) => {
-            const model =
-              (msg as any).model || selectedModelIds[index] || `model-${index}`
+            responses: group.assistantMessages.map((msg, index) => {
+              const model =
+                getMessageModel(msg) ?? selectedModelIds[index] ?? `model-${index}`
             const provider =
               models.find((m) => m.id === model)?.provider || "unknown"
 
@@ -331,6 +342,17 @@ export function MultiChat() {
 
   const conversationProps = useMemo(() => ({ messageGroups }), [messageGroups])
 
+  const skeletonResponseCount = useMemo(
+    () =>
+      Math.max(
+        selectedModelIds.length ||
+          modelsFromLastGroup.length ||
+          modelsFromPersisted.length,
+        2
+      ),
+    [modelsFromLastGroup, modelsFromPersisted, selectedModelIds]
+  )
+
   const inputProps = useMemo(
     () => ({
       value: prompt,
@@ -361,6 +383,7 @@ export function MultiChat() {
     ]
   )
 
+  const showInitialLoading = messagesLoading && messageGroups.length === 0
   const showOnboarding = messageGroups.length === 0 && !messagesLoading
 
   // Refresh greeting periodically to keep it time-aware
@@ -380,7 +403,20 @@ export function MultiChat() {
       )}
     >
       <AnimatePresence initial={false} mode="popLayout">
-        {showOnboarding ? (
+        {showInitialLoading ? (
+          <motion.div
+            key="multi-loading"
+            className="w-full flex-1 overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            layout="position"
+            layoutId="conversation-loading"
+            transition={{ layout: { duration: 0 } }}
+          >
+            <ConversationSkeleton responseCount={skeletonResponseCount} />
+          </motion.div>
+        ) : showOnboarding ? (
           <motion.div
             key="onboarding"
             className="absolute bottom-[60%] mx-auto max-w-[50rem] md:relative md:bottom-auto"
@@ -416,7 +452,14 @@ export function MultiChat() {
           showOnboarding ? "relative" : "absolute right-0 bottom-0 left-0"
         )}
       >
-        <MultiChatInput {...inputProps} />
+        {showInitialLoading ? (
+          <ChatInputSkeleton
+            className="bg-popover/80"
+            withModelSelector
+          />
+        ) : (
+          <MultiChatInput {...inputProps} />
+        )}
       </div>
     </div>
   )

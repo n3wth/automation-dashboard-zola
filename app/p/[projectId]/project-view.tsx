@@ -100,6 +100,7 @@ export function ProjectView({ projectId }: ProjectViewProps) {
     initialMessages: [],
     onFinish: cacheAndAddMessage,
     onError: handleError,
+    streamProtocol: "data",
   })
 
   const { selectedModel, handleModelChange } = useModel({

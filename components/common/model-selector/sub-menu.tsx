@@ -19,7 +19,7 @@ export function SubMenu({ hoveredModelData }: SubMenuProps) {
   )
 
   return (
-    <div className="relative w-[280px] rounded-md border border-border bg-background p-3 shadow-lg">
+    <div className="relative w-[280px] rounded-lg border border-border bg-popover/95 p-3 shadow-lg backdrop-blur-xl">
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-3">
           {provider?.icon && <provider.icon className="size-5" />}

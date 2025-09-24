@@ -193,45 +193,21 @@ export function ChatsProvider({
     return chat
   }, [chats])
 
-  // HACK: Use effect to trigger fetches to avoid setState during render
-  useEffect(() => {
-    // This effect handles fetching automation chats that aren't in the user's list
-    const isDev = process.env.NODE_ENV === 'development'
-
-    // Check if we need to fetch any chat from the URL
-    if (typeof window !== 'undefined') {
-      const pathSegments = window.location.pathname.split('/')
-      if (pathSegments[1] === 'c' && pathSegments[2]) {
-        const chatId = pathSegments[2]
-        const chatExists = chats.find(c => c.id === chatId)
-
-        // console.log(`[ChatsProvider] Checking chat ${chatId}: exists=${!!chatExists}, fetching=${fetchingDirectChat}, attempted=${attemptedDirectFetch.has(chatId)}`)
-
-        if (!chatExists && chatId && fetchingDirectChat !== chatId && !attemptedDirectFetch.has(chatId)) {
-          // In dev mode, fetch even if no userId
-          if (isDev || userId) {
-            // console.log(`[ChatsProvider] Triggering fetch for automation chat ${chatId}`)
-            fetchChatDirectly(chatId)
-          }
-        }
-      }
-    }
-  }, [chats, userId, fetchingDirectChat, attemptedDirectFetch])
-
   // HACK: Fetch any chat by ID, bypassing user check
-  const fetchChatDirectly = async (chatId: string) => {
-    if (fetchingDirectChat === chatId || attemptedDirectFetch.has(chatId)) return // Prevent duplicate requests
+  const fetchChatDirectly = useCallback(async (chatId: string) => {
+    if (fetchingDirectChat === chatId || attemptedDirectFetch.has(chatId)) {
+      return // Prevent duplicate requests
+    }
 
     setFetchingDirectChat(chatId)
     try {
-      // In development, use API endpoint
       if (process.env.NODE_ENV === 'development') {
-        // Use a dev user ID for API access
         const devUserId = '00000000-0000-0000-0000-000000000001'
         const response = await fetch(`/api/chats?userId=${devUserId}&isAuthenticated=false`)
         if (response.ok) {
-          const { chats } = await response.json()
-          const chat = chats.find((c: any) => c.id === chatId)
+          const payload = (await response.json()) as { chats?: Chats[] }
+          const remoteChats = payload.chats ?? []
+          const chat = remoteChats.find((c) => c.id === chatId)
           if (chat) {
             setChats((prev) => {
               if (prev.find((c) => c.id === chatId)) return prev
@@ -245,11 +221,10 @@ export function ChatsProvider({
           console.error("Failed to fetch chat via API:", response.status)
         }
       } else {
-        // Production path - direct Supabase
         const { createClient } = await import("@/lib/supabase/client")
         const supabase = createClient()
         if (!supabase) {
-          setAttemptedDirectFetch(prev => new Set(prev).add(chatId))
+          setAttemptedDirectFetch((prev) => new Set(prev).add(chatId))
           return
         }
 
@@ -270,15 +245,33 @@ export function ChatsProvider({
         }
       }
 
-      // Mark as attempted regardless of success
-      setAttemptedDirectFetch(prev => new Set(prev).add(chatId))
+      setAttemptedDirectFetch((prev) => new Set(prev).add(chatId))
     } catch (err) {
       console.error("Failed to fetch chat directly:", err)
-      setAttemptedDirectFetch(prev => new Set(prev).add(chatId))
+      setAttemptedDirectFetch((prev) => new Set(prev).add(chatId))
     } finally {
       setFetchingDirectChat(null)
     }
-  }
+  }, [attemptedDirectFetch, fetchingDirectChat])
+
+  // HACK: Use effect to trigger fetches to avoid setState during render
+  useEffect(() => {
+    const isDev = process.env.NODE_ENV === 'development'
+
+    if (typeof window === 'undefined') return
+
+    const pathSegments = window.location.pathname.split('/')
+    if (pathSegments[1] !== 'c' || !pathSegments[2]) return
+
+    const chatId = pathSegments[2]
+    const chatExists = chats.find((c) => c.id === chatId)
+
+    if (!chatExists && chatId && fetchingDirectChat !== chatId && !attemptedDirectFetch.has(chatId)) {
+      if (isDev || userId) {
+        fetchChatDirectly(chatId)
+      }
+    }
+  }, [attemptedDirectFetch, chats, fetchChatDirectly, fetchingDirectChat, userId])
 
   const updateChatModel = async (id: string, model: string) => {
     const prev = [...chats]

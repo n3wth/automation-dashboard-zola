@@ -44,8 +44,8 @@ export function AppInfoTrigger({ trigger }: AppInfoTriggerProps) {
         <DrawerContent className="bg-background border-border">
           <DrawerHeader>
             <Image
-              src="/banner_ocean.jpg"
-              alt={`calm paint generate by ${APP_NAME}`}
+              src="/bob-banner.png"
+              alt={`Bob retro celebration banner - ${APP_NAME}`}
               width={400}
               height={128}
               className="h-32 w-full object-cover"
@@ -69,8 +69,8 @@ export function AppInfoTrigger({ trigger }: AppInfoTriggerProps) {
       <DialogContent className="[&>button:last-child]:bg-background gap-0 overflow-hidden rounded-3xl p-0 shadow-xs sm:max-w-md [&>button:last-child]:rounded-full [&>button:last-child]:p-1">
         <DialogHeader className="p-0">
           <Image
-            src="/banner_ocean.jpg"
-            alt={`calm paint generate by ${APP_NAME}`}
+            src="/bob-banner.png"
+            alt={`Bob retro celebration banner - ${APP_NAME}`}
             width={400}
             height={128}
             className="h-32 w-full object-cover"

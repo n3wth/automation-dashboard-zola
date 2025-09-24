@@ -95,8 +95,8 @@ export default function CoverPage() {
     return () => observer.disconnect()
   }, [])
   return (
-    <div className="flex flex-col items-center justify-center w-full h-screen bg-black text-white relative overflow-hidden">
-      {/* Clean black background for cover */}
+    <div className="bg-background text-foreground relative flex h-screen w-full flex-col items-center justify-center overflow-hidden">
+      {/* Theme-aware background for cover */}
 
       <div className="flex flex-col items-center justify-center space-y-[8vh] w-full h-full px-[5vw] relative z-10">
         {/* Logo */}

@@ -9,9 +9,9 @@ import {
 } from "@/components/prompt-kit/prompt-input"
 import { Button } from "@/components/ui/button"
 import { getModelInfo } from "@/lib/models"
-import { getBobPlaceholder } from "@/lib/utils/bob-greetings"
-import { ArrowUpIcon, StopIcon } from "@phosphor-icons/react"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { cn } from "@/lib/utils"
+import { ArrowUpIcon, Spinner, StopIcon } from "@phosphor-icons/react"
+import { useCallback, useEffect, useMemo, useRef } from "react"
 import { PromptSystem } from "../suggestions/prompt-system"
 import { ButtonFileUpload } from "./button-file-upload"
 import { ButtonSearch } from "./button-search"
@@ -63,13 +63,33 @@ export function ChatInput({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   // Fix hydration mismatch by using client-side state
-  const [isButtonDisabled, setIsButtonDisabled] = useState(true)
-  const [placeholder, setPlaceholder] = useState("Ask Bob...")
+  const placeholder = "Ask Bob..."
 
-  // Set dynamic placeholder after hydration to avoid SSR mismatch
-  useEffect(() => {
-    setPlaceholder(getBobPlaceholder())
-  }, [])
+  const hasInput = value.length > 0 && !isOnlyWhitespace(value)
+  const isStreaming = status === "streaming"
+  const isAwaitingResponse = status === "submitted"
+  const isProcessingMessage = !isStreaming && (isSubmitting || isAwaitingResponse)
+  const isSendDisabled = !isStreaming && (!hasInput || isSubmitting || isAwaitingResponse)
+  const isErrored = status === "error"
+  const errorMessageId = isErrored ? "chat-input-error" : undefined
+
+  const sendButtonState = isStreaming
+    ? "streaming"
+    : isProcessingMessage
+      ? "loading"
+      : "idle"
+  const sendButtonTooltip =
+    sendButtonState === "streaming"
+      ? "Stop"
+      : sendButtonState === "loading"
+        ? "Sending"
+        : "Send"
+  const sendButtonAriaLabel =
+    sendButtonState === "streaming"
+      ? "Stop response"
+      : sendButtonState === "loading"
+        ? "Sending message"
+        : "Send message"
 
   const handleSend = useCallback(() => {
     if (isSubmitting) {
@@ -169,11 +189,6 @@ export function ChatInput({
     }
   }, [hasSearchSupport, enableSearch, setEnableSearch])
 
-  // Update button disabled state after hydration
-  useEffect(() => {
-    setIsButtonDisabled(!value || isSubmitting || isOnlyWhitespace(value))
-  }, [value, isSubmitting])
-
   return (
     <div className="relative flex w-full flex-col gap-4">
       {hasSuggestions && (
@@ -188,7 +203,7 @@ export function ChatInput({
         onClick={() => textareaRef.current?.focus()}
       >
         <PromptInput
-          className="bg-popover relative z-10 p-0 pt-1 shadow-xs backdrop-blur-xl"
+          className="relative z-10 border-border/60 bg-background/95 p-0 pt-1 text-foreground shadow-xs backdrop-blur-xl"
           maxHeight={200}
           value={value}
           onValueChange={onValueChange}
@@ -201,6 +216,8 @@ export function ChatInput({
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}
             className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"
+            aria-invalid={isErrored}
+            aria-describedby={errorMessageId}
           />
           <PromptInputActions className="mt-3 w-full justify-between p-2">
             <div className="flex gap-2">
@@ -223,26 +240,50 @@ export function ChatInput({
                 />
               ) : null}
             </div>
-            <PromptInputAction
-              tooltip={status === "streaming" ? "Stop" : "Send"}
-            >
+            <PromptInputAction tooltip={sendButtonTooltip}>
               <Button
-                size="sm"
-                className="size-9 rounded-full transition-all duration-300 ease-out"
-                disabled={isButtonDisabled}
+                id="chat-send-button"
+                data-testid="chat-send-button"
+                size="icon"
+                className={cn(
+                  "group relative size-9 rounded-full bg-white text-black shadow-[0_10px_30px_rgba(15,15,15,0.2)]",
+                  "transition-all duration-200 ease-out",
+                  "hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_18px_40px_rgba(15,15,15,0.28)]",
+                  "active:scale-95",
+                  "disabled:translate-y-0 disabled:bg-white/15 disabled:text-white/50 disabled:shadow-none disabled:!opacity-80 disabled:!cursor-not-allowed",
+                  "data-[state=streaming]:bg-rose-500 data-[state=streaming]:text-white",
+                  "data-[state=streaming]:hover:bg-rose-500/90 data-[state=streaming]:shadow-[0_16px_36px_rgba(244,63,94,0.45)] data-[state=streaming]:hover:shadow-[0_20px_44px_rgba(244,63,94,0.5)]",
+                  "data-[state=loading]:bg-white/70 data-[state=loading]:text-black/70 data-[state=loading]:shadow-[0_10px_30px_rgba(255,255,255,0.2)]",
+                  "data-[state=loading]:!cursor-wait data-[state=loading]:!opacity-100"
+                )}
+                disabled={isSendDisabled}
                 type="button"
                 onClick={handleSend}
-                aria-label={status === "streaming" ? "Stop" : "Send message"}
+                aria-label={sendButtonAriaLabel}
+                aria-busy={isSubmitting || isStreaming || isAwaitingResponse}
+                data-state={sendButtonState}
                 data-testid="send-button"
               >
-                {status === "streaming" ? (
-                  <StopIcon className="size-4" />
+                {sendButtonState === "streaming" ? (
+                  <StopIcon className="size-4 transition-transform duration-200 group-hover:scale-105" />
+                ) : sendButtonState === "loading" ? (
+                  <Spinner className="size-4 animate-spin" />
                 ) : (
-                  <ArrowUpIcon className="size-4" />
+                  <ArrowUpIcon className="size-4 transition-transform duration-200 group-hover:-translate-y-0.5 group-active:translate-y-0 group-active:scale-90" />
                 )}
               </Button>
             </PromptInputAction>
           </PromptInputActions>
+          {isErrored ? (
+            <div
+              id={errorMessageId}
+              role="status"
+              aria-live="polite"
+              className="text-destructive px-4 pb-3 text-xs"
+            >
+              Message failed to send. Try again.
+            </div>
+          ) : null}
         </PromptInput>
       </div>
     </div>

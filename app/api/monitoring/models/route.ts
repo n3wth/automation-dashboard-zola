@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
-import { MonitoringEvent } from '@/lib/monitoring'
 
 export const dynamic = 'force-dynamic'
 

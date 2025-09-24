@@ -1,4 +1,3 @@
-import { MODEL_DEFAULT } from "@/lib/config"
 import { isSupabaseEnabled } from "@/lib/supabase/config"
 import { createClient } from "@/lib/supabase/server"
 import { createGuestServerClient } from "@/lib/supabase/server-guest"
@@ -62,22 +61,22 @@ export async function GET(request: Request) {
     )
   }
 
+  // Try to create user record with minimal data - Supabase auth may need this
   try {
-    // Try to insert user only if not exists
-    const { error: insertError } = await supabaseAdmin.from("users").insert({
+    const { error: insertError } = await supabaseAdmin.from("users").upsert({
       id: user.id,
       email: user.email,
-      created_at: new Date().toISOString(),
-      message_count: 0,
-      premium: false,
-      favorite_models: [MODEL_DEFAULT],
-    } as any)
+    }, {
+      onConflict: 'id',
+      ignoreDuplicates: false
+    })
 
+    // Only log if it's not a duplicate key error
     if (insertError && insertError.code !== "23505") {
-      console.error("Error inserting user:", insertError)
+      console.error("Error upserting user:", insertError)
     }
   } catch (err) {
-    console.error("Unexpected user insert error:", err)
+    console.error("Unexpected user upsert error:", err)
   }
 
   // Handle custom domain redirects properly
