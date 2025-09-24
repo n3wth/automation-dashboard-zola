@@ -56,7 +56,7 @@ export class VisualTestingUtils {
     // Enable dark mode
     await this.page.evaluate(() => {
       document.documentElement.classList.add('dark')
-      localStorage.setItem('theme', 'dark')
+      localStorage.setItem('bob-theme', 'dark')
     })
 
     await this.page.waitForTimeout(500) // Wait for theme transition

@@ -183,7 +183,7 @@ export function ChatInput({
         onClick={() => textareaRef.current?.focus()}
       >
         <PromptInput
-          className="bg-black text-white relative z-10 p-0 pt-1 shadow-xs backdrop-blur-xl border-white/20"
+          className="relative z-10 border-border/60 bg-background/95 p-0 pt-1 text-foreground shadow-xs backdrop-blur-xl"
           maxHeight={200}
           value={value}
           onValueChange={onValueChange}
