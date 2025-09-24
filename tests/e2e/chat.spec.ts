@@ -9,11 +9,12 @@ test.describe('Chat Functionality', () => {
     await helpers.waitForChatInterface()
 
     // Verify core chat elements
-    await expect(page.locator('textarea')).toBeVisible()
-    await expect(page.locator('textarea')).toBeEnabled()
+    const chatInput = helpers.getChatInput()
+    await expect(chatInput).toBeVisible()
+    await expect(chatInput).toBeEnabled()
 
     // Check for send button or enter functionality
-    const sendButton = page.locator('button[type="submit"], button[aria-label*="send"], [data-testid="send-button"]')
+    const sendButton = helpers.getSendButton()
     if (await sendButton.isVisible()) {
       await expect(sendButton).toBeEnabled()
     }
@@ -85,7 +86,7 @@ test.describe('Chat Functionality', () => {
     const longMessage = 'This is a very long message that should test how the chat interface handles lengthy text input. '.repeat(10)
 
     await helpers.sendMessage(longMessage)
-    await expect(page.locator('textarea')).toHaveValue('')
+    await expect(helpers.getChatInput()).toHaveValue('')
     await expect(page.locator(`text*="${longMessage.substring(0, 50)}"`)).toBeVisible()
   })
 
@@ -95,7 +96,7 @@ test.describe('Chat Functionality', () => {
     await helpers.navigateToChat(TEST_DATA.chatIds.automation)
     await helpers.waitForChatInterface()
 
-    const textarea = page.locator('textarea')
+    const textarea = helpers.getChatInput()
 
     // Check placeholder text
     await expect(textarea).toHaveAttribute('placeholder', /.+/)
@@ -115,7 +116,7 @@ test.describe('Chat Functionality', () => {
     await helpers.navigateToChat(TEST_DATA.chatIds.automation)
     await helpers.waitForChatInterface()
 
-    const textarea = page.locator('textarea')
+    const textarea = helpers.getChatInput()
 
     // Test Enter to send
     await textarea.fill(TEST_DATA.messages.simple)
@@ -171,7 +172,7 @@ test.describe('Chat Functionality', () => {
 })
 
 test.describe('Model Selection', () => {
-  test.skip('should allow a user to switch between different models', async () => {
+  test.skip('should allow a user to switch between different models', async ({ page }) => {
     // 1. Navigate to a chat
     // 2. Open the model selection menu
     // 3. Select a different model
@@ -180,18 +181,18 @@ test.describe('Model Selection', () => {
 })
 
 test.describe('Chat History Management', () => {
-  test.skip('should allow a user to create a new chat', async () => {
+  test.skip('should allow a user to create a new chat', async ({ page }) => {
     // 1. Click the "New Chat" button
     // 2. Verify a new chat is created and the URL is updated
   })
 
-  test.skip('should allow a user to switch between chats', async () => {
+  test.skip('should allow a user to switch between chats', async ({ page }) => {
     // 1. Navigate to a chat
     // 2. Click on a different chat in the history sidebar
     // 3. Verify the new chat is loaded
   })
 
-  test.skip('should allow a user to delete a chat', async () => {
+  test.skip('should allow a user to delete a chat', async ({ page }) => {
     // 1. Create a new chat
     // 2. Find the chat in the history sidebar
     // 3. Click the delete button

@@ -23,13 +23,21 @@ function ChatContainerRoot({
   className,
   ...props
 }: ChatContainerRootProps) {
+  const {
+    ["aria-live"]: ariaLive = "polite",
+    ["aria-relevant"]: ariaRelevant = "additions text",
+    ...rest
+  } = props
+
   return (
     <StickToBottom
       className={cn("flex overflow-y-auto", className)}
       resize="smooth"
       initial="smooth"
       role="log"
-      {...props}
+      aria-live={ariaLive}
+      aria-relevant={ariaRelevant}
+      {...rest}
     >
       {children}
     </StickToBottom>

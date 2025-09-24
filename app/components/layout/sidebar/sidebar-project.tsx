@@ -1,6 +1,7 @@
 "use client"
 
 import { FolderPlusIcon } from "@phosphor-icons/react"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 import { useState } from "react"
 import { DialogCreateProject } from "./dialog-create-project"
@@ -40,7 +41,22 @@ export function SidebarProject() {
         </div>
       </button>
 
-      {isLoading ? null : (
+      {isLoading ? (
+        <div className="space-y-1">
+          {Array.from({ length: 2 }).map((_, index) => (
+            <div
+              key={`project-skeleton-${index}`}
+              className="flex items-center justify-between rounded-md px-2 py-2"
+            >
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-4 rounded-sm" />
+                <Skeleton className="h-4 w-32 rounded-md" />
+              </div>
+              <Skeleton className="h-4 w-6 rounded-md" />
+            </div>
+          ))}
+        </div>
+      ) : (
         <div className="space-y-1">
           {projects.map((project) => (
             <SidebarProjectItem key={project.id} project={project} />

@@ -43,8 +43,8 @@ export function convertFromApiFormat(apiData: UserPreferencesRow): UserPreferenc
   )
 
   return {
-    layout: (apiData.layout as LayoutType | null) ?? "fullscreen",
-    theme: themeValue ?? "system",
+    layout: (apiData.layout as LayoutType | null) ?? defaultPreferences.layout,
+    theme: themeValue ?? defaultPreferences.theme,
     promptSuggestions: apiData.prompt_suggestions ?? true,
     showToolInvocations: apiData.show_tool_invocations ?? true,
     showConversationPreviews: apiData.show_conversation_previews ?? true,
@@ -58,7 +58,6 @@ export function convertFromApiFormat(apiData: UserPreferencesRow): UserPreferenc
 export function convertToApiFormat(preferences: Partial<UserPreferences>): TablesUpdate<'user_preferences'> {
   const apiData: UserPreferencesUpdate = {}
   if (preferences.layout !== undefined) apiData.layout = preferences.layout
-  if (preferences.theme !== undefined) apiData.theme = preferences.theme
   if (preferences.promptSuggestions !== undefined)
     apiData.prompt_suggestions = preferences.promptSuggestions
   if (preferences.showToolInvocations !== undefined)

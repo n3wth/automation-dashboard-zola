@@ -125,6 +125,7 @@ export function MultiChatInput({
           onValueChange={onValueChange}
         >
           <PromptInputTextarea
+            data-testid="chat-input-textarea"
             placeholder={`${getBobPlaceholder()} (multi-model)`}
             onKeyDown={handleKeyDown}
             className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"
@@ -146,6 +147,7 @@ export function MultiChatInput({
                 type="button"
                 onClick={handleSend}
                 aria-label={status === "streaming" ? "Stop" : "Send message"}
+                data-testid="send-button"
               >
                 {status === "streaming" || anyLoading ? (
                   <Stop className="size-4" />

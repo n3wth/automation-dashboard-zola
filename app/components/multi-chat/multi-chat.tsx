@@ -1,6 +1,7 @@
 "use client"
 
 import { MultiModelConversation } from "@/app/components/multi-chat/multi-conversation"
+import { ChatInputSkeleton, ConversationSkeleton } from "@/app/components/chat/chat-skeleton"
 import { toast } from "@/components/ui/toast"
 import { getOrCreateGuestUserId } from "@/lib/api"
 import { useChats } from "@/lib/chat-store/chats/provider"
@@ -341,6 +342,17 @@ export function MultiChat() {
 
   const conversationProps = useMemo(() => ({ messageGroups }), [messageGroups])
 
+  const skeletonResponseCount = useMemo(
+    () =>
+      Math.max(
+        selectedModelIds.length ||
+          modelsFromLastGroup.length ||
+          modelsFromPersisted.length,
+        2
+      ),
+    [modelsFromLastGroup, modelsFromPersisted, selectedModelIds]
+  )
+
   const inputProps = useMemo(
     () => ({
       value: prompt,
@@ -371,6 +383,7 @@ export function MultiChat() {
     ]
   )
 
+  const showInitialLoading = messagesLoading && messageGroups.length === 0
   const showOnboarding = messageGroups.length === 0 && !messagesLoading
 
   // Refresh greeting periodically to keep it time-aware
@@ -390,7 +403,20 @@ export function MultiChat() {
       )}
     >
       <AnimatePresence initial={false} mode="popLayout">
-        {showOnboarding ? (
+        {showInitialLoading ? (
+          <motion.div
+            key="multi-loading"
+            className="w-full flex-1 overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            layout="position"
+            layoutId="conversation-loading"
+            transition={{ layout: { duration: 0 } }}
+          >
+            <ConversationSkeleton responseCount={skeletonResponseCount} />
+          </motion.div>
+        ) : showOnboarding ? (
           <motion.div
             key="onboarding"
             className="absolute bottom-[60%] mx-auto max-w-[50rem] md:relative md:bottom-auto"
@@ -426,7 +452,14 @@ export function MultiChat() {
           showOnboarding ? "relative" : "absolute right-0 bottom-0 left-0"
         )}
       >
-        <MultiChatInput {...inputProps} />
+        {showInitialLoading ? (
+          <ChatInputSkeleton
+            className="bg-popover/80"
+            withModelSelector
+          />
+        ) : (
+          <MultiChatInput {...inputProps} />
+        )}
       </div>
     </div>
   )
