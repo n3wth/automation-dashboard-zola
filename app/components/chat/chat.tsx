@@ -241,8 +241,8 @@ export function Chat() {
   if (shouldRedirect && isFetchingOrWillFetch) {
     // The effect will trigger fetchChatDirectly, so we just show loading
     return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-center">
+      <div className="flex h-full items-center justify-center" role="status" aria-live="polite">
+        <div className="text-center" aria-busy="true">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto mb-2"></div>
           <p className="text-muted-foreground">Loading automation chat...</p>
         </div>
@@ -284,6 +284,9 @@ export function Chat() {
             transition={{
               duration: 0.2,
             }}
+            role="status"
+            aria-live="polite"
+            aria-busy="true"
           >
             <div className="text-center">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto mb-4"></div>
