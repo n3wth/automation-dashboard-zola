@@ -12,7 +12,7 @@ export function AmbientOrbs() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.8, ease: "easeInOut" }}
       style={{
-        background: "rgb(15, 0, 26)",
+        background: "linear-gradient(180deg, rgb(15, 0, 26) 0%, rgb(25, 0, 40) 100%)",
       }}
     />
   )

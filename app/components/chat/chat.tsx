@@ -21,6 +21,7 @@ import { useChatCore } from "./use-chat-core"
 import { useChatOperations } from "./use-chat-operations"
 import { useFileUpload } from "./use-file-upload"
 import { useOnboardingTour } from "@/app/hooks/use-onboarding-tour"
+import { PixelArtHome } from "@/components/ui/pixel-art-home"
 
 const FeedbackWidget = dynamic(
   () => import("./feedback-widget").then((mod) => mod.FeedbackWidget),
@@ -363,8 +364,9 @@ export function Chat() {
               ease: "easeOut",
             }}
           >
-            <div className="text-center mb-8">
-              <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight leading-tight">
+            <PixelArtHome />
+            <div className="text-center mb-8 relative z-20">
+              <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight leading-tight mt-24">
                 What&apos;s on your mind?
               </h1>
             </div>
