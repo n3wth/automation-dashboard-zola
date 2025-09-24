@@ -113,8 +113,8 @@ export function MenuItem({
   return (
     <div
       className={cn(
-        "flex w-full items-center justify-between px-3 py-2 cursor-pointer transition-colors",
-        selected && "bg-accent",
+        "flex w-full items-center justify-between px-3 py-2 cursor-pointer transition-colors hover:bg-accent/60 hover:text-accent-foreground",
+        selected && "bg-accent text-accent-foreground",
         locked && "opacity-75",
         className
       )}
