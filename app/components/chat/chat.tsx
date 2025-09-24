@@ -546,7 +546,7 @@ export function Chat() {
       >
         {showInitialLoading ? (
           <ChatInputSkeleton
-            className="bg-black/60 border-white/20"
+            className="bg-black/60 border-border/60 dark:border-white/20"
             withModelSelector={false}
           />
         ) : (
