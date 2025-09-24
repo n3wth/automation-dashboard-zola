@@ -92,3 +92,35 @@ temp/
 # Local Supabase
 supabase/.branches
 supabase/.temp
+
+# Claude AI artifacts
+.claude/
+.serena/
+
+# SQL migration/fix files
+*-fix.sql
+*-migration.sql
+database-*.sql
+schema-*.sql
+setup-database.sql
+
+# Temporary scripts and artifacts
+execute-*.sh
+healthcheck.js
+crew-integration.py
+
+# Generated documentation (per project preference)
+DEPLOYMENT.md
+INSTALL.md
+MONITORING.md
+TESTING.md
+deployment-progress.md
+test-automation-*.md
+
+# Build and analysis artifacts
+bundle-analysis.json
+next-env.d.ts
+tsconfig.tsbuildinfo
+
+# Worktree directories (outside main repo)
+../*-worktree/

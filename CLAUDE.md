@@ -36,6 +36,13 @@ npm run test:e2e:chromium  # E2E tests in CI mode
 - Use absolute paths in all file operations
 - Never create README/docs unless explicitly requested
 
+## Available CLI Tools
+- **fd**: Modern file finder (`fd pattern` or `fd -t f -d 2` for depth limit)
+- **rg**: Fast text search (`rg pattern --type typescript`)
+- **bat**: Better file viewer with syntax highlighting
+- **eza**: Enhanced ls with git status (`eza -la --git`)
+- Use these modern tools for better performance than find/grep/cat/ls
+
 ## Testing Strategy
 - **Unit**: Vitest + React Testing Library (`*.test.ts` in `src/`)
 - **E2E**: Playwright (`tests/e2e/`)
@@ -57,6 +64,15 @@ ENCRYPTION_KEY=$(openssl rand -base64 32)
 - App: `localhost:3000`, PostgreSQL: `localhost:54322`
 - Volumes preserve node_modules between runs
 - Production test: `docker compose up` (without -f flag)
+
+## Parallel Development with Worktrees
+- **Setup**: `bash scripts/worktree-quickstart.sh`
+- **Create**: `bw create feature/name` (auto-assigns ports)
+- **List**: `bw list` (shows all active worktrees)
+- **Claude**: `bw claude feature/name` (starts in worktree)
+- **Ports**: main=3000, features=3001, hotfix=3002, experiments=3003
+- **Benefits**: 3-4x parallel development, zero context switching
+- **Docs**: See `docs/WORKTREE_WORKFLOW.md` for complete guide
 
 ## Performance Optimization
 - Turbopack enabled in dev mode
