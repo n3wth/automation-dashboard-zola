@@ -18,7 +18,14 @@ LOG_FILE="$LOG_DIR/browserbase-smoke.log"
 INTERVAL_SECONDS=${INTERVAL_SECONDS:-300}
 SMOKE_URL=${SMOKE_URL:-"https://bob.newth.ai"}
 
-echo "[smoke-watch] starting at $(date -Iseconds) for $SMOKE_URL" | tee -a "$LOG_FILE"
+ENGINE=${RUNNER_ENGINE:-gm}
+case "$ENGINE" in
+  gm) export SMOKE_MODEL=${SMOKE_MODEL:-google/gemini-2.5-flash-preview-05-20} ;;
+  cc) export SMOKE_MODEL=${SMOKE_MODEL:-anthropic/claude-3-5-sonnet-20240620} ;;
+  c)  export SMOKE_MODEL=${SMOKE_MODEL:-openai/gpt-4o-mini} ;;
+esac
+
+echo "[smoke-watch] starting at $(date -Iseconds) for $SMOKE_URL (engine=$ENGINE model=$SMOKE_MODEL)" | tee -a "$LOG_FILE"
 
 while true; do
   load_env
@@ -40,4 +47,3 @@ while true; do
   fi
   sleep "$INTERVAL_SECONDS"
 done
-
