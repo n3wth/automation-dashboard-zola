@@ -18,7 +18,6 @@ import { cn } from "@/lib/utils"
 import { toast } from "@/components/ui/toast"
 import { AnimatePresence, motion } from "motion/react"
 import dynamic from "next/dynamic"
-<<<<<<< HEAD
 import { redirect, useRouter } from "next/navigation"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useChatCore } from "./use-chat-core"
