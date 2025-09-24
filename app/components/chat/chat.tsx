@@ -363,13 +363,14 @@ export function Chat() {
               ease: "easeOut",
             }}
           >
-            <div className="text-center mb-8">
+            <div className="flex flex-col items-center text-center w-full px-4">
+              <div className="mb-8">
               <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight leading-tight">
                 What&apos;s on your mind?
               </h1>
-            </div>
-            {shouldShowAuthNotice ? (
-              <div className="bg-zinc-900/30 backdrop-blur-sm border border-white/10 rounded-2xl p-5 max-w-2xl mx-auto">
+              </div>
+              {shouldShowAuthNotice ? (
+                <div className="bg-zinc-900/30 backdrop-blur-sm border border-white/10 rounded-2xl p-5 max-w-2xl w-full">
                 <p className="text-white/60 text-[15px] leading-relaxed text-center">
                 You&apos;re exploring Bob as a guest.{' '}
                 <Link
@@ -380,8 +381,9 @@ export function Chat() {
                 </Link>{' '}
                     to save your conversations and unlock higher daily limits, or start a quick chat below to try things out.
                 </p>
-              </div>
-            ) : null}
+                </div>
+              ) : null}
+            </div>
           </motion.div>
         ) : null}
       </AnimatePresence>

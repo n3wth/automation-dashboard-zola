@@ -75,7 +75,7 @@ export function MessageUser({
   return (
     <MessageContainer
       className={cn(
-        "group flex w-full max-w-3xl flex-col items-end gap-0.5 px-6 pb-2",
+        "group flex w-full max-w-3xl flex-col items-end gap-0.5 px-6 pb-2 mx-auto",
         hasScrollAnchor && "min-h-scroll-anchor",
         className
       )}
