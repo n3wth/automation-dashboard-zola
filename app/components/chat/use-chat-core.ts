@@ -132,13 +132,41 @@ export function useChatCore({
 
     setIsSubmitting(true)
 
-    const uid = await getOrCreateGuestUserId(user)
-    if (!uid) {
+    let uid: string
+    try {
+      const userIdResult = await getOrCreateGuestUserId(user)
+      if (!userIdResult) {
+        setIsSubmitting(false)
+        return
+      }
+
+      uid = userIdResult
+
+      const messageValue = input
+
+      // Check limits and chat creation BEFORE creating optimistic message
+      const allowed = await checkLimitsAndNotify(uid)
+      if (!allowed) {
+        setIsSubmitting(false)
+        return
+      }
+
+      // Pre-check if chat creation will work for new chats
+      if (messages.length === 0) {
+        const currentChatId = await ensureChatExists(uid, messageValue)
+        if (!currentChatId) {
+          setIsSubmitting(false)
+          return
+        }
+      }
+    } catch (error) {
+      console.error("Pre-check failed:", error)
       setIsSubmitting(false)
       return
     }
 
     const messageValue = input
+
     const optimisticId = `optimistic-${Date.now().toString()}`
     const optimisticAttachments =
       files.length > 0 ? createOptimisticAttachments(files) : []
@@ -175,14 +203,11 @@ export function useChatCore({
     setFiles([])
 
     try {
-      const allowed = await checkLimitsAndNotify(uid)
-      if (!allowed) {
-        setMessages((prev) => prev.filter((m) => m.id !== optimisticId))
-        cleanupOptimisticAttachments(optimisticMessage.experimental_attachments)
-        return
-      }
+      // Get chat ID (already verified above for new chats)
+      const currentChatId = messages.length === 0
+        ? await ensureChatExists(uid, messageValue)
+        : chatId
 
-      const currentChatId = await ensureChatExists(uid, messageValue)
       if (!currentChatId) {
         setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId))
         cleanupOptimisticAttachments(optimisticMessage.experimental_attachments)
@@ -265,12 +290,46 @@ export function useChatCore({
     clearDraft,
     bumpChat,
     setIsSubmitting,
+    chatId,
+    messages.length,
   ])
 
   // Handle suggestion
   const handleSuggestion = useCallback(
     async (suggestion: string) => {
       setIsSubmitting(true)
+
+      let uid: string
+      try {
+        const userIdResult = await getOrCreateGuestUserId(user)
+
+        if (!userIdResult) {
+          setIsSubmitting(false)
+          return
+        }
+
+        uid = userIdResult
+
+        const allowed = await checkLimitsAndNotify(uid)
+        if (!allowed) {
+          setIsSubmitting(false)
+          return
+        }
+
+        // Pre-check if chat creation will work for new chats
+        if (messages.length === 0) {
+          const currentChatId = await ensureChatExists(uid, suggestion)
+          if (!currentChatId) {
+            setIsSubmitting(false)
+            return
+          }
+        }
+      } catch (error) {
+        console.error("Suggestion pre-check failed:", error)
+        setIsSubmitting(false)
+        return
+      }
+
       const optimisticId = `optimistic-${Date.now().toString()}`
       const optimisticMessage = {
         id: optimisticId,
@@ -282,20 +341,10 @@ export function useChatCore({
       setMessages((prev) => [...prev, optimisticMessage])
 
       try {
-        const uid = await getOrCreateGuestUserId(user)
-
-        if (!uid) {
-          setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId))
-          return
-        }
-
-        const allowed = await checkLimitsAndNotify(uid)
-        if (!allowed) {
-          setMessages((prev) => prev.filter((m) => m.id !== optimisticId))
-          return
-        }
-
-        const currentChatId = await ensureChatExists(uid, suggestion)
+        // Get chat ID (already verified above for new chats)
+        const currentChatId = messages.length === 0
+          ? await ensureChatExists(uid, suggestion)
+          : chatId
 
         if (!currentChatId) {
           setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId))
@@ -340,6 +389,8 @@ export function useChatCore({
       setMessages,
       bumpChat,
       setIsSubmitting,
+      chatId,
+      messages.length,
     ]
   )
 
