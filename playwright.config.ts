@@ -1,4 +1,31 @@
 import { defineConfig, devices } from '@playwright/test'
+import fs from 'fs'
+import path from 'path'
+
+// Lightweight .env loader so Playwright picks up .env.local without extra deps
+function loadEnv(file: string) {
+  const abs = path.resolve(process.cwd(), file)
+  if (!fs.existsSync(abs)) return
+  const content = fs.readFileSync(abs, 'utf8')
+  for (const rawLine of content.split(/\r?\n/)) {
+    const line = rawLine.trim()
+    if (!line || line.startsWith('#')) continue
+    const idx = line.indexOf('=')
+    if (idx === -1) continue
+    const key = line.slice(0, idx).trim()
+    let value = line.slice(idx + 1).trim()
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1)
+    }
+    if (!(key in process.env)) {
+      process.env[key] = value
+    }
+  }
+}
+
+// Load env in priority order: .env.local then .env
+loadEnv('.env.local')
+loadEnv('.env')
 
 const e2ePort = process.env.E2E_PORT ?? '3100'
 const e2eBaseUrl = `http://127.0.0.1:${e2ePort}`
@@ -56,15 +83,23 @@ export default defineConfig({
     timeout: 180 * 1000, // 3 minutes for unstable server startup
     stderr: 'pipe',
     stdout: 'pipe',
-    env: {
-      NODE_ENV: 'test', // Use test environment
-      PORT: e2ePort,
-      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://example.supabase.co',
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'test-anon-key',
-      SUPABASE_SERVICE_ROLE: process.env.SUPABASE_SERVICE_ROLE ?? 'test-service-role',
-      CSRF_SECRET: process.env.CSRF_SECRET ?? '0123456789abcdef0123456789abcdef',
-      ENCRYPTION_KEY:
-        process.env.ENCRYPTION_KEY ?? 'c2ltcGxlLXRlc3QtZW5jcnlwdGlvbi1rZXkzMg==',
-    },
+    env: (() => {
+      const env: Record<string, string> = {
+        NODE_ENV: 'test', // Use test environment
+        PORT: e2ePort,
+      }
+      // Pass through only if defined so we don't override .env.local
+      const keys = [
+        'NEXT_PUBLIC_SUPABASE_URL',
+        'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+        'SUPABASE_SERVICE_ROLE',
+        'CSRF_SECRET',
+        'ENCRYPTION_KEY',
+      ]
+      for (const k of keys) {
+        if (process.env[k]) env[k] = process.env[k] as string
+      }
+      return env
+    })(),
   },
 })

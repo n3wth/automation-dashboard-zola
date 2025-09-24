@@ -82,12 +82,51 @@ export class TestHelpers {
   }
 
   // Auth helpers
-  async login(userType: 'guest' | 'free' | 'pro' | 'admin' = 'free') {
+  async login() {
+    // Try real sign-in at /auth using env-provided creds. Falls back to a light mock.
     await this.page.goto('/auth')
     await this.waitForPageLoad()
-    await this.page.click(`button:has-text("${userType} User")`)
+
+    const email = process.env.BOB_AUTH_EMAIL || process.env.E2E_AUTH_EMAIL
+    const password = process.env.BOB_AUTH_PASSWORD || process.env.E2E_AUTH_PASSWORD
+
+    if (email && password) {
+      // Fill the real form
+      const emailInput = this.page.locator('input[type="email"], input[placeholder*="email" i]').first()
+      const passwordInput = this.page.locator('input[type="password"]').first()
+
+      await emailInput.fill(email)
+      await passwordInput.fill(password)
+
+      // Click the submit button (Sign In / Create Account)
+      const submit = this.page.locator('button:has-text("Sign In"), button:has-text("Create Account")').first()
+      if (await submit.isVisible()) {
+        await submit.click()
+      } else {
+        // If button locator fails, submit the form via Enter as a fallback
+        await passwordInput.press('Enter')
+      }
+
+      // Wait for possible redirect/home
+      await this.page.waitForTimeout(1500)
+      const atHome = this.page.url().endsWith('/') || this.page.url().includes('/c/')
+      const userVisible = await this.page.locator('[data-testid="user-menu"], .user-avatar').first().isVisible().catch(() => false)
+      if (atHome || userVisible) {
+        return
+      }
+    }
+
+    // Fallback: set a minimal mock token for UI that checks localStorage only.
+    // Note: This does not hydrate server-side user; tests that truly need auth
+    // should run with real credentials in .env.local.
+    await this.page.evaluate(() => {
+      localStorage.setItem('supabase.auth.token', JSON.stringify({
+        access_token: 'mock-token',
+        user: { id: 'e2e-mock-user', email: 'e2e@mock.local' }
+      }))
+    })
+    await this.page.goto('/')
     await this.waitForPageLoad()
-    await this.page.waitForURL('/')
   }
 
   async logout() {

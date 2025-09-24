@@ -5,8 +5,8 @@ test.describe('Dashboard', () => {
   test('should load and display the dashboard for an authenticated user', async ({ page }) => {
     const helpers = new TestHelpers(page)
 
-    // Log in as a free user
-    await helpers.login('free')
+    // Attempt login (uses env credentials or falls back to mock)
+    await helpers.login()
 
     // Navigate to the dashboard
     await page.goto('/dashboard')

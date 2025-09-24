@@ -30,6 +30,7 @@
     "pr": "gh pr create",
     "pr-list": "gh pr list",
     "pr-check": "./scripts/merge-prs.sh",
+    "bb:long": "node scripts/bb-longflows.mjs --n 3 --engine gm --minutes 3",
     "watch:auto-merge": "bash scripts/auto-merge-watch.sh",
     "watch:auto-rebase": "bash scripts/auto-rebase-watch.sh",
     "watch:aggressive": "bash scripts/aggressive-rebase-merge.sh",

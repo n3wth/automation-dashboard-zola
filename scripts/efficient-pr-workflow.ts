@@ -156,7 +156,7 @@ class EfficientPRWorkflow {
 
       console.log('✅ Automated login successful!');
 
-    } catch (error) {
+    } catch {
       console.log('⚠️ Automated login failed, falling back to manual login');
       console.log('📋 Please complete login manually in the browser');
       await this.waitForManualLogin();
@@ -187,7 +187,7 @@ class EfficientPRWorkflow {
 
     try {
       // Generate TOTP code
-      const totp = this.generateTOTP(totpSecret);
+      const totp = await this.generateTOTP(totpSecret);
       console.log('🔢 Generated 2FA code');
 
       // Enter 2FA code
@@ -204,9 +204,9 @@ class EfficientPRWorkflow {
     }
   }
 
-  private generateTOTP(secret: string): string {
+  private async generateTOTP(secret: string): Promise<string> {
     // Simple TOTP implementation
-    const crypto = require('crypto');
+    const crypto = await import('crypto');
 
     // Convert base32 secret to buffer
     const key = this.base32Decode(secret);
