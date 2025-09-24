@@ -3,7 +3,9 @@
 import { ChatInput } from "@/app/components/chat-input/chat-input"
 import { Conversation } from "@/app/components/chat/conversation"
 import { useModel } from "@/app/components/chat/use-model"
+import { OnboardingTour } from "@/app/components/onboarding/onboarding-tour"
 import { useChatDraft } from "@/app/hooks/use-chat-draft"
+import { useOnboardingTour } from "@/app/hooks/use-onboarding-tour"
 import { useChats } from "@/lib/chat-store/chats/provider"
 import { useMessages } from "@/lib/chat-store/messages/provider"
 import { useChatSession } from "@/lib/chat-store/session/provider"
@@ -14,7 +16,7 @@ import { cn } from "@/lib/utils"
 import { AnimatePresence, motion } from "motion/react"
 import dynamic from "next/dynamic"
 import { redirect } from "next/navigation"
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useChatCore } from "./use-chat-core"
 import { useChatOperations } from "./use-chat-operations"
 import { useFileUpload } from "./use-file-upload"
@@ -136,6 +138,45 @@ export function Chat() {
     bumpChat,
   })
 
+  const {
+    hasCompletedTour,
+    isLoading: isOnboardingStateLoading,
+    completeTour,
+    skipTour,
+  } = useOnboardingTour()
+  const [isTourActive, setIsTourActive] = useState(false)
+
+  const baseShowOnboarding = !chatId && messages.length === 0
+
+  useEffect(() => {
+    if (baseShowOnboarding && !isOnboardingStateLoading && !hasCompletedTour) {
+      setIsTourActive(true)
+    }
+  }, [baseShowOnboarding, hasCompletedTour, isOnboardingStateLoading])
+
+  useEffect(() => {
+    if (!baseShowOnboarding) {
+      setIsTourActive(false)
+    }
+  }, [baseShowOnboarding])
+
+  const handleTourComplete = useCallback(() => {
+    completeTour()
+    setIsTourActive(false)
+  }, [completeTour])
+
+  const handleTourSkip = useCallback(() => {
+    skipTour()
+    setIsTourActive(false)
+  }, [skipTour])
+
+  const handlePrefillFromTour = useCallback(
+    (prompt: string) => {
+      handleInputChange(prompt)
+    },
+    [handleInputChange]
+  )
+
   // Memoize the conversation props to prevent unnecessary rerenders
   const conversationProps = useMemo(
     () => ({
@@ -252,9 +293,12 @@ export function Chat() {
     redirect("/")
   }
 
-  const showOnboarding = !chatId && messages.length === 0
+  const showOnboarding = baseShowOnboarding
   const showLoadingForDirectFetch = chatId && fetchingDirectChat === chatId && !currentChat
   const hasMessages = messages.length > 0
+  const shouldShowTour =
+    showOnboarding && isTourActive && !isOnboardingStateLoading && !hasCompletedTour
+  const shouldShowDefaultOnboarding = showOnboarding && !shouldShowTour
 
   return (
     <div
@@ -290,8 +334,8 @@ export function Chat() {
           <Conversation key="conversation" {...conversationProps} />
         ) : (
           <motion.div
-            key="onboarding"
-            className="mx-auto max-w-[50rem] mb-8"
+            key={shouldShowTour ? "onboarding-tour" : "onboarding-heading"}
+            className="mx-auto mb-8 w-full max-w-[50rem] px-3 sm:px-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -300,9 +344,17 @@ export function Chat() {
               ease: "easeOut",
             }}
           >
-            <h1 className="mb-6 text-3xl font-medium tracking-tight">
-              What&apos;s on your mind?
-            </h1>
+            {shouldShowTour ? (
+              <OnboardingTour
+                onComplete={handleTourComplete}
+                onSkip={handleTourSkip}
+                onPrefillPrompt={handlePrefillFromTour}
+              />
+            ) : shouldShowDefaultOnboarding ? (
+              <h1 className="mb-6 text-3xl font-medium tracking-tight">
+                What&apos;s on your mind?
+              </h1>
+            ) : null}
           </motion.div>
         )}
       </AnimatePresence>
