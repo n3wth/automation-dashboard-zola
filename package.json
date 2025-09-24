@@ -19,7 +19,7 @@
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:chromium": "playwright test --project=chromium",
     "test:visual": "playwright test tests/visual",
-    "test:performance": "playwright test tests/e2e/performance.spec.ts",
+    "test:performance": "playwright test tests/e2e/performance-optimized.spec.ts --workers=1",
     "test:report": "playwright show-report",
     "test:report:all": "npm run test:coverage && npm run test:e2e && playwright show-report",
     "test:dashboard": "node scripts/test-dashboard.js",
