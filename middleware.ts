@@ -21,11 +21,69 @@ export async function middleware(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseDomain = supabaseUrl ? new URL(supabaseUrl).origin : ""
 
+  const buildCsp = (directives: Record<string, string[]>) =>
+    Object.entries(directives)
+      .map(
+        ([directive, values]) =>
+          `${directive} ${values.filter((value) => Boolean(value)).join(" ")}`,
+      )
+      .join("; ")
+      .concat(";")
+
+  const commonScriptSrc = [
+    "'self'",
+    "'unsafe-inline'",
+    "'unsafe-eval'",
+    "https://cdnjs.cloudflare.com",
+    "https://assets.onedollarstats.com",
+    "https://va.vercel-scripts.com",
+  ]
+
+  const commonConnectSrc = [
+    "'self'",
+    "wss:",
+    "https://api.openai.com",
+    "https://api.mistral.ai",
+    "https://api.supabase.com",
+    supabaseDomain,
+    "https://api.github.com",
+    "https://collector.onedollarstats.com",
+    "https://va.vercel-analytics.com",
+    "https://vitals.vercel-insights.com",
+  ]
+
+  const devDirectives: Record<string, string[]> = {
+    "default-src": ["'self'"],
+    "script-src": commonScriptSrc,
+    "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+    "font-src": ["'self'", "https://fonts.gstatic.com"],
+    "img-src": ["'self'", "data:", "https:", "blob:"],
+    "connect-src": [...commonConnectSrc],
+  }
+
+  const prodDirectives: Record<string, string[]> = {
+    "default-src": ["'self'"],
+    "script-src": [
+      ...commonScriptSrc,
+      "https://analytics.umami.is",
+      "https://vercel.live",
+      "https://us-assets.i.posthog.com",
+    ],
+    "frame-src": ["'self'", "https://vercel.live"],
+    "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+    "font-src": ["'self'", "https://fonts.gstatic.com"],
+    "img-src": ["'self'", "data:", "https:", "blob:"],
+    "connect-src": [
+      ...commonConnectSrc,
+      "https://api-gateway.umami.dev",
+      "https://us.i.posthog.com",
+      "https://us-assets.i.posthog.com",
+    ],
+  }
+
   response.headers.set(
     "Content-Security-Policy",
-    isDev
-      ? `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://assets.onedollarstats.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; connect-src 'self' wss: https://api.openai.com https://api.mistral.ai https://api.supabase.com ${supabaseDomain} https://api.github.com https://collector.onedollarstats.com;`
-      : `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://analytics.umami.is https://vercel.live https://assets.onedollarstats.com https://us-assets.i.posthog.com; frame-src 'self' https://vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' wss: https://api.openai.com https://api.mistral.ai https://api.supabase.com ${supabaseDomain} https://api-gateway.umami.dev https://api.github.com https://collector.onedollarstats.com https://us.i.posthog.com https://us-assets.i.posthog.com;`
+    buildCsp(isDev ? devDirectives : prodDirectives),
   )
 
   return response
