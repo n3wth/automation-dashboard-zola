@@ -148,10 +148,10 @@ export default function LoginPage() {
       <main className="flex flex-1 flex-col items-center justify-center px-4 sm:px-6">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
-            <h1 className="text-foreground text-3xl font-medium tracking-tight sm:text-4xl">
+            <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight leading-tight">
               Welcome to Bob
             </h1>
-            <p className="text-muted-foreground mt-3">
+            <p className="text-white/60 text-[15px] leading-relaxed mt-4">
               {isForgotPassword
                 ? "Enter your email to receive a password reset link"
                 : isSignUp
@@ -162,8 +162,8 @@ export default function LoginPage() {
           {error && (
             <div className={`rounded-md p-3 text-sm ${
               error.includes("Check your email")
-                ? "bg-green-50 text-green-700 border border-green-200"
-                : "bg-destructive/10 text-destructive"
+                ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                : "bg-destructive/10 text-destructive border border-destructive/20"
             }`}>
               {error}
             </div>
@@ -194,6 +194,7 @@ export default function LoginPage() {
             </div>
             <Button
               type="submit"
+              variant="secondary"
               className="w-full text-base"
               size="lg"
               disabled={isForgotPassword ? resetLoading : emailLoading}
@@ -252,15 +253,10 @@ export default function LoginPage() {
 
           {/* Divider - only show if not in forgot password mode */}
           {!isForgotPassword && (
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with
-                </span>
-              </div>
+            <div className="text-center">
+              <span className="text-white/40 text-xs uppercase tracking-wider">
+                Or continue with
+              </span>
             </div>
           )}
 
@@ -290,14 +286,14 @@ export default function LoginPage() {
         </div>
       </main>
 
-      <footer className="text-muted-foreground py-6 text-center text-sm">
+      <footer className="text-white/40 py-6 text-center text-sm">
         <p>
           By continuing, you agree to our{" "}
-          <Link href="/" className="text-foreground hover:underline">
+          <Link href="/" className="text-white/60 hover:text-white underline underline-offset-4">
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link href="/" className="text-foreground hover:underline">
+          <Link href="/" className="text-white/60 hover:text-white underline underline-offset-4">
             Privacy Policy
           </Link>
         </p>

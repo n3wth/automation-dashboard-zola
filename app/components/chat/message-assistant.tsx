@@ -86,7 +86,7 @@ export function MessageAssistant({
   return (
     <Message
       className={cn(
-        "group flex w-full max-w-3xl flex-1 items-start gap-4 px-6 pb-2",
+        "group flex w-full max-w-3xl flex-1 items-start gap-4 px-6 pb-2 mx-auto",
         hasScrollAnchor && "min-h-scroll-anchor",
         className
       )}

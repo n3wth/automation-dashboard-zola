@@ -330,6 +330,8 @@ export function ProjectView({ projectId }: ProjectViewProps) {
     [messages, status, handleDelete, handleEdit, handleReload]
   )
 
+  const hasMessages = messages.length > 0
+
   // Memoize the chat input props
   const chatInputProps = useMemo(
     () => ({
@@ -349,6 +351,7 @@ export function ProjectView({ projectId }: ProjectViewProps) {
       status,
       setEnableSearch,
       enableSearch,
+      hasMessages,
     }),
     [
       input,
@@ -365,6 +368,7 @@ export function ProjectView({ projectId }: ProjectViewProps) {
       status,
       setEnableSearch,
       enableSearch,
+      hasMessages,
     ]
   )
 

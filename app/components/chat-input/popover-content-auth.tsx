@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button"
 import { PopoverContent } from "@/components/ui/popover"
 import { signInWithGoogle } from "@/lib/api"
 import { APP_CONFIG } from "@/lib/constants/app"
-import { BobGreeting } from "@/lib/components/branding/bob-mascot"
 import { createClient } from "@/lib/supabase/client"
 import { isSupabaseEnabled } from "@/lib/supabase/config"
 import Image from "next/image"
@@ -72,9 +71,8 @@ export function PopoverContentAuth() {
         </div>
       )}
       <div className="p-3">
-        <BobGreeting type="welcome" className="mb-3" />
         <p className="text-primary mb-1 text-base font-medium">
-          Join Bob for enhanced AI conversations
+          Join Bob for enhanced AI convos
         </p>
         <p className="text-muted-foreground mb-5 text-base">
           Upload files, access premium models, bring your own keys, and more.

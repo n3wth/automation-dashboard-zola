@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo } from "react"
 import type { ReactNode } from "react"
-import { useVirtualizer } from "@tanstack/react-virtual"
+import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual"
 import type { Chats } from "@/lib/chat-store/types"
 import { SidebarItem } from "./sidebar-item"
 import { Pin } from "lucide-react"
@@ -77,7 +77,7 @@ export function VirtualizedChatList({
   const rowVirtualizer = useVirtualizer({
     count: items.length,
     getScrollElement: () => viewportRef.current ?? null,
-    estimateSize: (index) => (items[index]?.type === "heading" ? 32 : 48),
+    estimateSize: (index: number) => (items[index]?.type === "heading" ? 32 : 48),
     overscan: 8,
   })
 
@@ -99,7 +99,7 @@ export function VirtualizedChatList({
       className="relative"
       style={{ height: rowVirtualizer.getTotalSize(), minHeight: 0 }}
     >
-      {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+      {rowVirtualizer.getVirtualItems().map((virtualRow: VirtualItem) => {
         const item = items[virtualRow.index]
         if (!item) return null
 

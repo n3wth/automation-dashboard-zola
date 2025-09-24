@@ -1,0 +1,1 @@
+I understand the urgency. I will investigate the production failures immediately. First, I'll check for any recent error logs to quickly identify the root cause.No obvious logs. I'll check the monitoring script at `scripts/monitoring-check.ts` to assess the production environment's health.

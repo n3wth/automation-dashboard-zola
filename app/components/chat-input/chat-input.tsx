@@ -9,9 +9,11 @@ import {
 } from "@/components/prompt-kit/prompt-input"
 import { Button } from "@/components/ui/button"
 import { getModelInfo } from "@/lib/models"
+import { isSupabaseEnabled } from "@/lib/supabase/config"
 import { cn } from "@/lib/utils"
 import { ArrowUpIcon, Spinner, StopIcon } from "@phosphor-icons/react"
 import { useCallback, useEffect, useMemo, useRef } from "react"
+import Link from "next/link"
 import { PromptSystem } from "../suggestions/prompt-system"
 import { ButtonFileUpload } from "./button-file-upload"
 import { ButtonSearch } from "./button-search"
@@ -44,6 +46,7 @@ type ChatInputProps = {
   setEnableSearch: (enabled: boolean) => void
   enableSearch: boolean
   quotedText?: { text: string; messageId: string } | null
+  showMainAuthNotice?: boolean
 }
 
 export function ChatInput({
@@ -64,6 +67,8 @@ export function ChatInput({
   setEnableSearch,
   enableSearch,
   quotedText,
+  hasMessages,
+  showMainAuthNotice,
 }: ChatInputProps) {
   const selectModelConfig = getModelInfo(selectedModel)
   const hasSearchSupport = Boolean(selectModelConfig?.webSearch)
@@ -72,6 +77,10 @@ export function ChatInput({
 
   // Fix hydration mismatch by using client-side state
   const placeholder = "Ask Bob..."
+
+  const hasAnyMessages = Boolean(hasMessages)
+  const shouldShowAuthReminder =
+    isSupabaseEnabled && !isUserAuthenticated && !hasAnyMessages && !showMainAuthNotice
 
   const handleValueChange = useCallback(
     (nextValue: string) => {
@@ -274,14 +283,34 @@ export function ChatInput({
       >
         <PromptInput
           className={cn(
-            "relative z-10 border-border/60 bg-background/95 p-0 pt-1 text-foreground shadow-xs backdrop-blur-xl",
-            isAtCharacterLimit && "border-destructive focus-within:border-destructive",
-            !isAtCharacterLimit && shouldShowLongInputHint && "border-amber-400/80 focus-within:border-amber-400/90"
+            "relative z-10 border-white/10 bg-zinc-900/50 p-0 pt-1 text-foreground backdrop-blur-sm",
+            isAtCharacterLimit && "border-red-500/50 focus-within:border-red-500/70",
+            !isAtCharacterLimit && shouldShowLongInputHint && "border-amber-400/50 focus-within:border-amber-400/70"
           )}
           maxHeight={200}
           value={value}
           onValueChange={handleValueChange}
         >
+          {shouldShowAuthReminder ? (
+            <div
+              className="border-white/15 bg-white/5 text-white/80 mb-2 flex flex-col gap-3 rounded-2xl border px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between"
+              role="status"
+              aria-live="polite"
+            >
+              <span className="text-left">
+                <span className="text-white font-medium">You&apos;re chatting as a guest.</span>{" "}
+                Sign in to save your conversations and unlock higher daily limits.
+              </span>
+              <Button
+                asChild
+                variant="secondary"
+                size="sm"
+                className="w-full sm:w-auto"
+              >
+                <Link href="/auth">Sign in to continue</Link>
+              </Button>
+            </div>
+          ) : null}
           <FileList files={files} onFileRemove={onFileRemove} />
           <PromptInputTextarea
             ref={textareaRef}
@@ -321,12 +350,12 @@ export function ChatInput({
                 data-testid="chat-input-character-count"
                 aria-live="polite"
                 className={cn(
-                  "text-xs font-medium tabular-nums transition-colors",
+                  "text-xs tabular-nums transition-colors",
                   isAtCharacterLimit
-                    ? "text-destructive"
+                    ? "text-red-400/70"
                     : shouldShowLongInputHint
-                      ? "text-amber-400"
-                      : "text-muted-foreground"
+                      ? "text-amber-400/70"
+                      : "text-white/30"
                 )}
               >
                 {formattedInputLength} / {formattedMaxLength}
@@ -337,15 +366,15 @@ export function ChatInput({
                   data-testid="chat-send-button"
                   size="icon"
                   className={cn(
-                    "group relative size-9 rounded-full bg-white text-black shadow-[0_10px_30px_rgba(15,15,15,0.2)]",
-                    "transition-all duration-200 ease-out",
-                    "hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_18px_40px_rgba(15,15,15,0.28)]",
+                    "group relative size-9 rounded-full bg-white text-black",
+                    "transition-all duration-200",
+                    "hover:bg-white/90",
                     "active:scale-95",
-                    "disabled:translate-y-0 disabled:bg-white/15 disabled:text-white/50 disabled:shadow-none disabled:!opacity-80 disabled:!cursor-not-allowed",
-                    "data-[state=streaming]:bg-rose-500 data-[state=streaming]:text-white",
-                    "data-[state=streaming]:hover:bg-rose-500/90 data-[state=streaming]:shadow-[0_16px_36px_rgba(244,63,94,0.45)] data-[state=streaming]:hover:shadow-[0_20px_44px_rgba(244,63,94,0.5)]",
-                    "data-[state=loading]:bg-white/70 data-[state=loading]:text-black/70 data-[state=loading]:shadow-[0_10px_30px_rgba(255,255,255,0.2)]",
-                    "data-[state=loading]:!cursor-wait data-[state=loading]:!opacity-100"
+                    "disabled:bg-white/10 disabled:text-white/30 disabled:!cursor-not-allowed",
+                    "data-[state=streaming]:bg-red-500 data-[state=streaming]:text-white",
+                    "data-[state=streaming]:hover:bg-red-600",
+                    "data-[state=loading]:bg-white/50 data-[state=loading]:text-black/50",
+                    "data-[state=loading]:!cursor-wait"
                   )}
                   disabled={isSendDisabled}
                   type="button"
@@ -353,7 +382,6 @@ export function ChatInput({
                   aria-label={sendButtonAriaLabel}
                   aria-busy={isSubmitting || isStreaming || isAwaitingResponse}
                   data-state={sendButtonState}
-                  data-testid="send-button"
                 >
                   {sendButtonState === "streaming" ? (
                     <StopIcon className="size-4 transition-transform duration-200 group-hover:scale-105" />

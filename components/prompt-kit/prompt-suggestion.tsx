@@ -25,14 +25,20 @@ function PromptSuggestion({
 
   if (!isHighlightMode) {
     return (
-      <Button
-        variant={variant || "outline"}
-        size={size || "lg"}
-        className={cn("rounded-full", className)}
+      <button
+        className={cn(
+          "inline-flex items-center justify-center",
+          "rounded-full px-3 py-1 h-7 text-[13px] font-normal",
+          "border border-white/8 bg-transparent text-white/50",
+          "hover:bg-white/5 hover:border-white/10 hover:text-white/70",
+          "transition-all duration-200",
+          "outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/20",
+          className
+        )}
         {...props}
       >
         {children}
-      </Button>
+      </button>
     )
   }
 

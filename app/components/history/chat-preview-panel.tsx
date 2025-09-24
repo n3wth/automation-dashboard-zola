@@ -1,7 +1,13 @@
 import { MessageContent } from "@/components/prompt-kit/message"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { AlertCircle, Loader2, RefreshCw } from "lucide-react"
+import {
+  AlertCircle,
+  Inbox,
+  Loader2,
+  MessageSquare,
+  RefreshCw,
+} from "lucide-react"
 import { useLayoutEffect, useRef, useState } from "react"
 
 type ChatPreviewPanelProps = {
@@ -156,19 +162,35 @@ function ErrorState({
 
 function EmptyState() {
   return (
-    <div className="flex h-32 items-center justify-center p-4">
-      <p className="text-muted-foreground text-center text-sm">
-        No messages in this conversation yet
-      </p>
+    <div className="flex h-full items-center justify-center px-6 py-10">
+      <div className="space-y-3 text-center">
+        <div className="bg-muted/60 text-muted-foreground mx-auto flex h-12 w-12 items-center justify-center rounded-full">
+          <MessageSquare className="h-6 w-6" />
+        </div>
+        <div className="space-y-1">
+          <p className="text-base font-semibold">No messages yet</p>
+          <p className="text-muted-foreground text-sm">
+            Start chatting to see messages appear in this preview.
+          </p>
+        </div>
+      </div>
     </div>
   )
 }
 
 function DefaultState() {
   return (
-    <div className="flex h-full items-center justify-center p-4">
-      <div className="text-muted-foreground space-y-2 text-center">
-        <p className="text-sm opacity-60">Select a conversation to preview</p>
+    <div className="flex h-full items-center justify-center px-6 py-10">
+      <div className="space-y-3 text-center">
+        <div className="bg-muted/60 text-muted-foreground mx-auto flex h-12 w-12 items-center justify-center rounded-full">
+          <Inbox className="h-6 w-6" />
+        </div>
+        <div className="space-y-1">
+          <p className="text-base font-semibold">Preview a conversation</p>
+          <p className="text-muted-foreground text-sm">
+            Choose a thread from the history list to view its recent messages.
+          </p>
+        </div>
       </div>
     </div>
   )

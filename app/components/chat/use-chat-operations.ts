@@ -124,7 +124,8 @@ export function useChatOperations({
 
         return newChat.id
       } catch (err: unknown) {
-        let errorMessage = "Something went wrong."
+        console.error("Chat creation error:", err)
+        let errorMessage = "Failed to create chat"
         try {
           const errorObj = err as { message?: string }
           if (errorObj.message) {
@@ -135,10 +136,16 @@ export function useChatOperations({
           const errorObj = err as { message?: string }
           errorMessage = errorObj.message || errorMessage
         }
-        toast({
-          title: errorMessage,
-          status: "error",
-        })
+
+        // Don't show the same error twice if it's already been handled
+        if (!errorMessage.includes("Supabase not available") &&
+            !errorMessage.includes("Rate limit") &&
+            !errorMessage.includes("DAILY_LIMIT_REACHED")) {
+          toast({
+            title: errorMessage,
+            status: "error",
+          })
+        }
         return null
       }
     }
