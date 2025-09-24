@@ -71,4 +71,16 @@ Object.defineProperty(window, 'matchMedia', {
 // Mock environment variables
 beforeAll(() => {
   process.env.NODE_ENV = 'test'
+
+  // Provide safe defaults for required environment variables so Supabase-dependent
+  // modules don't throw during local tests. These values are intentionally non-secret
+  // placeholders that keep the test environment self-contained.
+  process.env.NEXT_PUBLIC_SUPABASE_URL ||= 'https://example.supabase.co'
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||= 'test-anon-key'
+  process.env.SUPABASE_SERVICE_ROLE ||= 'test-service-role'
+
+  // Secrets required by the application during runtime. These values do not grant
+  // access to any real service – they simply satisfy runtime validations.
+  process.env.CSRF_SECRET ||= '0123456789abcdef0123456789abcdef'
+  process.env.ENCRYPTION_KEY ||= 'c2ltcGxlLXRlc3QtZW5jcnlwdGlvbi1rZXkzMg=='
 })
