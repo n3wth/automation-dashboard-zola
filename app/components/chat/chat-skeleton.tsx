@@ -8,21 +8,21 @@ function MessageSkeleton({ variant = "assistant" }: { variant?: "user" | "assist
   const justify = variant === "user" ? "justify-end" : "justify-start"
   const bubbleAlignment = variant === "user" ? "items-end" : "items-start"
   const bubbleBackground =
-    variant === "user" ? "bg-primary/10 border-primary/20" : "bg-muted/40 border-border/40"
+    variant === "user" ? "bg-transparent" : "bg-transparent"
 
   return (
     <div className={cn("flex w-full px-6", justify)}>
-      <div className="w-full max-w-3xl">
+      <div className="w-full max-w-3xl mx-auto">
         <div
           className={cn(
-            "flex w-full flex-col gap-3 rounded-3xl border p-4 shadow-sm backdrop-blur",
+            "flex w-full flex-col gap-3 rounded-3xl p-4 opacity-30",
             bubbleAlignment,
             bubbleBackground
           )}
         >
-          <Skeleton className="h-3.5 w-32 rounded-full" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="h-3.5 w-32 rounded-full bg-white/10" />
+          <Skeleton className="h-4 w-full bg-white/10" />
+          <Skeleton className="h-4 w-2/3 bg-white/10" />
         </div>
       </div>
     </div>
@@ -31,12 +31,12 @@ function MessageSkeleton({ variant = "assistant" }: { variant?: "user" | "assist
 
 function ResponseCardSkeleton() {
   return (
-    <div className="bg-background/80 w-full max-w-[420px] flex-shrink-0 rounded-2xl border border-border/50 p-4 shadow-sm backdrop-blur">
-      <Skeleton className="mb-4 h-3 w-20 rounded-full" />
+    <div className="bg-transparent w-full max-w-[420px] flex-shrink-0 rounded-2xl p-4 opacity-30">
+      <Skeleton className="mb-4 h-3 w-20 rounded-full bg-white/10" />
       <div className="space-y-3">
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-5/6" />
-        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-4 w-full bg-white/10" />
+        <Skeleton className="h-4 w-5/6 bg-white/10" />
+        <Skeleton className="h-4 w-3/4 bg-white/10" />
       </div>
     </div>
   )
@@ -98,23 +98,23 @@ export function ChatInputSkeleton({
   return (
     <div
       className={cn(
-        "border-input bg-background/80 relative z-10 rounded-3xl border p-4 shadow-xs backdrop-blur",
+        "bg-transparent relative z-10 rounded-3xl p-4 opacity-30",
         className
       )}
     >
-      <Skeleton className="h-16 w-full rounded-2xl" />
+      <Skeleton className="h-16 w-full rounded-2xl bg-white/10" />
       <div className="mt-4 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           {withModelSelector ? (
             <>
-              <Skeleton className="h-5 w-24 rounded-md" />
-              <Skeleton className="h-5 w-16 rounded-md" />
+              <Skeleton className="h-5 w-24 rounded-md bg-white/10" />
+              <Skeleton className="h-5 w-16 rounded-md bg-white/10" />
             </>
           ) : (
-            <Skeleton className="h-5 w-28 rounded-md" />
+            <Skeleton className="h-5 w-28 rounded-md bg-white/10" />
           )}
         </div>
-        <Skeleton className="h-9 w-9 rounded-full" />
+        <Skeleton className="h-9 w-9 rounded-full bg-white/10" />
       </div>
     </div>
   )

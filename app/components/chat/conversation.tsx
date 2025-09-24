@@ -83,7 +83,7 @@ export function Conversation({
               messages.length > 0 &&
               messages[messages.length - 1].role === "user" && (
                 <li
-                  className="group min-h-scroll-anchor flex w-full max-w-3xl list-none flex-col items-start gap-2 px-6 pb-2"
+                  className="group min-h-scroll-anchor flex w-full max-w-3xl list-none flex-col items-start gap-2 px-6 pb-2 mx-auto"
                   role="status"
                   aria-live="polite"
                 >
@@ -92,7 +92,7 @@ export function Conversation({
                 </li>
               )}
           </ol>
-          <div className="pointer-events-none absolute bottom-0 flex w-full max-w-3xl flex-1 items-end justify-end gap-4 px-6 pb-2">
+          <div className="pointer-events-none absolute bottom-0 flex w-full max-w-3xl flex-1 items-end justify-end gap-4 px-6 pb-2 mx-auto">
             <ScrollButton
               className="pointer-events-auto absolute right-[30px] top-[-50px]"
               aria-label="Scroll to latest messages"
