@@ -29,7 +29,15 @@
     "merge-prs": "./scripts/merge-prs.sh",
     "pr": "gh pr create",
     "pr-list": "gh pr list",
-    "pr-check": "./scripts/merge-prs.sh"
+    "pr-check": "./scripts/merge-prs.sh",
+    "watch:auto-merge": "bash scripts/auto-merge-watch.sh",
+    "watch:auto-rebase": "bash scripts/auto-rebase-watch.sh",
+    "watch:aggressive": "bash scripts/aggressive-rebase-merge.sh",
+    "watch:issue-sync": "bash scripts/issue-sync.sh --watch",
+    "watch:test-issues": "bash scripts/test-file-issues.sh --watch",
+    "watch:smoke": "bash scripts/browserbase-smoke-watch.sh",
+    "watch:bb-flows": "bash scripts/browserbase-flows-watch.sh",
+    "watch:logs": "bash scripts/monitor-logs.sh"
   },
   "overrides": {
     "jsondiffpatch": "^0.7.2"
