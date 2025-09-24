@@ -211,12 +211,14 @@ export function ChatInput({
           <FileList files={files} onFileRemove={onFileRemove} />
           <PromptInputTextarea
             ref={textareaRef}
+            data-testid="chat-input-textarea"
             placeholder={placeholder}
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}
             className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"
             aria-invalid={isErrored}
             aria-describedby={errorMessageId}
+            aria-label="Message input"
           />
           <PromptInputActions className="mt-3 w-full justify-between p-2">
             <div className="flex gap-2">
@@ -261,6 +263,7 @@ export function ChatInput({
                 aria-label={sendButtonAriaLabel}
                 aria-busy={isSubmitting || isStreaming || isAwaitingResponse}
                 data-state={sendButtonState}
+                data-testid="send-button"
               >
                 {sendButtonState === "streaming" ? (
                   <StopIcon className="size-4 transition-transform duration-200 group-hover:scale-105" />
