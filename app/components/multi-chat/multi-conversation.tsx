@@ -78,10 +78,11 @@ function ResponseCard({ response, group }: ResponseCardProps) {
             {response.message.content}
           </Message>
         ) : response.isLoading ? (
-          <div className="space-y-2">
+          <div className="space-y-2" role="status" aria-live="polite" aria-busy="true">
             <div className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
               assistant
             </div>
+            <span className="sr-only">{model?.name} response loading</span>
             <Loader />
           </div>
         ) : (
@@ -117,9 +118,18 @@ export function MultiModelConversation({
     setGroupResponses(updated)
   }, [messageGroups])
 
+  const isStreaming = messageGroups.some((group) =>
+    group.responses.some((response) => response.isLoading)
+  )
+
   return (
-    <div className="relative flex h-full w-full flex-col items-center overflow-y-auto">
-      <ChatContainerRoot className="relative w-full">
+    <section className="relative flex h-full w-full flex-col items-center overflow-y-auto" aria-label="Multi-model conversation">
+      <ChatContainerRoot
+        className="relative w-full"
+        tabIndex={0}
+        aria-label="Multi-model conversation messages"
+        aria-busy={isStreaming}
+      >
         <ChatContainerContent
           className="flex w-full flex-col items-center pt-20 pb-[134px]"
           style={{
@@ -189,6 +199,6 @@ export function MultiModelConversation({
           </div>
         </ChatContainerContent>
       </ChatContainerRoot>
-    </div>
+    </section>
   )
 }
