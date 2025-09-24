@@ -94,10 +94,6 @@ export async function GET(request: Request) {
         const { error: insertError } = await supabaseAdmin.from("users").insert({
           id: user.id,
           email: user.email,
-          anonymous: false,
-          message_count: 0,
-          premium: false,
-          favorite_models: [MODEL_DEFAULT],
         } as any)
 
         if (insertError && insertError.code !== "23505") {
