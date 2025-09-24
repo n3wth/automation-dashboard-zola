@@ -12,7 +12,7 @@ env:
 
 jobs:
   deploy:
-    name: Deploy
+    name: Build & Push
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
     permissions:
