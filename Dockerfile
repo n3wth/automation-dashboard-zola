@@ -1,5 +1,5 @@
 # Base Node.js image
-FROM node:18-alpine AS base
+FROM node:22-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -25,14 +25,18 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Set build-time environment variables
-# These are placeholders for the build process only
-ENV NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder_key_for_build
-ENV ENCRYPTION_KEY=t/o1f3K4KE+0Fp1motcoZDz72oEJU14Y31Z5M8gI7jA=
-ENV CSRF_SECRET=placeholder_csrf_secret_for_build_only
+# Allow overrides via build args while providing safe defaults for CI builds
+ARG NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder_key_for_build
+ARG ENCRYPTION_KEY=t/o1f3K4KE+0Fp1motcoZDz72oEJU14Y31Z5M8gI7jA=
+ARG CSRF_SECRET=placeholder_csrf_secret_for_build_only
 
 # Build the application
-RUN npm run build
+RUN NEXT_PUBLIC_SUPABASE_URL="$NEXT_PUBLIC_SUPABASE_URL" \
+    NEXT_PUBLIC_SUPABASE_ANON_KEY="$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
+    ENCRYPTION_KEY="$ENCRYPTION_KEY" \
+    CSRF_SECRET="$CSRF_SECRET" \
+    npm run build
 
 # Verify standalone build was created
 RUN ls -la .next/ && \

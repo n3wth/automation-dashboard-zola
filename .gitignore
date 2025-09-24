@@ -78,6 +78,7 @@ TEST_RESULTS.md
 TROUBLESHOOTING_AUTH.md
 DOCKER_SETUP_GUIDE.md
 QUICK_START.md
+!docs/QUICK_START.md
 
 # IDE and editor files
 .idea/

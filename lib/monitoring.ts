@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import type { Json, TablesInsert } from '@/app/types/database.types'
+import { createClient, type TypedSupabaseServerClient } from '@/lib/supabase/server'
 
 export enum MonitoringEvent {
   AI_MODEL_USAGE = 'AI_MODEL_USAGE',
@@ -10,12 +11,12 @@ interface TrackEventParams {
   type: MonitoringEvent;
   value?: string;
   userId?: string;
-  metadata?: Record<string, any>;
+  metadata?: Json;
 }
 
 export async function trackEvent({ type, value, userId, metadata }: TrackEventParams) {
   try {
-    const supabase = await createClient()
+    const supabase: TypedSupabaseServerClient = await createClient()
     if (!supabase) return // Skip if Supabase is not enabled
 
     // Map dev users to anonymous UUID for database constraints
@@ -23,12 +24,14 @@ export async function trackEvent({ type, value, userId, metadata }: TrackEventPa
       ? '00000000-0000-0000-0000-000000000001'
       : userId
 
-    const { error } = await (supabase as any).from('monitoring').insert({
+    const payload: TablesInsert<'monitoring'> = {
       type,
-      value,
-      user_id: dbUserId,
-      metadata,
-    })
+      value: value ?? null,
+      user_id: dbUserId ?? null,
+      metadata: metadata ?? null,
+    }
+
+    const { error } = await supabase.from('monitoring').insert(payload)
 
     if (error) {
       console.error('Failed to track event:', error)

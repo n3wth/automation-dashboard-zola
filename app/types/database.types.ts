@@ -40,6 +40,39 @@ export type Database = {
           },
         ]
       }
+      anonymous_usage: {
+        Row: {
+          id: string
+          session_id: string
+          ip_address: string | null
+          user_agent: string | null
+          query_count: number | null
+          first_query_at: string | null
+          last_query_at: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          session_id: string
+          ip_address?: string | null
+          user_agent?: string | null
+          query_count?: number | null
+          first_query_at?: string | null
+          last_query_at?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          session_id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          query_count?: number | null
+          first_query_at?: string | null
+          last_query_at?: string | null
+          created_at?: string | null
+        }
+        Relationships: []
+      }
       chat_attachments: {
         Row: {
           chat_id: string
@@ -100,6 +133,7 @@ export type Database = {
           public: boolean
           pinned: boolean
           pinned_at: string | null
+          system_prompt: string | null
         }
         Insert: {
           created_at?: string | null
@@ -112,6 +146,7 @@ export type Database = {
           public?: boolean
           pinned?: boolean
           pinned_at?: string | null
+          system_prompt?: string | null
         }
         Update: {
           created_at?: string | null
@@ -124,6 +159,7 @@ export type Database = {
           public?: boolean
           pinned?: boolean
           pinned_at?: string | null
+          system_prompt?: string | null
         }
         Relationships: [
           {
@@ -272,6 +308,41 @@ export type Database = {
           },
         ]
       }
+      monitoring: {
+        Row: {
+          id: number
+          created_at: string
+          type: string | null
+          value: string | null
+          user_id: string | null
+          metadata: Json | null
+        }
+        Insert: {
+          id?: number
+          created_at?: string
+          type?: string | null
+          value?: string | null
+          user_id?: string | null
+          metadata?: Json | null
+        }
+        Update: {
+          id?: number
+          created_at?: string
+          type?: string | null
+          value?: string | null
+          user_id?: string | null
+          metadata?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "monitoring_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_keys: {
         Row: {
           user_id: string
@@ -356,7 +427,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_events_over_time: {
+        Args: Record<string, never>
+        Returns: {
+          hour: string
+          count: number
+        }[]
+      }
+      increment_anonymous_query_count: {
+        Args: {
+          p_session_id: string
+          p_ip: string | null
+          p_user_agent: string | null
+        }
+        Returns: number
+      }
     }
     Enums: Record<string, never>
     CompositeTypes: {

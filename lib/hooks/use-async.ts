@@ -1,15 +1,15 @@
 import { useCallback, useState } from 'react'
 
-interface UseAsyncOptions {
-  onSuccess?: (data: any) => void
-  onError?: (error: Error) => void
+interface UseAsyncOptions<TArgs extends unknown[], TResult> {
+  onSuccess?: (data: TResult, args: TArgs) => void
+  onError?: (error: Error, args: TArgs) => void
 }
 
-interface UseAsyncReturn<T> {
-  data: T | null
+interface UseAsyncReturn<TResult, TArgs extends unknown[]> {
+  data: TResult | null
   isLoading: boolean
   error: string | null
-  execute: (...args: any[]) => Promise<T | undefined>
+  execute: (...args: TArgs) => Promise<TResult | undefined>
   reset: () => void
 }
 
@@ -17,16 +17,16 @@ interface UseAsyncReturn<T> {
  * Standardized async operation hook
  * Provides consistent loading, error, and success handling
  */
-export function useAsync<T>(
-  asyncFunction: (...args: any[]) => Promise<T>,
-  options: UseAsyncOptions = {}
-): UseAsyncReturn<T> {
-  const [data, setData] = useState<T | null>(null)
+export function useAsync<TResult, TArgs extends unknown[]>(
+  asyncFunction: (...args: TArgs) => Promise<TResult>,
+  options: UseAsyncOptions<TArgs, TResult> = {}
+): UseAsyncReturn<TResult, TArgs> {
+  const [data, setData] = useState<TResult | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const execute = useCallback(
-    async (...args: any[]) => {
+    async (...args: TArgs) => {
       try {
         setIsLoading(true)
         setError(null)
@@ -34,12 +34,16 @@ export function useAsync<T>(
         const result = await asyncFunction(...args)
         setData(result)
 
-        options.onSuccess?.(result)
+        options.onSuccess?.(result, args)
         return result
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error'
         setError(errorMessage)
-        options.onError?.(err as Error)
+        if (err instanceof Error) {
+          options.onError?.(err, args)
+        } else {
+          options.onError?.(new Error(errorMessage), args)
+        }
       } finally {
         setIsLoading(false)
       }

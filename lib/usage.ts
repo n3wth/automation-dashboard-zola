@@ -1,3 +1,4 @@
+import type { Database } from "@/app/types/database.types"
 import { UsageLimitError } from "@/lib/api"
 import {
   AUTH_DAILY_MESSAGE_LIMIT,
@@ -5,7 +6,9 @@ import {
   FREE_MODELS_IDS,
   NON_AUTH_DAILY_MESSAGE_LIMIT,
 } from "@/lib/config"
-import { SupabaseClient } from "@supabase/supabase-js"
+import type { SupabaseClient } from "@supabase/supabase-js"
+
+type SupabaseDbClient = SupabaseClient<Database>
 
 const isFreeModel = (modelId: string) => FREE_MODELS_IDS.includes(modelId)
 const isProModel = (modelId: string) => !isFreeModel(modelId)
@@ -20,7 +23,7 @@ const isProModel = (modelId: string) => !isFreeModel(modelId)
  * @throws UsageLimitError if the daily limit is reached, or a generic Error if checking fails.
  * @returns User data including message counts and reset date
  */
-export async function checkUsage(supabase: SupabaseClient, userId: string) {
+export async function checkUsage(supabase: SupabaseDbClient, userId: string) {
   // Handle session-based anonymous users (anon-* prefix)
   if (userId.startsWith('anon-')) {
     // For session-based anonymous users, check the anonymous_usage table
@@ -108,7 +111,7 @@ export async function checkUsage(supabase: SupabaseClient, userId: string) {
 
   // Reset the daily counter if the day has changed (using UTC).
   const now = new Date()
-  let dailyCount = (userData as any).daily_message_count || 0
+  let dailyCount = userData.daily_message_count ?? 0
   const lastReset = userData.daily_reset ? new Date(userData.daily_reset) : null
 
   const isNewDay =
@@ -121,7 +124,7 @@ export async function checkUsage(supabase: SupabaseClient, userId: string) {
     dailyCount = 0
     const { error: resetError } = await supabase
       .from("users")
-      .update({ daily_message_count: 0, daily_reset: now.toISOString() } as any)
+      .update({ daily_message_count: 0, daily_reset: now.toISOString() })
       .eq("id", userId)
 
     if (resetError) {
@@ -151,7 +154,7 @@ export async function checkUsage(supabase: SupabaseClient, userId: string) {
  * @throws Error if updating fails.
  */
 export async function incrementUsage(
-  supabase: SupabaseClient<any, "public", any> | null,
+  supabase: SupabaseDbClient | null,
   userId: string
 ): Promise<void> {
   // LOCAL DEV BYPASS: Skip increment for all dev users
@@ -200,7 +203,7 @@ export async function incrementUsage(
   }
 
   const messageCount = userData.message_count || 0
-  const dailyCount = (userData as any).daily_message_count || 0
+  const dailyCount = userData.daily_message_count ?? 0
 
   // Increment both overall and daily message counts.
   const newOverallCount = messageCount + 1
@@ -212,7 +215,7 @@ export async function incrementUsage(
       message_count: newOverallCount,
       daily_message_count: newDailyCount,
       last_active_at: new Date().toISOString(),
-    } as any)
+    })
     .eq("id", userId)
 
   if (updateError) {
@@ -220,7 +223,7 @@ export async function incrementUsage(
   }
 }
 
-export async function checkProUsage(supabase: SupabaseClient, userId: string) {
+export async function checkProUsage(supabase: SupabaseDbClient, userId: string) {
   const { data: userData, error: userDataError } = await supabase
     .from("users")
     .select("daily_pro_message_count, daily_pro_reset")
@@ -272,7 +275,7 @@ export async function checkProUsage(supabase: SupabaseClient, userId: string) {
 }
 
 export async function incrementProUsage(
-  supabase: SupabaseClient,
+  supabase: SupabaseDbClient,
   userId: string
 ) {
   const { data, error } = await supabase
@@ -301,7 +304,7 @@ export async function incrementProUsage(
 }
 
 export async function checkUsageByModel(
-  supabase: SupabaseClient<any, "public", any> | null,
+  supabase: SupabaseDbClient | null,
   userId: string,
   modelId: string,
   isAuthenticated: boolean
@@ -348,7 +351,7 @@ export async function checkUsageByModel(
 }
 
 export async function incrementUsageByModel(
-  supabase: SupabaseClient<any, "public", any> | null,
+  supabase: SupabaseDbClient | null,
   userId: string,
   modelId: string,
   isAuthenticated: boolean

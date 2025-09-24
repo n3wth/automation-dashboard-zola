@@ -42,11 +42,7 @@ export async function updateSession(request: NextRequest) {
 
   // Use getSession instead of getUser to avoid unnecessary API calls
   // getSession only validates the JWT locally without hitting the API
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  const user = session?.user
+  await supabase.auth.getSession()
 
   // if (
   //   !user &&

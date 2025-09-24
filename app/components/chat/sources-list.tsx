@@ -5,7 +5,7 @@ import type { SourceUIPart } from "@ai-sdk/ui-utils"
 import { CaretDown, Link } from "@phosphor-icons/react"
 import { AnimatePresence, motion } from "motion/react"
 import Image from "next/image"
-import { useState } from "react"
+import { useId, useState } from "react"
 import { addUTM, formatUrl, getFavicon } from "./utils"
 
 type SourcesListProps = {
@@ -22,6 +22,7 @@ const TRANSITION = {
 export function SourcesList({ sources, className }: SourcesListProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [failedFavicons, setFailedFavicons] = useState<Set<string>>(new Set())
+  const listId = useId()
 
   const handleFaviconError = (url: string) => {
     setFailedFavicons((prev) => new Set(prev).add(url))
@@ -34,6 +35,8 @@ export function SourcesList({ sources, className }: SourcesListProps) {
           onClick={() => setIsExpanded(!isExpanded)}
           type="button"
           className="hover:bg-accent flex w-full flex-row items-center rounded-t-md px-3 py-2 transition-colors"
+          aria-expanded={isExpanded}
+          aria-controls={isExpanded ? listId : undefined}
         >
           <div className="flex flex-1 flex-row items-center gap-2 text-left text-sm">
             Sources
@@ -83,6 +86,7 @@ export function SourcesList({ sources, className }: SourcesListProps) {
               exit={{ height: 0, opacity: 0 }}
               transition={TRANSITION}
               className="overflow-hidden"
+              id={listId}
             >
               <ul className="space-y-2 px-3 pt-3 pb-3">
                 {sources.map((source) => {

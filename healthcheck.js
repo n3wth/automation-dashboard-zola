@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* eslint-disable @typescript-eslint/no-require-imports */
+
 /**
  * Health check script for Docker container
  * Verifies that the Next.js application is responding correctly

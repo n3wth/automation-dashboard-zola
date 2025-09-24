@@ -28,6 +28,8 @@ export function ButtonSearch({
           <Button
             variant="secondary"
             className="border-border dark:bg-secondary rounded-full border bg-transparent"
+            type="button"
+            aria-label="Enable web search"
           >
             <GlobeIcon className="size-5" />
             Search
@@ -47,6 +49,9 @@ export function ButtonSearch({
           "border-[#0091FF]/20 bg-[#E5F3FE] text-[#0091FF] hover:bg-[#E5F3FE] hover:text-[#0091FF]"
       )}
       onClick={handleClick}
+      aria-pressed={isSelected}
+      aria-label={isSelected ? "Disable web search" : "Enable web search"}
+      type="button"
     >
       <GlobeIcon className="size-5" />
       <span className="hidden md:block">Search</span>

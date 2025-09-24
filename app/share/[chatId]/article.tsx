@@ -54,8 +54,8 @@ export default function Article({
               className="text-muted-foreground group flex h-12 w-full max-w-36 items-center justify-between rounded-full py-2 pr-2 pl-4 shadow-sm btn-bob"
             >
               Ask Bob{" "}
-              <div className="rounded-full bg-black/20 p-2 backdrop-blur-sm transition-colors group-hover:bg-black/30">
-                <ArrowUpRight className="h-4 w-4 text-white" />
+              <div className="rounded-full bg-primary/10 p-2 backdrop-blur-sm transition-colors group-hover:bg-primary/20">
+                <ArrowUpRight className="h-4 w-4 text-primary" />
               </div>
             </Button>
           </Link>
@@ -78,7 +78,7 @@ export default function Article({
                   <MessageContent
                     markdown={true}
                     className={cn(
-                      message.role === "user" && "bg-blue-600 text-white",
+                      message.role === "user" && "bg-primary text-primary-foreground",
                       message.role === "assistant" &&
                         "w-full min-w-full bg-transparent",
                       "prose-h1:scroll-m-20 prose-h1:text-2xl prose-h1:font-semibold prose-h2:mt-8 prose-h2:scroll-m-20 prose-h2:text-xl prose-h2:mb-3 prose-h2:font-medium prose-h3:scroll-m-20 prose-h3:text-base prose-h3:font-medium prose-h4:scroll-m-20 prose-h5:scroll-m-20 prose-h6:scroll-m-20 prose-strong:font-medium prose-table:block prose-table:overflow-y-auto"

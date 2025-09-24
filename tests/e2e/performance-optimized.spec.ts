@@ -1,13 +1,20 @@
 import { test, expect } from '@playwright/test'
 import { TestHelpers, TEST_DATA } from '../utils/test-helpers'
 
+type PerformanceWithMemory = Performance & {
+  memory?: {
+    usedJSHeapSize: number
+    totalJSHeapSize: number
+    jsHeapSizeLimit: number
+  }
+}
+
 // Optimized performance tests - reduced scope and faster execution
 test.describe('Performance Tests', () => {
   // Set shorter timeouts for performance tests
   test.setTimeout(30000) // 30 seconds max per test
 
   test('critical web vitals', async ({ page }) => {
-    const helpers = new TestHelpers(page)
 
     // Measure page load performance
     await page.goto('/', { waitUntil: 'domcontentloaded' }) // Don't wait for all resources
@@ -62,7 +69,8 @@ test.describe('Performance Tests', () => {
 
     // Simple memory check
     const memory = await page.evaluate(() => {
-      return (performance as any).memory?.usedJSHeapSize || 0
+      const perf = performance as PerformanceWithMemory
+      return perf.memory?.usedJSHeapSize ?? 0
     })
 
     // Just ensure memory is reasonable (not checking growth)
