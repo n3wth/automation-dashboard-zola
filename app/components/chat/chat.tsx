@@ -363,11 +363,17 @@ export function Chat() {
               ease: "easeOut",
             }}
           >
-            <h1 className="mb-6 text-3xl font-medium tracking-tight">
-              What&apos;s on your mind?
-            </h1>
+            <div className="text-center space-y-6 mb-8">
+              <h1 className="bg-gradient-to-br from-white via-white to-white/80 bg-clip-text text-transparent text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight">
+                What&apos;s on your mind?
+              </h1>
+              <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent max-w-md mx-auto" />
+            </div>
             {shouldShowAuthNotice ? (
-              <p className="text-muted-foreground text-base leading-relaxed text-center md:text-left">
+              <div className="relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 shadow-2xl shadow-black/20">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent rounded-2xl" />
+                <div className="relative space-y-4">
+                  <p className="text-white/90 text-lg leading-relaxed text-center">
                 You&apos;re exploring Bob as a guest.{' '}
                 <Link
                   href="/auth"
