@@ -25,7 +25,11 @@
     "test:dashboard": "node scripts/test-dashboard.mjs",
     "test:install": "playwright install",
     "test:all": "npm run test:run && npm run test:e2e",
-    "test:ci": "npm run test:coverage && npm run test:e2e:chromium"
+    "test:ci": "npm run test:coverage && npm run test:e2e:chromium",
+    "merge-prs": "./scripts/merge-prs.sh",
+    "pr": "gh pr create",
+    "pr-list": "gh pr list",
+    "pr-check": "./scripts/merge-prs.sh"
   },
   "overrides": {
     "jsondiffpatch": "^0.7.2"
