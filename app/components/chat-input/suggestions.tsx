@@ -129,7 +129,6 @@ export const Suggestions = memo(function Suggestions({
               animate: { opacity: 1, scale: 1 },
             }}
           >
-            <suggestion.icon className="size-4" />
             {suggestion.label}
           </MotionPromptSuggestion>
         ))}

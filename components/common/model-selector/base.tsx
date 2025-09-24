@@ -205,8 +205,11 @@ export function ModelSelector({
 
   const trigger = (
     <Button
-      variant="outline"
-      className={cn("dark:bg-secondary justify-between btn-bob", className)}
+      variant="ghost"
+      className={cn(
+        "justify-between border border-white/10 bg-transparent hover:bg-white/5 hover:border-white/15 transition-all h-9",
+        className
+      )}
       disabled={isLoadingModels}
       aria-label={triggerAriaLabel}
     >
@@ -229,9 +232,9 @@ export function ModelSelector({
             <PopoverTrigger asChild>
               <Button
                 size="sm"
-                variant="secondary"
+                variant="ghost"
                 className={cn(
-                  "border-border dark:bg-secondary text-accent-foreground h-9 w-auto border bg-transparent justify-between gap-3",
+                  "h-9 w-auto border border-white/10 bg-transparent hover:bg-white/5 hover:border-white/15 transition-all justify-between gap-3",
                   className
                 )}
                 type="button"

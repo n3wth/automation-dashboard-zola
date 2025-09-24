@@ -27,7 +27,7 @@ export function ButtonSearch({
         <PopoverTrigger asChild>
           <Button
             variant="secondary"
-            className="border-border dark:bg-secondary rounded-full border bg-transparent"
+            className="rounded-full border border-white/10 bg-transparent hover:bg-white/5 hover:border-white/15 transition-all"
             type="button"
             aria-label="Enable web search"
           >
@@ -44,9 +44,9 @@ export function ButtonSearch({
     <Button
       variant="secondary"
       className={cn(
-        "border-border dark:bg-secondary rounded-full border bg-transparent transition-all duration-150 has-[>svg]:px-1.75 md:has-[>svg]:px-3",
+        "rounded-full border border-white/10 bg-transparent hover:bg-white/5 hover:border-white/15 transition-all duration-150 has-[>svg]:px-1.75 md:has-[>svg]:px-3",
         isSelected &&
-          "border-[#0091FF]/20 bg-[#E5F3FE] text-[#0091FF] hover:bg-[#E5F3FE] hover:text-[#0091FF]"
+          "border-[#0091FF]/20 bg-[#0091FF]/10 text-[#0091FF] hover:bg-[#0091FF]/15 hover:text-[#0091FF]"
       )}
       onClick={handleClick}
       aria-pressed={isSelected}

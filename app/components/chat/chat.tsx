@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils"
 import { AnimatePresence, motion } from "motion/react"
 import dynamic from "next/dynamic"
 import Link from "next/link"
-import { redirect, useRouter } from "next/navigation"
+import { redirect } from "next/navigation"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useChatCore } from "./use-chat-core"
 import { useChatOperations } from "./use-chat-operations"
@@ -32,10 +32,10 @@ const DialogAuth = dynamic(
   { ssr: false }
 )
 
-const OnboardingTour = dynamic(
-  () => import("../onboarding/onboarding-tour").then((mod) => mod.OnboardingTour),
-  { ssr: false }
-)
+// const OnboardingTour = dynamic(
+//   () => import("../onboarding/onboarding-tour").then((mod) => mod.OnboardingTour),
+//   { ssr: false }
+// )
 
 export function Chat() {
   const { chatId } = useChatSession()
@@ -63,8 +63,8 @@ export function Chat() {
   const {
     hasCompletedTour,
     isLoading: isOnboardingStateLoading,
-    completeTour,
-    skipTour,
+    // completeTour,
+    // skipTour,
   } = useOnboardingTour()
 
   const [isTourActive, setIsTourActive] = useState(false)
@@ -154,25 +154,25 @@ export function Chat() {
     bumpChat,
   })
 
-  const router = useRouter()
+  // const router = useRouter()
 
   // Handle tour completion
-  const handleTourComplete = useCallback(() => {
-    completeTour()
-  }, [completeTour])
+  // const handleTourComplete = useCallback(() => {
+  //   completeTour()
+  // }, [completeTour])
 
   // Handle tour skip
-  const handleTourSkip = useCallback(() => {
-    skipTour()
-  }, [skipTour])
+  // const handleTourSkip = useCallback(() => {
+  //   skipTour()
+  // }, [skipTour])
 
   // Handle prefill from tour
-  const handlePrefillFromTour = useCallback(
-    (prompt: string) => {
-      handleInputChange(prompt)
-    },
-    [handleInputChange]
-  )
+  // const handlePrefillFromTour = useCallback(
+  //   (prompt: string) => {
+  //     handleInputChange(prompt)
+  //   },
+  //   [handleInputChange]
+  // )
 
   // Memoize the conversation props to prevent unnecessary rerenders
   const conversationProps = useMemo(
@@ -195,6 +195,13 @@ export function Chat() {
   )
 
   const hasMessages = messages.length > 0
+  const baseShowOnboarding = !chatId && !hasMessages
+  const showOnboarding = baseShowOnboarding
+  const shouldShowTour =
+    showOnboarding && isTourActive && !isOnboardingStateLoading && !hasCompletedTour
+  // const shouldShowDefaultOnboarding = showOnboarding && !shouldShowTour
+  const shouldShowAuthNotice =
+    isSupabaseEnabled && !isAuthenticated && showOnboarding
 
   // Memoize the chat input props
   const chatInputProps = useMemo(
@@ -218,6 +225,7 @@ export function Chat() {
       enableSearch,
       quotedText,
       hasMessages,
+      showMainAuthNotice: shouldShowAuthNotice,
     }),
     [
       input,
@@ -239,6 +247,7 @@ export function Chat() {
       setEnableSearch,
       enableSearch,
       quotedText,
+      shouldShowAuthNotice,
     ]
   )
 
@@ -257,6 +266,19 @@ export function Chat() {
   // Check if we're currently fetching or should wait for fetch attempt
   const isFetchingOrWillFetch = fetchingDirectChat === chatId ||
     (shouldRedirect && !attemptedDirectFetch.has(chatId))
+
+  // Set tour active state on mount when appropriate
+  useEffect(() => {
+    if (baseShowOnboarding && !isOnboardingStateLoading && !hasCompletedTour) {
+      setIsTourActive(true)
+    }
+  }, [baseShowOnboarding, hasCompletedTour, isOnboardingStateLoading])
+
+  useEffect(() => {
+    if (!baseShowOnboarding) {
+      setIsTourActive(false)
+    }
+  }, [baseShowOnboarding])
 
   // Log the state for debugging - commented out to prevent performance issues
   // if (chatId) {
@@ -293,29 +315,9 @@ export function Chat() {
     redirect("/")
   }
 
-  const baseShowOnboarding = !chatId && !hasMessages
   const showLoadingForDirectFetch = chatId && fetchingDirectChat === chatId && !currentChat
-  const showOnboarding = baseShowOnboarding
-  const shouldShowTour =
-    showOnboarding && isTourActive && !isOnboardingStateLoading && !hasCompletedTour
-  const shouldShowDefaultOnboarding = showOnboarding && !shouldShowTour
-  const shouldShowAuthNotice =
-    isSupabaseEnabled && !isAuthenticated && showOnboarding
-  const showInitialLoading =
-    Boolean(chatId) && isChatsLoading && !showLoadingForDirectFetch && !hasMessages
-
-  // Set tour active state on mount when appropriate
-  useEffect(() => {
-    if (baseShowOnboarding && !isOnboardingStateLoading && !hasCompletedTour) {
-      setIsTourActive(true)
-    }
-  }, [baseShowOnboarding, hasCompletedTour, isOnboardingStateLoading])
-
-  useEffect(() => {
-    if (!baseShowOnboarding) {
-      setIsTourActive(false)
-    }
-  }, [baseShowOnboarding])
+  // const showInitialLoading =
+  //   Boolean(chatId) && isChatsLoading && !showLoadingForDirectFetch && !hasMessages
 
   return (
     <div
@@ -361,11 +363,14 @@ export function Chat() {
               ease: "easeOut",
             }}
           >
-            <h1 className="mb-6 text-3xl font-medium tracking-tight">
-              What&apos;s on your mind?
-            </h1>
+            <div className="text-center mb-8">
+              <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight leading-tight">
+                What&apos;s on your mind?
+              </h1>
+            </div>
             {shouldShowAuthNotice ? (
-              <p className="text-muted-foreground text-base leading-relaxed text-center md:text-left">
+              <div className="bg-zinc-900/30 backdrop-blur-sm border border-white/10 rounded-2xl p-5 max-w-2xl mx-auto">
+                <p className="text-white/60 text-[15px] leading-relaxed text-center">
                 You&apos;re exploring Bob as a guest.{' '}
                 <Link
                   href="/auth"
@@ -373,8 +378,9 @@ export function Chat() {
                 >
                   Sign in
                 </Link>{' '}
-                to save your conversations and unlock higher daily limits, or start a quick chat below to try things out.
-              </p>
+                    to save your conversations and unlock higher daily limits, or start a quick chat below to try things out.
+                </p>
+              </div>
             ) : null}
           </motion.div>
         ) : null}

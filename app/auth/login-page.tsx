@@ -162,8 +162,8 @@ export default function LoginPage() {
           {error && (
             <div className={`rounded-md p-3 text-sm ${
               error.includes("Check your email")
-                ? "bg-green-50 text-green-700 border border-green-200"
-                : "bg-destructive/10 text-destructive"
+                ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                : "bg-destructive/10 text-destructive border border-destructive/20"
             }`}>
               {error}
             </div>
@@ -194,6 +194,7 @@ export default function LoginPage() {
             </div>
             <Button
               type="submit"
+              variant="secondary"
               className="w-full text-base"
               size="lg"
               disabled={isForgotPassword ? resetLoading : emailLoading}
