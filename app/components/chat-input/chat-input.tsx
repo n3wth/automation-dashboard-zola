@@ -9,9 +9,8 @@ import {
 } from "@/components/prompt-kit/prompt-input"
 import { Button } from "@/components/ui/button"
 import { getModelInfo } from "@/lib/models"
-import { getBobPlaceholder } from "@/lib/utils/bob-greetings"
 import { ArrowUpIcon, StopIcon } from "@phosphor-icons/react"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef } from "react"
 import { PromptSystem } from "../suggestions/prompt-system"
 import { ButtonFileUpload } from "./button-file-upload"
 import { ButtonSearch } from "./button-search"
@@ -63,13 +62,14 @@ export function ChatInput({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   // Fix hydration mismatch by using client-side state
-  const [isButtonDisabled, setIsButtonDisabled] = useState(true)
-  const [placeholder, setPlaceholder] = useState("Ask Bob...")
+  const placeholder = "Ask Bob..."
 
-  // Set dynamic placeholder after hydration to avoid SSR mismatch
-  useEffect(() => {
-    setPlaceholder(getBobPlaceholder())
-  }, [])
+  const hasInput = value.length > 0 && !isOnlyWhitespace(value)
+  const isStreaming = status === "streaming"
+  const isAwaitingResponse = status === "submitted"
+  const isSendDisabled = !isStreaming && (!hasInput || isSubmitting || isAwaitingResponse)
+  const isErrored = status === "error"
+  const errorMessageId = isErrored ? "chat-input-error" : undefined
 
   const handleSend = useCallback(() => {
     if (isSubmitting) {
@@ -169,11 +169,6 @@ export function ChatInput({
     }
   }, [hasSearchSupport, enableSearch, setEnableSearch])
 
-  // Update button disabled state after hydration
-  useEffect(() => {
-    setIsButtonDisabled(!value || isSubmitting || isOnlyWhitespace(value))
-  }, [value, isSubmitting])
-
   return (
     <div className="relative flex w-full flex-col gap-4">
       {hasSuggestions && (
@@ -200,6 +195,8 @@ export function ChatInput({
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}
             className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"
+            aria-invalid={isErrored}
+            aria-describedby={errorMessageId}
           />
           <PromptInputActions className="mt-3 w-full justify-between p-2">
             <div className="flex gap-2">
@@ -226,12 +223,15 @@ export function ChatInput({
               tooltip={status === "streaming" ? "Stop" : "Send"}
             >
               <Button
+                id="chat-send-button"
+                data-testid="chat-send-button"
                 size="sm"
                 className="size-9 rounded-full transition-all duration-300 ease-out"
-                disabled={isButtonDisabled}
+                disabled={isSendDisabled}
                 type="button"
                 onClick={handleSend}
                 aria-label={status === "streaming" ? "Stop" : "Send message"}
+                aria-busy={isSubmitting || isStreaming || isAwaitingResponse}
               >
                 {status === "streaming" ? (
                   <StopIcon className="size-4" />
@@ -241,6 +241,16 @@ export function ChatInput({
               </Button>
             </PromptInputAction>
           </PromptInputActions>
+          {isErrored ? (
+            <div
+              id={errorMessageId}
+              role="status"
+              aria-live="polite"
+              className="text-destructive px-4 pb-3 text-xs"
+            >
+              Message failed to send. Try again.
+            </div>
+          ) : null}
         </PromptInput>
       </div>
     </div>
