@@ -24,12 +24,27 @@ export const defaultPreferences: UserPreferences = {
 }
 
 type UserPreferencesRow = Tables<'user_preferences'>
+type UserPreferencesUpdate = TablesUpdate<'user_preferences'> & {
+  theme?: ThemeType
+}
+
+const parseThemeFromApi = (value: unknown): ThemeType | null => {
+  if (value === "light" || value === "dark" || value === "system") {
+    return value
+  }
+
+  return null
+}
 
 // Helper functions to convert between API format (snake_case) and frontend format (camelCase)
 export function convertFromApiFormat(apiData: UserPreferencesRow): UserPreferences {
+  const themeValue = parseThemeFromApi(
+    (apiData as Record<string, unknown>).theme
+  )
+
   return {
     layout: (apiData.layout as LayoutType | null) ?? "fullscreen",
-    theme: (apiData.theme as ThemeType | null) ?? "system",
+    theme: themeValue ?? "system",
     promptSuggestions: apiData.prompt_suggestions ?? true,
     showToolInvocations: apiData.show_tool_invocations ?? true,
     showConversationPreviews: apiData.show_conversation_previews ?? true,
@@ -41,7 +56,7 @@ export function convertFromApiFormat(apiData: UserPreferencesRow): UserPreferenc
 }
 
 export function convertToApiFormat(preferences: Partial<UserPreferences>): TablesUpdate<'user_preferences'> {
-  const apiData: TablesUpdate<'user_preferences'> = {}
+  const apiData: UserPreferencesUpdate = {}
   if (preferences.layout !== undefined) apiData.layout = preferences.layout
   if (preferences.theme !== undefined) apiData.theme = preferences.theme
   if (preferences.promptSuggestions !== undefined)

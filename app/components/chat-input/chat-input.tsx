@@ -91,6 +91,29 @@ export function ChatInput({
         return
       }
 
+      if (e.key === "Escape" && (status === "streaming" || status === "submitted")) {
+        e.preventDefault()
+        stop()
+        return
+      }
+
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+        if (status === "streaming") {
+          e.preventDefault()
+          stop()
+          return
+        }
+
+        if (isOnlyWhitespace(value)) {
+          e.preventDefault()
+          return
+        }
+
+        e.preventDefault()
+        onSend()
+        return
+      }
+
       if (e.key === "Enter" && status === "streaming") {
         e.preventDefault()
         return
@@ -105,7 +128,7 @@ export function ChatInput({
         onSend()
       }
     },
-    [isSubmitting, onSend, status, value]
+    [isSubmitting, onSend, status, stop, value]
   )
 
   const handlePaste = useCallback(

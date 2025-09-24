@@ -128,6 +128,14 @@ test.describe('Chat Functionality', () => {
     await textarea.type('Line 2')
     const value = await textarea.inputValue()
     expect(value.includes('\n')).toBeTruthy()
+
+    // Test Ctrl/Cmd+Enter to send
+    await textarea.clear()
+    const shortcutMessage = 'Shortcut ctrl+enter'
+    await textarea.fill(shortcutMessage)
+    await textarea.press('Control+Enter')
+    await expect(textarea).toHaveValue('')
+    await expect(page.locator(`text="${shortcutMessage}"`)).toBeVisible()
   })
 
   test('error handling for network issues', async ({ page }) => {
