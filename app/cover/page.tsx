@@ -69,16 +69,18 @@ export default function CoverPage() {
     const hideDevElements = () => {
       // Hide all buttons and dev indicators
       document.querySelectorAll('button, [class*="nextjs"], [data-nextjs], [style*="position: fixed"]').forEach(el => {
-        el.style.display = 'none !important'
-        el.style.visibility = 'hidden !important'
-        el.remove()
+        const htmlEl = el as HTMLElement
+        htmlEl.style.display = 'none !important'
+        htmlEl.style.visibility = 'hidden !important'
+        htmlEl.remove()
       })
 
       // Specifically target the N indicator
       document.querySelectorAll('*').forEach(el => {
+        const htmlEl = el as HTMLElement
         if (el.textContent?.trim() === 'N' &&
-            (el.style.position === 'fixed' || el.style.position === 'absolute')) {
-          el.remove()
+            (htmlEl.style.position === 'fixed' || htmlEl.style.position === 'absolute')) {
+          htmlEl.remove()
         }
       })
     }

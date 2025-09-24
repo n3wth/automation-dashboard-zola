@@ -19,42 +19,46 @@ export function SubMenu({ hoveredModelData }: SubMenuProps) {
   )
 
   return (
-    <div className="relative w-[280px] rounded-md border border-border bg-background p-3 shadow-lg">
-      <div className="flex flex-col gap-2">
+    <div className="model-submenu-panel w-[280px] p-3">
+      <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3">
-          {provider?.icon && <provider.icon className="size-5" />}
-          <h3 className="font-medium">{hoveredModelData.name}</h3>
+          {provider?.icon && (
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500/20 to-purple-600/20 border border-violet-400/30">
+              <provider.icon className="size-5 text-violet-300" />
+            </div>
+          )}
+          <h3 className="font-semibold text-white text-sm">{hoveredModelData.name}</h3>
         </div>
 
-        <p className="text-muted-foreground text-sm">
+        <p className="text-white/70 text-xs leading-relaxed">
           {hoveredModelData.description}
         </p>
 
-        <div className="flex flex-col gap-1">
-          <div className="mt-1 flex flex-wrap gap-2">
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {hoveredModelData.vision && (
-              <div className="flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700 dark:bg-green-800 dark:text-green-100">
+              <div className="model-capability-tag flex items-center gap-1 rounded-full bg-green-500/10 border-green-400/30 px-2.5 py-1 text-xs text-green-300 font-medium">
                 <ImageIcon className="size-3" />
                 <span>Vision</span>
               </div>
             )}
 
             {hoveredModelData.tools && (
-              <div className="flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-xs text-purple-700 dark:bg-purple-800 dark:text-purple-100">
+              <div className="model-capability-tag flex items-center gap-1 rounded-full bg-purple-500/10 border-purple-400/30 px-2.5 py-1 text-xs text-purple-300 font-medium">
                 <WrenchIcon className="size-3" />
                 <span>Tools</span>
               </div>
             )}
 
             {hoveredModelData.reasoning && (
-              <div className="flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-700 dark:bg-amber-800 dark:text-amber-100">
+              <div className="model-capability-tag flex items-center gap-1 rounded-full bg-amber-500/10 border-amber-400/30 px-2.5 py-1 text-xs text-amber-300 font-medium">
                 <BrainIcon className="size-3" />
                 <span>Reasoning</span>
               </div>
             )}
 
             {hoveredModelData.webSearch && (
-              <div className="flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700 dark:bg-blue-800 dark:text-blue-100">
+              <div className="model-capability-tag flex items-center gap-1 rounded-full bg-cyan-500/10 border-cyan-400/30 px-2.5 py-1 text-xs text-cyan-300 font-medium">
                 <GlobeIcon className="size-3" />
                 <span>Web Search</span>
               </div>
@@ -62,22 +66,22 @@ export function SubMenu({ hoveredModelData }: SubMenuProps) {
           </div>
         </div>
 
-        <div className="mt-4 flex flex-col gap-2">
-          <div className="flex items-center justify-between gap-2 text-sm">
-            <span className="font-medium">Context</span>
-            <span>
-              {Intl.NumberFormat("fr-FR", {
+        <div className="space-y-3 border-t border-white/10 pt-3">
+          <div className="flex items-center justify-between gap-2 text-xs">
+            <span className="font-medium text-white/80">Context</span>
+            <span className="font-mono text-white/90">
+              {Intl.NumberFormat("en-US", {
                 style: "decimal",
               }).format(hoveredModelData.contextWindow ?? 0)}{" "}
               tokens
             </span>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between gap-2 text-sm">
-              <span className="font-medium">Input Pricing</span>
-              <span>
-                {Intl.NumberFormat("ja-JP", {
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-2 text-xs">
+              <span className="font-medium text-white/80">Input Pricing</span>
+              <span className="font-mono text-emerald-300">
+                {Intl.NumberFormat("en-US", {
                   style: "currency",
                   currency: "USD",
                 }).format(hoveredModelData.inputCost ?? 0)}{" "}
@@ -85,10 +89,10 @@ export function SubMenu({ hoveredModelData }: SubMenuProps) {
               </span>
             </div>
 
-            <div className="flex items-center justify-between gap-2 text-sm">
-              <span className="font-medium">Output Pricing</span>
-              <span>
-                {Intl.NumberFormat("ja-JP", {
+            <div className="flex items-center justify-between gap-2 text-xs">
+              <span className="font-medium text-white/80">Output Pricing</span>
+              <span className="font-mono text-blue-300">
+                {Intl.NumberFormat("en-US", {
                   style: "currency",
                   currency: "USD",
                 }).format(hoveredModelData.outputCost ?? 0)}{" "}
@@ -97,35 +101,35 @@ export function SubMenu({ hoveredModelData }: SubMenuProps) {
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-2 text-sm">
-            <span className="font-medium">Provider</span>
-            <span>{hoveredModelData.provider}</span>
+          <div className="flex items-center justify-between gap-2 text-xs">
+            <span className="font-medium text-white/80">Provider</span>
+            <span className="text-violet-300 font-medium">{hoveredModelData.provider}</span>
           </div>
 
-          <div className="flex items-center justify-between gap-2 text-sm">
-            <span className="flex-1 font-medium">Id</span>
-            <span className="text-muted-foreground truncate text-xs">
+          <div className="flex items-center justify-between gap-2 text-xs">
+            <span className="font-medium text-white/80">Id</span>
+            <span className="text-white/60 truncate font-mono text-[10px] max-w-[140px]">
               {String(hoveredModelData.id)}
             </span>
           </div>
 
-          <div className="mt-4 flex items-center justify-between gap-2 text-xs">
+          <div className="flex items-center justify-between gap-4 pt-2 border-t border-white/5">
             <a
               href={addUTM(hoveredModelData.apiDocs ?? "")}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-0.5"
+              className="flex items-center gap-1 text-xs text-white/70 hover:text-violet-300 transition-colors"
             >
-              <span className="">API Docs</span>
+              <span>API Docs</span>
               <ArrowSquareOutIcon className="size-3" />
             </a>
             <a
               href={addUTM(hoveredModelData.modelPage ?? "")}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-0.5"
+              className="flex items-center gap-1 text-xs text-white/70 hover:text-violet-300 transition-colors"
             >
-              <span className="">Model Page</span>
+              <span>Model Page</span>
               <ArrowSquareOutIcon className="size-3" />
             </a>
           </div>

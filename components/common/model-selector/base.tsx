@@ -283,6 +283,13 @@ export function ModelSelector({
             sideOffset={4}
             forceMount
             side="top"
+            onMouseLeave={(e) => {
+              // Only clear hover state if not moving to submenu
+              const relatedTarget = e.relatedTarget as Element | null
+              if (!relatedTarget?.closest?.('.model-submenu-container')) {
+                setHoveredModel(null)
+              }
+            }}
           >
             <div className="bg-popover sticky top-0 z-10 rounded-t-md border-b px-0 pt-0 pb-0">
               <div className="relative">
@@ -370,7 +377,18 @@ export function ModelSelector({
 
             {/* Submenu positioned absolutely */}
             {hoveredModelData && (
-              <div className="absolute top-0 left-[calc(100%+8px)]">
+              <div
+                className="model-submenu-container"
+                onMouseEnter={() => {
+                  if (hoveredModelData) {
+                    setHoveredModel(hoveredModelData.id)
+                  }
+                }}
+                onMouseLeave={() => {
+                  // Delay clearing to allow for smooth transitions between items
+                  setTimeout(() => setHoveredModel(null), 100)
+                }}
+              >
                 <SubMenu hoveredModelData={hoveredModelData} />
               </div>
             )}

@@ -288,13 +288,19 @@
 
   /* Bob-themed button */
   .btn-bob {
-    @apply relative bg-violet-600 border border-violet-500/30;
-    transition: all 0.2s ease;
+    position: relative;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .btn-bob:hover {
-    @apply bg-violet-700;
-    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      0 4px 16px rgba(255, 255, 255, 0.1) !important;
+    transform: translateY(-0.5px);
   }
 
 }
@@ -689,4 +695,697 @@ code {
 /* sonner toast */
 [data-sonner-toaster] > li {
   width: 100%;
+}
+
+/* Radix Popper Content Wrapper Improvements */
+[data-radix-popper-content-wrapper] {
+  z-index: 999999 !important;
+  will-change: transform, opacity;
+}
+
+/* Model selector dropdown improvements */
+[data-slot="dropdown-menu-content"] {
+  background: rgba(0, 0, 0, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 8px 32px rgba(0, 0, 0, 0.8),
+    0 0 60px rgba(139, 92, 246, 0.1) !important;
+  transform-origin: var(--radix-dropdown-menu-content-transform-origin);
+  will-change: transform, opacity;
+}
+
+/* Model selector item hover improvements */
+[data-slot="dropdown-menu-item"] {
+  transition: all 0.15s ease-out;
+  border-radius: 6px;
+  margin: 1px;
+}
+
+[data-slot="dropdown-menu-item"]:hover,
+[data-slot="dropdown-menu-item"][data-highlighted] {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.2),
+    0 4px 12px rgba(255, 255, 255, 0.15);
+  transform: translateX(1px);
+}
+
+/* Sub-menu positioning and styling improvements */
+.model-submenu-container {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 8px);
+  z-index: 1000000;
+  will-change: transform, opacity;
+}
+
+.model-submenu-panel {
+  background: rgba(0, 0, 0, 0.97) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 12px 48px rgba(0, 0, 0, 0.9),
+    0 0 80px rgba(139, 92, 246, 0.08);
+  border-radius: 8px;
+  animation: submenu-appear 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes submenu-appear {
+  from {
+    opacity: 0;
+    transform: translateX(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* Improve tag styling in submenu */
+.model-capability-tag {
+  backdrop-filter: blur(8px);
+  border: 1px solid;
+  transition: all 0.2s ease-out;
+}
+
+.model-capability-tag:hover {
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Better search input styling */
+[data-slot="dropdown-menu-content"] input {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(8px);
+}
+
+[data-slot="dropdown-menu-content"] input:focus {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.2),
+    0 4px 12px rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Universal hover effect improvements for buttons and interactive elements */
+button:not(:disabled) {
+  transition: all 0.15s ease-out !important;
+}
+
+button:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Specific button variant hover improvements */
+button[data-variant="outline"]:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.3),
+    0 4px 16px rgba(255, 255, 255, 0.2) !important;
+}
+
+button[data-variant="secondary"]:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Icon button hover effects */
+button[class*="size-"]:hover,
+button[class*="h-"]:hover {
+  background: rgba(139, 92, 246, 0.1) !important;
+  border-radius: 6px;
+}
+
+/* Link hover effects */
+a:not([class*="underline"]):hover {
+  color: rgba(139, 92, 246, 0.9) !important;
+  transition: color 0.15s ease-out;
+}
+
+/* Form input hover effects - only for specific input types */
+input[type="text"]:hover,
+input[type="email"]:hover,
+input[type="password"]:hover,
+input[type="search"]:hover,
+textarea:hover {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.15s ease-out;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+textarea:focus {
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Prevent unwanted highlights on main chat input and content areas */
+.chat-input-area,
+.chat-input-area input,
+.chat-input-area textarea {
+  background: transparent !important;
+}
+
+.chat-input-area input:hover,
+.chat-input-area textarea:hover {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.chat-input-area input:focus,
+.chat-input-area textarea:focus {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Prevent highlights on content containers and read-only areas */
+.content-area,
+.message-content,
+.chat-message,
+[role="presentation"],
+[role="img"],
+.prose,
+.markdown,
+.text-content {
+  background: transparent !important;
+}
+
+.content-area:hover,
+.message-content:hover,
+.chat-message:hover,
+[role="presentation"]:hover,
+[role="img"]:hover,
+.prose:hover,
+.markdown:hover,
+.text-content:hover {
+  background: transparent !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Prevent highlights on static text and labels */
+p:hover,
+span:hover,
+div:not([role]):not([class*="button"]):not([class*="card"]):not([class*="panel"]):hover {
+  background: transparent !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Only apply hover effects to intentionally interactive elements */
+[role="button"],
+[role="menuitem"],
+[role="option"],
+[role="tab"],
+[role="link"],
+button,
+a,
+input,
+textarea,
+select,
+[class*="button"],
+[class*="clickable"],
+[class*="interactive"] {
+  /* These elements can have hover effects */
+}
+
+/* Remove hover effects from non-interactive content */
+main:hover,
+section:hover,
+article:hover,
+header:hover,
+footer:hover,
+nav:hover,
+aside:hover {
+  background: transparent !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Ultimate fallback: prevent ALL hover effects except on explicitly interactive elements */
+*:hover {
+  /* Reset all hover effects by default */
+}
+
+/* Then re-enable hover effects only for interactive elements */
+button:hover,
+a:hover,
+input:hover,
+textarea:hover,
+select:hover,
+[role="button"]:hover,
+[role="menuitem"]:hover,
+[role="option"]:hover,
+[role="tab"]:hover,
+[role="link"]:hover,
+[class*="button"]:hover,
+[class*="clickable"]:hover,
+[class*="interactive"]:hover,
+[tabindex]:not([tabindex="-1"]):hover {
+  /* These elements inherit their specific hover styles from above */
+}
+
+/* Card hover effects */
+[class*="card"]:hover,
+[class*="panel"]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.2s ease-out;
+}
+
+/* Menu item improvements */
+[role="menuitem"]:hover,
+[role="option"]:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: white !important;
+  transform: translateX(2px);
+  transition: all 0.15s ease-out;
+}
+
+/* Tooltip improvements */
+[data-radix-tooltip-content] {
+  background: rgba(0, 0, 0, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(12px) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+  animation: tooltip-appear 0.15s ease-out;
+}
+
+@keyframes tooltip-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Avatar/profile image hover effects */
+img[class*="avatar"]:hover,
+[class*="avatar"] img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3) !important;
+  transition: all 0.2s ease-out;
+}
+
+/* Tab hover effects */
+[role="tab"]:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(139, 92, 246, 0.9) !important;
+  border-bottom-color: rgba(139, 92, 246, 0.5) !important;
+  transition: all 0.15s ease-out;
+}
+
+/* Fix any flickering or visual glitches */
+* {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+
+/* Improved performance for animations */
+.model-submenu-container,
+.model-submenu-panel,
+[data-radix-popper-content-wrapper],
+[data-slot="dropdown-menu-content"] {
+  will-change: transform, opacity;
+  contain: layout style paint;
+}
+
+/* Prevent hover effects from interfering with each other */
+[data-slot="dropdown-menu-item"] {
+  isolation: isolate;
+}
+
+/* Enhanced visibility for focused elements */
+*:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6) !important;
+  outline-offset: 2px !important;
+  border-radius: 4px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .model-submenu-panel,
+  button,
+  [data-slot="dropdown-menu-item"] {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* Ensure proper z-index stacking */
+[data-radix-dropdown-menu-content],
+[data-radix-popper-content-wrapper] {
+  z-index: 999999 !important;
+}
+
+.model-submenu-container {
+  z-index: 1000000 !important;
+}
+
+/* Fix text selection issues in menus */
+[data-slot="dropdown-menu-content"] * {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Improve scrollbar styling in dropdown */
+[data-slot="dropdown-menu-content"]::-webkit-scrollbar {
+  width: 6px;
+}
+
+[data-slot="dropdown-menu-content"]::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 3px;
+}
+
+[data-slot="dropdown-menu-content"]::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+[data-slot="dropdown-menu-content"]::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Additional button style fixes */
+button[variant="outline"],
+button[data-variant="outline"] {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+button[variant="ghost"],
+button[data-variant="ghost"] {
+  background: transparent;
+  border: none;
+}
+
+button[variant="ghost"]:hover,
+button[data-variant="ghost"]:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* PRINCIPLED DESIGN SYSTEM - Border Radius Standardization */
+/* Base values: --radius = 12px (0.75rem) */
+:root {
+  --radius-xs: 4px;  /* Small elements like tags */
+  --radius-sm: 8px;  /* Buttons, inputs */
+  --radius-md: 12px; /* Cards, panels (--radius) */
+  --radius-lg: 16px; /* Modals, large containers */
+  --radius-xl: 20px; /* Special cases */
+}
+
+/* Component-specific radius standardization */
+
+/* Buttons - use sm radius (8px) */
+button {
+  border-radius: var(--radius-sm) !important;
+}
+
+/* Inputs and form elements - use sm radius (8px) */
+input,
+textarea,
+select {
+  border-radius: var(--radius-sm) !important;
+}
+
+/* Cards and panels - use md radius (12px) */
+[class*="card"],
+[class*="panel"],
+.model-submenu-panel {
+  border-radius: var(--radius-md) !important;
+}
+
+/* Dropdowns and popovers - use md radius (12px) */
+[data-slot="dropdown-menu-content"],
+[data-radix-popover-content],
+[data-radix-tooltip-content] {
+  border-radius: var(--radius-md) !important;
+}
+
+/* Menu items - use sm radius (8px) */
+[data-slot="dropdown-menu-item"],
+[role="menuitem"],
+[role="option"] {
+  border-radius: var(--radius-sm) !important;
+}
+
+/* Tags and badges - use xs radius (4px) */
+.model-capability-tag,
+[class*="badge"],
+[class*="tag"] {
+  border-radius: var(--radius-xs) !important;
+}
+
+/* Large containers and modals - use lg radius (16px) */
+[class*="modal"],
+[class*="dialog"],
+[data-radix-dialog-content] {
+  border-radius: var(--radius-lg) !important;
+}
+
+/* Chat input area - use md radius (12px) */
+.chat-input-area {
+  border-radius: var(--radius-md) !important;
+}
+
+/* Override specific mismatched radii */
+.model-submenu-container > * {
+  border-radius: var(--radius-md) !important;
+}
+
+/* SOLID BACKGROUNDS FOR MODALS AND POPUPS */
+/* All modals, dialogs, and popups should have solid backgrounds for better readability */
+
+/* Modal and dialog backgrounds */
+[data-radix-dialog-content],
+[class*="modal"],
+[class*="dialog"] {
+  background: rgb(0, 0, 0) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 20px 60px rgba(0, 0, 0, 0.8),
+    0 0 100px rgba(139, 92, 246, 0.08) !important;
+}
+
+/* Popup and popover backgrounds */
+[data-radix-popover-content] {
+  background: rgb(0, 0, 0) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 12px 40px rgba(0, 0, 0, 0.7),
+    0 0 80px rgba(139, 92, 246, 0.06) !important;
+}
+
+/* Dropdown menus already have proper solid backgrounds from earlier */
+
+/* Tooltip backgrounds */
+[data-radix-tooltip-content] {
+  background: rgba(0, 0, 0, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(12px) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Auth/login modals - ensure solid background */
+.auth-modal,
+.login-modal,
+[class*="auth"][class*="modal"] {
+  background: rgba(0, 0, 0, 0.98) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+}
+
+/* Drawer backgrounds (mobile) */
+[data-radix-drawer-content] {
+  background: rgba(0, 0, 0, 0.98) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+/* Settings panel backgrounds */
+.settings-panel,
+[class*="settings"][class*="panel"] {
+  background: rgba(0, 0, 0, 0.98) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* PRINCIPLED HOVER SYSTEM */
+/* Consistent hover states based on component hierarchy and interaction importance */
+
+/* Level 1: Primary Actions (Buttons, Primary CTAs) */
+.hover-primary,
+button[variant="default"]:not(:disabled),
+button[data-variant="default"]:not(:disabled),
+.btn-primary:not(:disabled) {
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-primary:hover,
+button[variant="default"]:not(:disabled):hover,
+button[data-variant="default"]:not(:disabled):hover,
+.btn-primary:not(:disabled):hover {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.3),
+    0 4px 12px rgba(255, 255, 255, 0.15) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: rgba(0, 0, 0, 0.9) !important;
+}
+
+/* Level 2: Secondary Actions (Secondary buttons, Form elements) */
+.hover-secondary,
+button[variant="secondary"]:not(:disabled),
+button[data-variant="secondary"]:not(:disabled),
+button[variant="outline"]:not(:disabled),
+button[data-variant="outline"]:not(:disabled) {
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-secondary:hover,
+button[variant="secondary"]:not(:disabled):hover,
+button[data-variant="secondary"]:not(:disabled):hover,
+button[variant="outline"]:not(:disabled):hover,
+button[data-variant="outline"]:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.3),
+    0 4px 12px rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Level 3: Subtle Actions (Ghost buttons, Menu items) */
+.hover-subtle,
+button[variant="ghost"]:not(:disabled),
+button[data-variant="ghost"]:not(:disabled),
+[data-slot="dropdown-menu-item"],
+[role="menuitem"],
+[role="option"] {
+  transition: all 0.12s ease-out;
+}
+
+.hover-subtle:hover,
+button[variant="ghost"]:not(:disabled):hover,
+button[data-variant="ghost"]:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Level 4: Navigation and Links */
+.hover-nav,
+a:not([class*="button"]):not([role="button"]) {
+  transition: color 0.12s ease-out;
+}
+
+.hover-nav:hover,
+a:not([class*="button"]):not([role="button"]):hover {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Level 5: Cards and Containers */
+.hover-card,
+[class*="card"]:not([role="button"]),
+[class*="panel"]:not([role="button"]) {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-card:hover,
+[class*="card"]:not([role="button"]):hover,
+[class*="panel"]:not([role="button"]):hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Level 6: Interactive Elements (Inputs, Selects) */
+.hover-interactive,
+input:not([type="submit"]):not([type="button"]),
+textarea,
+select {
+  transition: all 0.12s ease-out;
+}
+
+/* Form inputs already have specific styling above */
+
+/* Disable hover on disabled elements */
+[disabled],
+[aria-disabled="true"],
+.disabled {
+  pointer-events: none !important;
+  opacity: 0.5 !important;
+}
+
+/* Focus states - consistent with hover but more pronounced */
+.hover-primary:focus-visible,
+.hover-secondary:focus-visible,
+.hover-subtle:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6) !important;
+  outline-offset: 2px !important;
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.2),
+    0 4px 12px rgba(255, 255, 255, 0.15) !important;
+}
+
+/* MODAL AND POPOVER TRANSPARENCY FIXES */
+/* Force all modal and dialog backgrounds to be completely solid black */
+[data-radix-dialog-content],
+[data-radix-popover-content],
+[class*="modal"],
+[class*="dialog"],
+[class*="popover"],
+[role="dialog"],
+[role="alertdialog"] {
+  background: rgb(0, 0, 0) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Ensure overlay/backdrop is also solid */
+[data-radix-dialog-overlay],
+[data-radix-popover-overlay],
+[class*="overlay"],
+[class*="backdrop"] {
+  background: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Fix flickering and movement on model selector and specific buttons */
+.btn-bob,
+.btn-bob:hover,
+button[class*="btn-bob"]:hover {
+  transform: none !important;
+  transition: background-color 0.1s ease-out, border-color 0.1s ease-out !important;
+}
+
+.btn-bob:hover,
+button[class*="btn-bob"]:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
 }
