@@ -39,14 +39,12 @@ export function Header({ hasSidebar }: { hasSidebar: boolean }) {
         <div className="flex flex-1 items-center justify-between">
           <div className="-ml-0.5 flex flex-1 items-center gap-2 lg:-ml-2.5">
             <div className="flex flex-1 items-center gap-2">
-              {(!hasSidebar || isMobile) && (
-                <Link
-                  href="/"
-                  className="pointer-events-auto inline-flex items-center text-xl font-medium tracking-tight"
-                >
-                  <Logo size="md" variant="ascii" />
-                </Link>
-              )}
+              <Link
+                href="/"
+                className="pointer-events-auto inline-flex items-center text-xl font-medium tracking-tight text-white"
+              >
+                <Logo size="md" variant="ascii" />
+              </Link>
               {hasSidebar && isMobile && <HeaderSidebarTrigger />}
             </div>
           </div>

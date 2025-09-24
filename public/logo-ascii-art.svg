@@ -2,9 +2,22 @@
 <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 54 24">
   <!-- Generator: Adobe Illustrator 29.6.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 9)  -->
   <defs>
+    <linearGradient id="purpleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#A855F7;stop-opacity:0.85" />
+      <stop offset="100%" style="stop-color:#E879F9;stop-opacity:0.75" />
+    </linearGradient>
+    <linearGradient id="purpleFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:0.7" />
+      <stop offset="100%" style="stop-color:#C084FC;stop-opacity:0.5" />
+    </linearGradient>
     <style>
       .st0 {
-        fill: currentColor;
+        fill: url(#purpleFill);
+        stroke: white;
+        stroke-width: 1.0;
+        stroke-linejoin: round;
+        opacity: 0.9;
+        filter: drop-shadow(0 0 4px rgba(139, 92, 246, 0.3));
       }
     </style>
   </defs>

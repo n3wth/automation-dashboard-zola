@@ -40,7 +40,7 @@ export function AppProvider({ children, userProfile }: AppProviderProps) {
                       enableSystem
                       disableTransitionOnChange
                     >
-                      <SidebarProvider defaultOpen>
+                      <SidebarProvider defaultOpen={false}>
                         <Toaster position="top-center" />
                         {children}
                       </SidebarProvider>
