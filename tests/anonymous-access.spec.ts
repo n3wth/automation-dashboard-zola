@@ -4,7 +4,7 @@ test.describe('Anonymous Access', () => {
   test.beforeEach(async ({ page, context }) => {
     // Clear all cookies and localStorage
     await context.clearCookies()
-    await page.goto('http://localhost:3001')
+    await page.goto('/')
     await page.evaluate(() => {
       localStorage.clear()
       sessionStorage.clear()
@@ -12,7 +12,7 @@ test.describe('Anonymous Access', () => {
   })
 
   test('anonymous user can access homepage without login', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('/')
 
     // Check that the page loads
     await expect(page).toHaveTitle(/Bob/i)
@@ -28,7 +28,7 @@ test.describe('Anonymous Access', () => {
   })
 
   test('anonymous user can send a message', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('/')
 
     // Type a message
     const chatInput = page.locator('textarea[placeholder="Ask Bob..."]')
@@ -48,7 +48,7 @@ test.describe('Anonymous Access', () => {
   })
 
   test('anonymous user gets session ID stored', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('/')
 
     // Send a message to trigger session creation
     const chatInput = page.locator('textarea[placeholder="Ask Bob..."]')
@@ -68,7 +68,7 @@ test.describe('Anonymous Access', () => {
   })
 
   test('rate limit enforcement for anonymous users', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('/')
 
     // This test would need to be more sophisticated in production
     // For now, just verify that the session tracking is in place
@@ -92,7 +92,7 @@ test.describe('Anonymous Access', () => {
   })
 
   test('no phantom user appears for anonymous visitors', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('/')
 
     // Check that no user profile is shown
     const userMenu = page.locator('[data-testid="user-menu"]')
@@ -120,7 +120,7 @@ test.describe('Anonymous Access', () => {
   })
 
   test('header does not jump after sending message', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('/')
 
     // Get initial header position
     const header = page.locator('header').first()
@@ -141,16 +141,16 @@ test.describe('Anonymous Access', () => {
   })
 
   test('nav logo is clickable', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('/')
 
     // Navigate to a different page first
-    await page.goto('http://localhost:3001/auth')
+    await page.goto('/auth')
 
     // Click the logo to go back home
     const logo = page.locator('a[href="/"] img[alt="Bob"]').first()
     await logo.click()
 
     // Verify we're back on homepage
-    await expect(page).toHaveURL('http://localhost:3001/')
+    await expect(page).toHaveURL('/')
   })
 })
