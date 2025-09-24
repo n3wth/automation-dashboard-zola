@@ -84,13 +84,13 @@ export function DialogAuth({ open, setOpen }: DialogAuthProps) {
             onClick={handleSignInWithGoogle}
             disabled={isLoading}
           >
-            <img
-              src="https://www.google.com/favicon.ico"
-              alt="Google logo"
-              width={20}
-              height={20}
-              className="mr-2 size-4"
-            />
+          <Image
+            src="https://www.google.com/favicon.ico"
+            alt="Google logo"
+            width={20}
+            height={20}
+            className="mr-2 size-4"
+          />
             <span>{isLoading ? "Bob is connecting..." : "Chat with Bob via Google"}</span>
           </Button>
         </DialogFooter>

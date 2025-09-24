@@ -3,13 +3,13 @@ import { cookies } from "next/headers"
 const CSRF_SECRET = process.env.CSRF_SECRET!
 
 // Use Web Crypto API for Edge Runtime compatibility
-function getRandomBytes(length: number): Uint8Array {
+async function getRandomBytes(length: number): Promise<Uint8Array> {
   if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
     // Edge Runtime and modern browsers
     return crypto.getRandomValues(new Uint8Array(length))
   } else {
     // Node.js fallback
-    const { randomBytes } = require("crypto")
+    const { randomBytes } = await import("node:crypto")
     return new Uint8Array(randomBytes(length))
   }
 }
@@ -24,7 +24,7 @@ async function createSHA256Hash(data: string): Promise<string> {
     return Array.from(hashArray).map(b => b.toString(16).padStart(2, '0')).join('')
   } else {
     // Node.js fallback
-    const { createHash } = require("crypto")
+    const { createHash } = await import("node:crypto")
     return createHash("sha256").update(data).digest("hex")
   }
 }
@@ -34,7 +34,7 @@ function bytesToHex(bytes: Uint8Array): string {
 }
 
 export async function generateCsrfToken(): Promise<string> {
-  const rawBytes = getRandomBytes(32)
+  const rawBytes = await getRandomBytes(32)
   const raw = bytesToHex(rawBytes)
   const token = await createSHA256Hash(`${raw}${CSRF_SECRET}`)
   return `${raw}:${token}`

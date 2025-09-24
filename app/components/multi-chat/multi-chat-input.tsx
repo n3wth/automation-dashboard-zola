@@ -64,6 +64,29 @@ export function MultiChatInput({
         return
       }
 
+      if (e.key === "Escape" && (status === "streaming" || status === "submitted")) {
+        e.preventDefault()
+        stop()
+        return
+      }
+
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+        if (status === "streaming") {
+          e.preventDefault()
+          stop()
+          return
+        }
+
+        if (isOnlyWhitespace(value)) {
+          e.preventDefault()
+          return
+        }
+
+        e.preventDefault()
+        onSend()
+        return
+      }
+
       if (e.key === "Enter" && status === "streaming") {
         e.preventDefault()
         return
@@ -78,7 +101,7 @@ export function MultiChatInput({
         onSend()
       }
     },
-    [isSubmitting, anyLoading, onSend, status, value]
+    [anyLoading, isSubmitting, onSend, status, stop, value]
   )
 
   // Update button disabled state after hydration
@@ -102,6 +125,7 @@ export function MultiChatInput({
           onValueChange={onValueChange}
         >
           <PromptInputTextarea
+            data-testid="chat-input-textarea"
             placeholder={`${getBobPlaceholder()} (multi-model)`}
             onKeyDown={handleKeyDown}
             className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"
@@ -123,6 +147,7 @@ export function MultiChatInput({
                 type="button"
                 onClick={handleSend}
                 aria-label={status === "streaming" ? "Stop" : "Send message"}
+                data-testid="send-button"
               >
                 {status === "streaming" || anyLoading ? (
                   <Stop className="size-4" />

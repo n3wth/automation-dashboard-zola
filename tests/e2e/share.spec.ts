@@ -1,9 +1,7 @@
-import { test, expect } from '@playwright/test'
-import { TestHelpers } from '../utils/test-helpers'
+import { test } from '@playwright/test'
 
 test.describe('Chat Sharing', () => {
-  test.skip('should allow a user to share a chat', async ({ page }) => {
-    const helpers = new TestHelpers(page)
+  test.skip('should allow a user to share a chat', async () => {
     // 1. Log in
     // 2. Create a new chat
     // 3. Get the chat ID
@@ -12,16 +10,14 @@ test.describe('Chat Sharing', () => {
     // 6. Verify the share link is valid
   })
 
-  test.skip('should allow an unauthenticated user to view a shared chat', async ({ page }) => {
-    const helpers = new TestHelpers(page)
+  test.skip('should allow an unauthenticated user to view a shared chat', async () => {
     // 1. Get a valid share link
     // 2. Navigate to the share link
     // 3. Verify the chat content is visible
     // 4. Verify that the user is prompted to log in to continue the conversation
   })
 
-  test.skip('should not allow an authenticated user to view a shared chat they do not have access to', async ({ page }) => {
-    const helpers = new TestHelpers(page)
+  test.skip('should not allow an authenticated user to view a shared chat they do not have access to', async () => {
     // 1. Log in as user A
     // 2. Create a chat and share it
     // 3. Log out

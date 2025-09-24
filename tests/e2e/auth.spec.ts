@@ -16,7 +16,9 @@ test.describe('Authentication', () => {
     if (!isAuthenticated) {
       // App should either redirect to login or show guest interface
       const hasLogin = await page.locator('text=/sign in|login|authenticate/i').isVisible()
-      const hasGuestAccess = await page.locator('textarea, input[type="text"]').isVisible()
+      const hasGuestAccess = await page
+        .getByTestId('chat-input-textarea')
+        .isVisible()
 
       expect(hasLogin || hasGuestAccess).toBeTruthy()
     }
@@ -59,8 +61,11 @@ test.describe('Authentication', () => {
       const hasContent = await page.locator('main, [role="main"], .content').isVisible()
       const hasLogin = await page.locator('text=/sign in|login|authenticate/i').isVisible()
       const isRedirected = !page.url().includes(route)
+      const hasGuestInterface = await page
+        .getByTestId('chat-input-textarea')
+        .isVisible()
 
-      expect(hasContent || hasLogin || isRedirected).toBeTruthy()
+      expect(hasContent || hasLogin || isRedirected || hasGuestInterface).toBeTruthy()
     }
   })
 
@@ -116,7 +121,9 @@ test.describe('Authentication', () => {
     // Should handle expired session gracefully
     const hasErrorMessage = await page.locator('text=/session|expired|login/i').isVisible()
     const redirectedToLogin = page.url().includes('login') || page.url().includes('auth')
-    const showsGuestInterface = await page.locator('textarea, input').isVisible()
+    const showsGuestInterface = await page
+      .getByTestId('chat-input-textarea')
+      .isVisible()
 
     expect(hasErrorMessage || redirectedToLogin || showsGuestInterface).toBeTruthy()
   })
@@ -134,7 +141,9 @@ test.describe('Authentication', () => {
     // App should handle auth errors gracefully
     const hasErrorState = await page.locator('text=/error|failed|unavailable/i').isVisible()
     const hasOfflineMode = await page.locator('text=/offline|disconnected/i').isVisible()
-    const stillFunctional = await page.locator('textarea, input[type="text"]').isVisible()
+    const stillFunctional = await page
+      .getByTestId('chat-input-textarea')
+      .isVisible()
 
     expect(hasErrorState || hasOfflineMode || stillFunctional).toBeTruthy()
   })

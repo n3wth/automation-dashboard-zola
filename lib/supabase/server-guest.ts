@@ -5,11 +5,7 @@ import { isSupabaseEnabled } from "./config"
 
 export type TypedSupabaseGuestClient = SupabaseClient<Database>
 
-export async function createGuestServerClient(): Promise<TypedSupabaseGuestClient> {
-  if (!isSupabaseEnabled) {
-    throw new Error("Supabase is not enabled. Check environment variables.")
-  }
-
+const instantiateGuestClient = (): TypedSupabaseGuestClient => {
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE!,
@@ -19,7 +15,15 @@ export async function createGuestServerClient(): Promise<TypedSupabaseGuestClien
         setAll: () => {},
       },
     }
-  ) as any as TypedSupabaseGuestClient
+  ) as unknown as SupabaseClient<Database>
+}
+
+export async function createGuestServerClient(): Promise<TypedSupabaseGuestClient> {
+  if (!isSupabaseEnabled) {
+    throw new Error("Supabase is not enabled. Check environment variables.")
+  }
+
+  return instantiateGuestClient()
 }
 
 export async function createGuestServerClientSafe(): Promise<TypedSupabaseGuestClient | null> {
@@ -27,14 +31,5 @@ export async function createGuestServerClientSafe(): Promise<TypedSupabaseGuestC
     return null
   }
 
-  return createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE!,
-    {
-      cookies: {
-        getAll: () => [],
-        setAll: () => {},
-      },
-    }
-  ) as any as TypedSupabaseGuestClient
+  return instantiateGuestClient()
 }

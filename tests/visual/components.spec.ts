@@ -90,7 +90,7 @@ test.describe('Visual Regression Tests', () => {
     } else {
       // Force dark mode via localStorage
       await page.evaluate(() => {
-        localStorage.setItem('theme', 'dark')
+        localStorage.setItem('bob-theme', 'dark')
         document.documentElement.classList.add('dark')
       })
       await page.reload()

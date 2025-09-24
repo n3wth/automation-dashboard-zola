@@ -60,6 +60,21 @@ the URLs in `.env.local` accordingly. Playwright end-to-end tests boot on port
 Open [http://localhost:3000](http://localhost:3000) (or whichever port you
 selected) and start chatting.
 
+## Keyboard Shortcuts
+
+Stay in the flow with built-in shortcuts (use `Ctrl` on Windows/Linux and `⌘` on macOS):
+
+- `Enter` — Send your message
+- `Shift` + `Enter` — Insert a new line
+- `Ctrl`/`⌘` + `Enter` — Send while keeping focus in the composer
+- `Esc` or `Ctrl`/`⌘` + `.` — Stop the current assistant response
+- `Ctrl`/`⌘` + `Shift` + `X` — Clear the active chat (confirmation required)
+- `Ctrl` + `Shift` + `↑` / `⌘` + `⌥` + `↑` — Jump to the previous conversation
+- `Ctrl` + `Shift` + `↓` / `⌘` + `⌥` + `↓` — Jump to the next conversation
+- `⌘` + `Shift` + `U` — Start a new chat
+- `⌘` + `K` — Open chat history search
+- `⌘` + `Shift` + `P` — Switch the active model
+
 ### Local AI with Ollama
 
 For complete independence from cloud providers:

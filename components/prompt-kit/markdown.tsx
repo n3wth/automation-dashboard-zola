@@ -1,7 +1,7 @@
 import { LinkMarkdown } from "@/app/components/chat/link-markdown"
 import { cn } from "@/lib/utils"
 import { marked } from "marked"
-import { memo, useId, useMemo } from "react"
+import { Children, memo, useId, useMemo, type ReactNode } from "react"
 import ReactMarkdown, { Components } from "react-markdown"
 import remarkBreaks from "remark-breaks"
 import remarkGfm from "remark-gfm"
@@ -24,10 +24,34 @@ function parseMarkdownIntoBlocks(markdown: string): string[] {
   return tokens.map((token) => token.raw)
 }
 
-function extractLanguage(className?: string): string {
-  if (!className) return "plaintext"
-  const match = className.match(/language-(\w+)/)
-  return match ? match[1] : "plaintext"
+function extractLanguage(className?: string): string | undefined {
+  if (!className) return undefined
+  const languageClass = className
+    .split(" ")
+    .find((part) => part.startsWith("language-"))
+
+  if (!languageClass) return undefined
+
+  const language = languageClass.slice("language-".length)
+  if (!language) return undefined
+
+  const sanitized = language.split("{")[0]
+  return sanitized ? sanitized.toLowerCase() : undefined
+}
+
+function getCodeString(children: ReactNode): string {
+  return Children.toArray(children)
+    .map((child) => {
+      if (typeof child === "string" || typeof child === "number") {
+        return String(child)
+      }
+      return ""
+    })
+    .join("")
+}
+
+function normalizeCodeValue(value: string): string {
+  return value.replace(/\r?\n$/, "")
 }
 
 const INITIAL_COMPONENTS: Partial<Components> = {
@@ -35,6 +59,9 @@ const INITIAL_COMPONENTS: Partial<Components> = {
     const isInline =
       !props.node?.position?.start.line ||
       props.node?.position?.start.line === props.node?.position?.end.line
+
+    const rawCode = getCodeString(children)
+    const normalizedCode = normalizeCodeValue(rawCode)
 
     if (isInline) {
       return (
@@ -45,26 +72,27 @@ const INITIAL_COMPONENTS: Partial<Components> = {
           )}
           {...props}
         >
-          {children}
+          {normalizedCode}
         </span>
       )
     }
 
     const language = extractLanguage(className)
+    const displayLanguage = language ?? "text"
 
     return (
       <CodeBlock className={className}>
         <CodeBlockGroup className="flex h-9 items-center justify-between px-4">
           <div className="text-muted-foreground py-1 pr-2 font-mono text-xs">
-            {language}
+            {displayLanguage}
           </div>
         </CodeBlockGroup>
         <div className="sticky top-16 lg:top-0">
           <div className="absolute right-0 bottom-0 flex h-9 items-center pr-1.5">
-            <ButtonCopy code={children as string} />
+            <ButtonCopy code={normalizedCode} />
           </div>
         </div>
-        <CodeBlockCode code={children as string} language={language} />
+        <CodeBlockCode code={normalizedCode} language={language} />
       </CodeBlock>
     )
   },

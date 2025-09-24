@@ -6,15 +6,19 @@ import { isSupabaseEnabled } from "./config"
 export type TypedSupabaseClient = SupabaseClient<Database>
 
 // Create a properly typed client that throws if Supabase is not enabled
+function instantiateClient(): TypedSupabaseClient {
+  return createBrowserClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  ) as unknown as SupabaseClient<Database>
+}
+
 export function createClient(): TypedSupabaseClient {
   if (!isSupabaseEnabled) {
     throw new Error("Supabase is not enabled. Check environment variables.")
   }
 
-  return createBrowserClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  ) as any as TypedSupabaseClient
+  return instantiateClient()
 }
 
 // For cases where we need to handle the client being unavailable gracefully
@@ -23,10 +27,7 @@ export function createClientSafe(): TypedSupabaseClient | null {
     return null
   }
 
-  return createBrowserClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  ) as any as TypedSupabaseClient
+  return instantiateClient()
 }
 
 // Type guard to check if client is available

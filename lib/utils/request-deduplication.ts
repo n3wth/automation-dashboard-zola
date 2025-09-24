@@ -1,5 +1,5 @@
 // Request deduplication to prevent duplicate API calls
-const pendingRequests = new Map<string, Promise<any>>()
+const pendingRequests = new Map<string, Promise<unknown>>()
 
 export function deduplicateRequest<T>(
   key: string,
@@ -34,7 +34,7 @@ interface CacheEntry<T> {
   timestamp: number
 }
 
-const cache = new Map<string, CacheEntry<any>>()
+const cache = new Map<string, CacheEntry<unknown>>()
 const DEFAULT_TTL = 5000 // 5 seconds
 
 export function cacheWithTTL<T>(

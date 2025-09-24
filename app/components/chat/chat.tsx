@@ -1,9 +1,13 @@
 "use client"
 
+import { useKeyShortcut } from "@/app/hooks/use-key-shortcut"
 import { ChatInput } from "@/app/components/chat-input/chat-input"
 import { Conversation } from "@/app/components/chat/conversation"
+import { ChatInputSkeleton, ConversationSkeleton } from "@/app/components/chat/chat-skeleton"
 import { useModel } from "@/app/components/chat/use-model"
+import { OnboardingTour } from "@/app/components/onboarding/onboarding-tour"
 import { useChatDraft } from "@/app/hooks/use-chat-draft"
+import { useOnboardingTour } from "@/app/hooks/use-onboarding-tour"
 import { useChats } from "@/lib/chat-store/chats/provider"
 import { useMessages } from "@/lib/chat-store/messages/provider"
 import { useChatSession } from "@/lib/chat-store/session/provider"
@@ -11,13 +15,37 @@ import { SYSTEM_PROMPT_DEFAULT } from "@/lib/config"
 import { useUserPreferences } from "@/lib/user-preference-store/provider"
 import { useUser } from "@/lib/user-store/provider"
 import { cn } from "@/lib/utils"
+import { toast } from "@/components/ui/toast"
 import { AnimatePresence, motion } from "motion/react"
 import dynamic from "next/dynamic"
-import { redirect } from "next/navigation"
-import { useCallback, useMemo, useState } from "react"
+<<<<<<< HEAD
+import { redirect, useRouter } from "next/navigation"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useChatCore } from "./use-chat-core"
 import { useChatOperations } from "./use-chat-operations"
 import { useFileUpload } from "./use-file-upload"
+
+const isEditableElement = (target: EventTarget | null) => {
+  const element = target as HTMLElement | null
+  if (!element) return false
+
+  const tagName = element.tagName
+  if (!tagName) return false
+
+  return (
+    tagName === "INPUT" ||
+    tagName === "TEXTAREA" ||
+    tagName === "SELECT" ||
+    element.isContentEditable ||
+    element.getAttribute("role") === "textbox"
+  )
+}
+
+const isMacOs = () => {
+  if (typeof navigator === "undefined") return false
+  const platform = navigator.userAgent || ""
+  return /Mac|iPhone|iPad|iPod/i.test(platform)
+}
 
 const FeedbackWidget = dynamic(
   () => import("./feedback-widget").then((mod) => mod.FeedbackWidget),
@@ -30,8 +58,10 @@ const DialogAuth = dynamic(
 )
 
 export function Chat() {
+  const router = useRouter()
   const { chatId } = useChatSession()
   const {
+    chats,
     createNewChat,
     getChatById,
     updateChatModel,
@@ -46,7 +76,12 @@ export function Chat() {
     [chatId, getChatById]
   )
 
-  const { messages: initialMessages, cacheAndAddMessage } = useMessages()
+  const {
+    messages: initialMessages,
+    cacheAndAddMessage,
+    deleteMessages: deleteMessagesFromStore,
+    isLoading: areMessagesLoading,
+  } = useMessages()
   const { user } = useUser()
   const { preferences } = useUserPreferences()
   const { draftValue, clearDraft } = useChatDraft(chatId)
@@ -110,6 +145,7 @@ export function Chat() {
     input,
     status,
     stop,
+    setMessages,
     hasSentFirstMessageRef,
     isSubmitting,
     enableSearch,
@@ -128,13 +164,52 @@ export function Chat() {
     createOptimisticAttachments,
     setFiles,
     checkLimitsAndNotify,
-    cleanupOptimisticAttachments,
-    ensureChatExists,
-    handleFileUploads,
-    selectedModel,
-    clearDraft,
+      cleanupOptimisticAttachments,
+      ensureChatExists,
+      handleFileUploads,
+      selectedModel,
+      clearDraft,
     bumpChat,
   })
+
+  const {
+    hasCompletedTour,
+    isLoading: isOnboardingStateLoading,
+    completeTour,
+    skipTour,
+  } = useOnboardingTour()
+  const [isTourActive, setIsTourActive] = useState(false)
+
+  const baseShowOnboarding = !chatId && messages.length === 0
+
+  useEffect(() => {
+    if (baseShowOnboarding && !isOnboardingStateLoading && !hasCompletedTour) {
+      setIsTourActive(true)
+    }
+  }, [baseShowOnboarding, hasCompletedTour, isOnboardingStateLoading])
+
+  useEffect(() => {
+    if (!baseShowOnboarding) {
+      setIsTourActive(false)
+    }
+  }, [baseShowOnboarding])
+
+  const handleTourComplete = useCallback(() => {
+    completeTour()
+    setIsTourActive(false)
+  }, [completeTour])
+
+  const handleTourSkip = useCallback(() => {
+    skipTour()
+    setIsTourActive(false)
+  }, [skipTour])
+
+  const handlePrefillFromTour = useCallback(
+    (prompt: string) => {
+      handleInputChange(prompt)
+    },
+    [handleInputChange]
+  )
 
   // Memoize the conversation props to prevent unnecessary rerenders
   const conversationProps = useMemo(
@@ -201,6 +276,132 @@ export function Chat() {
     ]
   )
 
+  const chatOrder = chats
+    .map((chat) => chat.id)
+    .filter((id): id is string => Boolean(id))
+
+  const navigateChat = useCallback(
+    (offset: number) => {
+      if (!chatId || chatOrder.length <= 1) {
+        return
+      }
+
+      const currentIndex = chatOrder.findIndex((id) => id === chatId)
+      if (currentIndex === -1) {
+        return
+      }
+
+      const nextIndex = (currentIndex + offset + chatOrder.length) % chatOrder.length
+      const nextChatId = chatOrder[nextIndex]
+
+      if (nextChatId && nextChatId !== chatId) {
+        router.push(`/c/${nextChatId}`)
+      }
+    },
+    [chatId, chatOrder, router]
+  )
+
+  useKeyShortcut(
+    useCallback((event: KeyboardEvent) => {
+      if (event.repeat) return false
+      if (isEditableElement(event.target)) return false
+
+      if (isMacOs()) {
+        return event.metaKey && event.altKey && !event.shiftKey && event.key === "ArrowUp"
+      }
+
+      return event.ctrlKey && event.shiftKey && event.key === "ArrowUp"
+    }, []),
+    useCallback(() => {
+      navigateChat(-1)
+    }, [navigateChat])
+  )
+
+  useKeyShortcut(
+    useCallback((event: KeyboardEvent) => {
+      if (event.repeat) return false
+      if (isEditableElement(event.target)) return false
+
+      if (isMacOs()) {
+        return event.metaKey && event.altKey && !event.shiftKey && event.key === "ArrowDown"
+      }
+
+      return event.ctrlKey && event.shiftKey && event.key === "ArrowDown"
+    }, []),
+    useCallback(() => {
+      navigateChat(1)
+    }, [navigateChat])
+  )
+
+  const handleClearChat = useCallback(async () => {
+    if (!chatId || messages.length === 0) {
+      return
+    }
+
+    const shouldClear =
+      typeof window === "undefined" ||
+      window.confirm("Clear all messages in this chat? This action cannot be undone.")
+
+    if (!shouldClear) {
+      return
+    }
+
+    if (status === "streaming" || status === "submitted") {
+      stop()
+    }
+
+    setMessages([])
+    handleInputChange("")
+
+    try {
+      await deleteMessagesFromStore()
+      toast({
+        title: "Chat cleared",
+        description: "All messages were removed from this conversation.",
+        status: "success",
+      })
+    } catch (error) {
+      console.error("Failed to clear chat:", error)
+      toast({ title: "Failed to clear chat", status: "error" })
+    }
+  }, [
+    chatId,
+    deleteMessagesFromStore,
+    handleInputChange,
+    messages.length,
+    setMessages,
+    status,
+    stop,
+  ])
+
+  useKeyShortcut(
+    useCallback((event: KeyboardEvent) => {
+      if (event.repeat) return false
+      if (!event.shiftKey) return false
+      if (!(event.metaKey || event.ctrlKey)) return false
+
+      return event.key.toLowerCase() === "x"
+    }, []),
+    useCallback(() => {
+      void handleClearChat()
+    }, [handleClearChat])
+  )
+
+  const handleStopShortcut = useCallback(() => {
+    if (status === "streaming" || status === "submitted") {
+      stop()
+    }
+  }, [status, stop])
+
+  useKeyShortcut(
+    useCallback(
+      (event: KeyboardEvent) =>
+        !event.repeat && (event.metaKey || event.ctrlKey) && !event.shiftKey && event.key === ".",
+      []
+    ),
+    handleStopShortcut
+  )
+
   // Handle redirect for invalid chatId - only redirect if we're certain the chat doesn't exist
   // and we're not in a transient state during chat creation or fetching automation chats
   const shouldRedirect = (
@@ -236,8 +437,8 @@ export function Chat() {
   if (shouldRedirect && isFetchingOrWillFetch) {
     // The effect will trigger fetchChatDirectly, so we just show loading
     return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-center">
+      <div className="flex h-full items-center justify-center" role="status" aria-live="polite">
+        <div className="text-center" aria-busy="true">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto mb-2"></div>
           <p className="text-muted-foreground">Loading automation chat...</p>
         </div>
@@ -252,9 +453,16 @@ export function Chat() {
     redirect("/")
   }
 
-  const showOnboarding = !chatId && messages.length === 0
   const showLoadingForDirectFetch = chatId && fetchingDirectChat === chatId && !currentChat
+  const showOnboarding = baseShowOnboarding
   const hasMessages = messages.length > 0
+  const shouldShowTour =
+    showOnboarding && isTourActive && !isOnboardingStateLoading && !hasCompletedTour
+  const shouldShowDefaultOnboarding = showOnboarding && !shouldShowTour
+  const isInitialDataLoading =
+    (areMessagesLoading || isChatsLoading) && !showLoadingForDirectFetch
+  const showInitialLoading =
+    Boolean(chatId) && isInitialDataLoading && !hasMessages
 
   return (
     <div
@@ -275,6 +483,9 @@ export function Chat() {
             transition={{
               duration: 0.2,
             }}
+            role="status"
+            aria-live="polite"
+            aria-busy="true"
           >
             <div className="text-center">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto mb-4"></div>
@@ -286,12 +497,25 @@ export function Chat() {
               </p>
             </div>
           </motion.div>
+        ) : showInitialLoading ? (
+          <motion.div
+            key="conversation-loading"
+            className="w-full flex-1 overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{
+              duration: 0.2,
+            }}
+          >
+            <ConversationSkeleton />
+          </motion.div>
         ) : hasMessages ? (
           <Conversation key="conversation" {...conversationProps} />
-        ) : (
+        ) : showOnboarding ? (
           <motion.div
-            key="onboarding"
-            className="mx-auto max-w-[50rem] mb-8"
+            key={shouldShowTour ? "onboarding-tour" : "onboarding-heading"}
+            className="mx-auto mb-8 w-full max-w-[50rem] px-3 sm:px-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -300,11 +524,19 @@ export function Chat() {
               ease: "easeOut",
             }}
           >
-            <h1 className="mb-6 text-3xl font-medium tracking-tight">
-              What&apos;s on your mind?
-            </h1>
+            {shouldShowTour ? (
+              <OnboardingTour
+                onComplete={handleTourComplete}
+                onSkip={handleTourSkip}
+                onPrefillPrompt={handlePrefillFromTour}
+              />
+            ) : shouldShowDefaultOnboarding ? (
+              <h1 className="mb-6 text-3xl font-medium tracking-tight">
+                What&apos;s on your mind?
+              </h1>
+            ) : null}
           </motion.div>
-        )}
+        ) : null}
       </AnimatePresence>
 
       <div
@@ -312,7 +544,14 @@ export function Chat() {
           "relative inset-x-0 bottom-0 z-50 mx-auto w-full max-w-3xl"
         )}
       >
-        <ChatInput {...chatInputProps} />
+        {showInitialLoading ? (
+          <ChatInputSkeleton
+            className="bg-black/60 border-white/20"
+            withModelSelector={false}
+          />
+        ) : (
+          <ChatInput {...chatInputProps} />
+        )}
       </div>
 
       <FeedbackWidget authUserId={user?.id} />

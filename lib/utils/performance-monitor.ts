@@ -64,7 +64,7 @@ export class PerformanceMonitor {
         if (measure && measure.duration > 100) {
           console.warn(`⏱️ Slow operation "${name}": ${measure.duration.toFixed(2)}ms`)
         }
-      } catch (e) {
+      } catch {
         // Marks might not exist
       }
     }
@@ -77,12 +77,20 @@ export class PerformanceMonitor {
 
   // Memory usage monitoring (Chrome only)
   getMemoryUsage() {
-    if ('memory' in performance) {
-      const memory = (performance as any).memory
+    const { memory } = performance as Performance & {
+      memory?: {
+        usedJSHeapSize: number
+        totalJSHeapSize: number
+        jsHeapSizeLimit: number
+      }
+    }
+
+    if (memory) {
+      const toMB = (value: number) => `${(value / 1048576).toFixed(2)} MB`
       return {
-        usedJSHeapSize: (memory.usedJSHeapSize / 1048576).toFixed(2) + ' MB',
-        totalJSHeapSize: (memory.totalJSHeapSize / 1048576).toFixed(2) + ' MB',
-        limit: (memory.jsHeapSizeLimit / 1048576).toFixed(2) + ' MB'
+        usedJSHeapSize: toMB(memory.usedJSHeapSize),
+        totalJSHeapSize: toMB(memory.totalJSHeapSize),
+        limit: toMB(memory.jsHeapSizeLimit),
       }
     }
     return null
