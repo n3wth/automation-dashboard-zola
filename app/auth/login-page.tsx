@@ -5,10 +5,9 @@ import { Input } from "@/components/ui/input"
 import { signInWithGoogle } from "@/lib/api"
 import { createClient } from "@/lib/supabase/client"
 import { createClientSafe } from "@/lib/supabase/client"
-import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { HeaderGoBack } from "../components/header-go-back"
 
 export default function LoginPage() {
@@ -68,14 +67,24 @@ export default function LoginPage() {
       setError(null)
 
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
         })
         if (error) throw error
+
+        // If email confirmation is disabled, the user should be automatically signed in
+        // If not signed in after signup, manually sign them in
+        if (!data.session) {
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          })
+          if (signInError) throw signInError
+        }
+
         setError(null)
-        // Show success message for email confirmation
-        setError("Check your email for a confirmation link")
+        router.push("/")
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
