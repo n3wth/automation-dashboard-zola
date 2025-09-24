@@ -96,8 +96,8 @@ export function ThemeToggle({ className }: { className?: string }) {
           variant="ghost"
           size="icon"
           className={cn(
-            "relative h-9 w-9 rounded-full border border-border",
-            "bg-background text-foreground hover:bg-muted",
+            "relative h-9 w-9 rounded-full border border-white/10",
+            "bg-transparent text-white/70 hover:bg-white/5 hover:border-white/15 hover:text-white transition-all",
             className
           )}
           aria-label="Toggle theme"

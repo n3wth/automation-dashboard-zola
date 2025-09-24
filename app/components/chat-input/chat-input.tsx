@@ -283,9 +283,9 @@ export function ChatInput({
       >
         <PromptInput
           className={cn(
-            "relative z-10 border-border/60 bg-background/95 p-0 pt-1 text-foreground shadow-xs backdrop-blur-xl",
-            isAtCharacterLimit && "border-destructive focus-within:border-destructive",
-            !isAtCharacterLimit && shouldShowLongInputHint && "border-amber-400/80 focus-within:border-amber-400/90"
+            "relative z-10 border-white/10 bg-zinc-900/50 p-0 pt-1 text-foreground backdrop-blur-sm",
+            isAtCharacterLimit && "border-red-500/50 focus-within:border-red-500/70",
+            !isAtCharacterLimit && shouldShowLongInputHint && "border-amber-400/50 focus-within:border-amber-400/70"
           )}
           maxHeight={200}
           value={value}
@@ -350,12 +350,12 @@ export function ChatInput({
                 data-testid="chat-input-character-count"
                 aria-live="polite"
                 className={cn(
-                  "text-xs font-medium tabular-nums transition-colors",
+                  "text-xs tabular-nums transition-colors",
                   isAtCharacterLimit
-                    ? "text-destructive"
+                    ? "text-red-400/70"
                     : shouldShowLongInputHint
-                      ? "text-amber-400"
-                      : "text-muted-foreground"
+                      ? "text-amber-400/70"
+                      : "text-white/30"
                 )}
               >
                 {formattedInputLength} / {formattedMaxLength}
@@ -366,15 +366,15 @@ export function ChatInput({
                   data-testid="chat-send-button"
                   size="icon"
                   className={cn(
-                    "group relative size-9 rounded-full bg-white text-black shadow-[0_10px_30px_rgba(15,15,15,0.2)]",
-                    "transition-all duration-200 ease-out",
-                    "hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_18px_40px_rgba(15,15,15,0.28)]",
+                    "group relative size-9 rounded-full bg-white text-black",
+                    "transition-all duration-200",
+                    "hover:bg-white/90",
                     "active:scale-95",
-                    "disabled:translate-y-0 disabled:bg-white/15 disabled:text-white/50 disabled:shadow-none disabled:!opacity-80 disabled:!cursor-not-allowed",
-                    "data-[state=streaming]:bg-rose-500 data-[state=streaming]:text-white",
-                    "data-[state=streaming]:hover:bg-rose-500/90 data-[state=streaming]:shadow-[0_16px_36px_rgba(244,63,94,0.45)] data-[state=streaming]:hover:shadow-[0_20px_44px_rgba(244,63,94,0.5)]",
-                    "data-[state=loading]:bg-white/70 data-[state=loading]:text-black/70 data-[state=loading]:shadow-[0_10px_30px_rgba(255,255,255,0.2)]",
-                    "data-[state=loading]:!cursor-wait data-[state=loading]:!opacity-100"
+                    "disabled:bg-white/10 disabled:text-white/30 disabled:!cursor-not-allowed",
+                    "data-[state=streaming]:bg-red-500 data-[state=streaming]:text-white",
+                    "data-[state=streaming]:hover:bg-red-600",
+                    "data-[state=loading]:bg-white/50 data-[state=loading]:text-black/50",
+                    "data-[state=loading]:!cursor-wait"
                   )}
                   disabled={isSendDisabled}
                   type="button"

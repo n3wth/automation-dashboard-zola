@@ -6,7 +6,6 @@ import { ButtonNewChat } from "@/app/components/layout/button-new-chat"
 import { UserMenu } from "@/app/components/layout/user-menu"
 import { useBreakpoint } from "@/app/hooks/use-breakpoint"
 import { Logo } from "@/components/ui/logo"
-import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { APP_NAME } from "@/lib/config"
 import { useUserPreferences } from "@/lib/user-preference-store/provider"
@@ -52,7 +51,6 @@ export function Header({ hasSidebar }: { hasSidebar: boolean }) {
           <div />
           {!isLoggedIn ? (
             <div className="pointer-events-auto flex flex-1 items-center justify-end gap-3">
-              <ThemeToggle />
               <AppInfoTrigger
                 trigger={
                   <Button
@@ -75,7 +73,6 @@ export function Header({ hasSidebar }: { hasSidebar: boolean }) {
             </div>
           ) : (
             <div className="pointer-events-auto flex flex-1 items-center justify-end gap-2">
-              <ThemeToggle />
               {!isMultiModelEnabled && <DialogPublish />}
               <ButtonNewChat />
               {!hasSidebar && <HistoryTrigger hasSidebar={hasSidebar} />}
