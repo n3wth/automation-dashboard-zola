@@ -41,7 +41,11 @@ function DropdownMenuContent({
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
         className={cn(
-          "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md backdrop-blur-xl",
+          "bg-popover text-popover-foreground z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md backdrop-blur-xl",
+          "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
+          "data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 data-[side=right]:slide-in-from-left-2 data-[side=left]:slide-in-from-right-2",
+          "data-[side=bottom]:origin-top data-[side=top]:origin-bottom data-[side=right]:origin-left data-[side=left]:origin-right",
+          "duration-150 data-[state=closed]:duration-100 ease-out data-[state=closed]:ease-in will-change-[transform,opacity]",
           className
         )}
         {...props}
@@ -210,13 +214,15 @@ function DropdownMenuSubTrigger({
       data-slot="dropdown-menu-sub-trigger"
       data-inset={inset}
       className={cn(
-        "hover:bg-accent/60 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-hidden transition-colors select-none data-[inset]:pl-8",
+        "group/sub-trigger flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-hidden transition-colors duration-150 ease-out select-none",
+        "hover:bg-accent/60 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+        "data-[state=open]:bg-accent data-[state=open]:text-accent-foreground data-[inset]:pl-8",
         className
       )}
       {...props}
     >
       {children}
-      <CaretRight className="ml-auto size-4" />
+      <CaretRight className="ml-auto size-4 transition-transform duration-200 group-data-[state=open]/sub-trigger:translate-x-0.5" />
     </DropdownMenuPrimitive.SubTrigger>
   )
 }
@@ -229,7 +235,11 @@ function DropdownMenuSubContent({
     <DropdownMenuPrimitive.SubContent
       data-slot="dropdown-menu-sub-content"
       className={cn(
-        "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 z-50 min-w-[8rem] overflow-hidden rounded-md border p-1 shadow-lg backdrop-blur-xl",
+        "bg-popover text-popover-foreground z-50 min-w-[8rem] overflow-hidden rounded-md border p-1 shadow-lg backdrop-blur-xl",
+        "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
+        "data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 data-[side=right]:slide-in-from-left-2 data-[side=left]:slide-in-from-right-2",
+        "data-[side=bottom]:origin-top data-[side=top]:origin-bottom data-[side=right]:origin-left data-[side=left]:origin-right",
+        "duration-150 data-[state=closed]:duration-100 ease-out data-[state=closed]:ease-in will-change-[transform,opacity]",
         className
       )}
       {...props}
