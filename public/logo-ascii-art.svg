@@ -1,35 +1,13 @@
-<svg width="80" height="40" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 40">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 308.08 136.93" width="80" height="40">
   <defs>
-    <!-- Subtle gradient inspired by newth.ai -->
-    <linearGradient id="techGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#8b5cf6"/>
-      <stop offset="50%" style="stop-color:#3b82f6"/>
-      <stop offset="100%" style="stop-color:#8b5cf6"/>
-    </linearGradient>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+    </style>
   </defs>
-
-  <!-- Thicker ASCII-style blocks for "BOB" -->
-  <g fill="white">
-    <!-- B -->
-    <rect x="4" y="8" width="4" height="24"/>
-    <rect x="4" y="8" width="14" height="4"/>
-    <rect x="4" y="18" width="12" height="4"/>
-    <rect x="4" y="28" width="14" height="4"/>
-    <rect x="14" y="12" width="4" height="6"/>
-    <rect x="14" y="22" width="4" height="6"/>
-
-    <!-- O -->
-    <rect x="24" y="8" width="14" height="4"/>
-    <rect x="24" y="28" width="14" height="4"/>
-    <rect x="24" y="12" width="4" height="16"/>
-    <rect x="34" y="12" width="4" height="16"/>
-
-    <!-- B -->
-    <rect x="44" y="8" width="4" height="24"/>
-    <rect x="44" y="8" width="14" height="4"/>
-    <rect x="44" y="18" width="12" height="4"/>
-    <rect x="44" y="28" width="14" height="4"/>
-    <rect x="54" y="12" width="4" height="6"/>
-    <rect x="54" y="22" width="4" height="6"/>
-  </g>
+  <path class="cls-1" d="M0,0v136.93h79.87v-57.05h-11.41v-22.82h11.41V0H0ZM57.05,114.1H22.82v-34.23h34.23v34.23ZM57.05,22.82v34.23H22.82V22.82h34.23Z"/>
+  <path class="cls-1" d="M114.1,22.82v114.1h79.87V0h-79.87v22.82ZM171.16,22.82v91.28h-34.23V22.82h34.23Z"/>
+  <path class="cls-1" d="M251.03,0h-22.82v136.93h79.87v-57.05h-11.41v-22.82h11.41V0h-57.05ZM285.26,114.1h-34.23v-34.23h34.23v34.23ZM285.26,57.05h-34.23V22.82h34.23v34.23Z"/>
 </svg>
