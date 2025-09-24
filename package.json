@@ -29,7 +29,8 @@
     "merge-prs": "./scripts/merge-prs.sh",
     "pr": "gh pr create",
     "pr-list": "gh pr list",
-    "pr-check": "./scripts/merge-prs.sh"
+    "pr-check": "./scripts/merge-prs.sh",
+    "bb:long": "node scripts/bb-longflows.mjs --n 3 --engine gm --minutes 3"
   },
   "overrides": {
     "jsondiffpatch": "^0.7.2"

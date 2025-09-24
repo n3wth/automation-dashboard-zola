@@ -1,0 +1,251 @@
+# Cursor Agent Configuration
+# Advanced filtering and prioritization for automated issue processing
+
+# Issue Filtering Configuration
+issue_filters:
+  # Labels that make issues suitable for automation
+  include_labels:
+    - "good first issue"
+    - "bug"
+    - "enhancement"
+    - "documentation"
+    - "refactor"
+    - "help wanted"
+    - "typo"
+    - "config"
+    - "testing"
+
+  # Labels that exclude issues from automation
+  exclude_labels:
+    - "wontfix"
+    - "duplicate"
+    - "invalid"
+    - "question"
+    - "epic"
+    - "blocked"
+    - "dependencies"
+    - "breaking change"
+    - "security"
+    - "architecture"
+
+  # Issue age and complexity filters
+  max_age_days: 30
+  min_comments: 0
+  max_comments: 20
+  complexity_score:
+    min: 1
+    max: 7
+
+  # Text-based filtering
+  title_keywords:
+    include:
+      - "fix"
+      - "add"
+      - "update"
+      - "improve"
+      - "remove"
+      - "typo"
+    exclude:
+      - "design"
+      - "architecture"
+      - "security"
+      - "performance"
+      - "migration"
+
+# Agent Processing Configuration
+agent_settings:
+  # Resource limits
+  max_concurrent_agents: 2
+  timeout_minutes: 30
+  max_daily_issues: 10
+
+  # Behavior settings
+  auto_assign_to_self: true
+  create_draft_prs: false
+  require_manual_review: false  # Fully automated
+  auto_close_on_success: false
+
+  # Quality gates
+  run_pre_commit_hooks: true
+  require_tests: false
+  require_type_check: true
+  require_lint_pass: true
+
+# Repository Configuration
+repository:
+  default_branch: "main"
+  branch_prefix: "cursor-agent/"
+
+  # Protected files that agents should not modify
+  protected_files:
+    - ".github/workflows/*"
+    - "package.json"
+    - "package-lock.json"
+    - "yarn.lock"
+    - "Dockerfile*"
+    - "docker-compose*.yml"
+    - "README.md"
+    - "CHANGELOG.md"
+    - "LICENSE*"
+
+  # Directories where changes are allowed
+  allowed_directories:
+    - "src/"
+    - "lib/"
+    - "components/"
+    - "pages/"
+    - "app/"
+    - "docs/"
+    - "test/"
+    - "__tests__/"
+    - "spec/"
+
+# Issue Prioritization
+prioritization:
+  # Priority scoring weights (higher = more important)
+  weights:
+    label_priority: 0.4
+    age_factor: 0.2
+    complexity_factor: 0.2
+    engagement_factor: 0.2
+
+  # Label-based priority scores
+  label_priorities:
+    "good first issue": 10
+    "bug": 8
+    "typo": 9
+    "documentation": 6
+    "enhancement": 5
+    "refactor": 4
+    "help wanted": 7
+    "testing": 5
+
+  # Age-based scoring (newer issues get higher priority)
+  age_scoring:
+    "0-1_days": 10
+    "1-3_days": 8
+    "3-7_days": 6
+    "7-14_days": 4
+    "14-30_days": 2
+
+  # Complexity scoring (simpler issues get higher priority)
+  complexity_scoring:
+    low: 10    # 1-3 estimated complexity
+    medium: 6  # 4-6 estimated complexity
+    high: 2    # 7-10 estimated complexity
+
+# Notification Settings
+notifications:
+  # Slack integration
+  slack:
+    enabled: false
+    webhook_url: ""
+    channel: "#automation"
+    events:
+      - "pr_created"
+      - "pr_merged"
+      - "agent_failed"
+
+  # Discord integration
+  discord:
+    enabled: false
+    webhook_url: ""
+    events:
+      - "pr_created"
+      - "agent_failed"
+
+  # Email notifications
+  email:
+    enabled: false
+    smtp_server: ""
+    recipients: []
+
+# Monitoring and Logging
+monitoring:
+  log_level: "info"  # debug, info, warn, error
+  log_file: "$HOME/.cursor-agent-monitor.log"
+  max_log_size_mb: 10
+  retain_logs_days: 30
+
+  # Metrics collection
+  collect_metrics: true
+  metrics_file: "$HOME/.cursor-agent-metrics.json"
+
+  # Health check settings
+  health_check_interval: 300  # seconds
+  max_consecutive_failures: 3
+
+# Advanced Agent Prompts
+prompts:
+  # System prompt for all agents
+  system_prompt: |
+    You are a helpful AI coding assistant working on GitHub issue automation.
+    Focus on making minimal, correct changes that solve the specific issue.
+    Follow existing code patterns and maintain high code quality.
+    Always test your changes when possible.
+
+  # Issue analysis prompt template
+  analysis_prompt: |
+    Analyze this GitHub issue and determine if it's suitable for automated fixing:
+
+    Issue: {title}
+    Description: {body}
+    Labels: {labels}
+
+    Consider:
+    1. Is the problem clearly defined?
+    2. Can it be solved with code changes?
+    3. Are the requirements unambiguous?
+    4. Is it within the scope of automated tooling?
+
+  # Fix implementation prompt template
+  fix_prompt: |
+    Fix this GitHub issue: #{number}
+
+    Title: {title}
+    Description: {body}
+
+    Please:
+    1. Analyze the codebase to understand the issue
+    2. Implement a minimal fix that addresses the problem
+    3. Follow existing code patterns and conventions
+    4. Add tests if appropriate
+    5. Make clean, focused commits
+
+    Focus on quality over speed. Make sure the fix is correct and maintainable.
+
+# Integration Settings
+integrations:
+  # Cursor CLI settings
+  cursor:
+    cli_command: "cursor-agent"
+    headless_mode: true
+    output_format: "text"  # text, json, stream-json
+    model_preference: "claude-3.5-sonnet"  # or "gpt-4", "claude-3", etc.
+    max_context_tokens: 100000
+    temperature: 0.1
+    auto_approve: true   # Auto-approve commands for full automation
+
+  # GitHub CLI settings
+  github:
+    cli_command: "gh"
+    api_version: "2022-11-28"
+    auto_merge_enabled: false
+    require_reviews: 1
+
+# Error Handling
+error_handling:
+  # Retry configuration
+  max_retries: 3
+  retry_delay_seconds: 60
+  exponential_backoff: true
+
+  # Failure responses
+  on_timeout: "abandon"  # abandon, retry, extend
+  on_api_error: "retry"  # retry, abandon, skip
+  on_build_failure: "abandon"  # abandon, retry, fix
+
+  # Recovery strategies
+  auto_recovery: true
+  fallback_branch_cleanup: true
+  notify_on_persistent_failures: true
