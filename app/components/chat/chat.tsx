@@ -61,12 +61,13 @@ export function Chat() {
 
   // Onboarding tour functionality
   const {
-    isTourActive,
     hasCompletedTour,
-    isOnboardingStateLoading,
+    isLoading: isOnboardingStateLoading,
     completeTour,
     skipTour,
   } = useOnboardingTour()
+
+  const [isTourActive, setIsTourActive] = useState(false)
 
   // File upload functionality
   const {
@@ -168,7 +169,7 @@ export function Chat() {
   // Handle prefill from tour
   const handlePrefillFromTour = useCallback(
     (prompt: string) => {
-      handleInputChange({ target: { value: prompt } } as React.ChangeEvent<HTMLTextAreaElement>)
+      handleInputChange(prompt)
     },
     [handleInputChange]
   )
@@ -302,6 +303,19 @@ export function Chat() {
     isSupabaseEnabled && !isAuthenticated && showOnboarding
   const showInitialLoading =
     Boolean(chatId) && isChatsLoading && !showLoadingForDirectFetch && !hasMessages
+
+  // Set tour active state on mount when appropriate
+  useEffect(() => {
+    if (baseShowOnboarding && !isOnboardingStateLoading && !hasCompletedTour) {
+      setIsTourActive(true)
+    }
+  }, [baseShowOnboarding, hasCompletedTour, isOnboardingStateLoading])
+
+  useEffect(() => {
+    if (!baseShowOnboarding) {
+      setIsTourActive(false)
+    }
+  }, [baseShowOnboarding])
 
   return (
     <div

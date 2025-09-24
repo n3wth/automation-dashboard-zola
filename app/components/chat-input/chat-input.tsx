@@ -380,7 +380,6 @@ export function ChatInput({
                   aria-label={sendButtonAriaLabel}
                   aria-busy={isSubmitting || isStreaming || isAwaitingResponse}
                   data-state={sendButtonState}
-                  data-testid="send-button"
                 >
                   {sendButtonState === "streaming" ? (
                     <StopIcon className="size-4 transition-transform duration-200 group-hover:scale-105" />
