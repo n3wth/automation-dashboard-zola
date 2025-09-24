@@ -39,6 +39,7 @@ export function useMultiChat(models: ModelConfig[]): ModelChat[] {
           })
         }
       },
+      streamProtocol: "data",
     })
   )
 

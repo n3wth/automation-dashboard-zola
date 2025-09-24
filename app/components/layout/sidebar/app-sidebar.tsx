@@ -18,14 +18,13 @@ import {
   NotePencilIcon,
   X,
 } from "@phosphor-icons/react"
-import { Pin } from "lucide-react"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
-import { useMemo } from "react"
+import { useMemo, useRef } from "react"
 import { groupChatsByDate } from "../../history/utils"
 import { HistoryTrigger } from "../../history/history-trigger"
-import { SidebarList } from "./sidebar-list"
 import { SidebarProject } from "./sidebar-project"
+import { VirtualizedChatList } from "./virtualized-chat-list"
 
 export function AppSidebar() {
   const { isMobile, isMounted } = useSsrBreakpoint(768)
@@ -33,6 +32,7 @@ export function AppSidebar() {
   const { chats, pinnedChats, isLoading } = useChats()
   const params = useParams<{ chatId: string }>()
   const currentChatId = params.chatId
+  const scrollViewportRef = useRef<HTMLDivElement | null>(null)
 
   const groupedChats = useMemo(() => {
     const result = groupChatsByDate(chats, "")
@@ -68,7 +68,10 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
       <SidebarContent className="border-border/40 border-t">
-        <ScrollArea className="flex h-full px-3 [&>div>div]:!block">
+        <ScrollArea
+          className="flex h-full px-3 [&>div>div]:!block"
+          viewportRef={scrollViewportRef}
+        >
           <div className="mt-3 mb-5 flex w-full flex-col items-start gap-0">
             <button
               className="hover:bg-accent/80 hover:text-foreground text-primary group/new-chat relative inline-flex w-full items-center rounded-md bg-transparent px-2 py-2 text-sm transition-colors"
@@ -102,26 +105,13 @@ export function AppSidebar() {
           {isLoading ? (
             <div className="h-full" />
           ) : hasChats ? (
-            <div className="space-y-5">
-              {pinnedChats.length > 0 && (
-                <div className="space-y-5">
-                  <SidebarList
-                    key="pinned"
-                    title="Pinned"
-                    icon={<Pin className="size-3" />}
-                    items={pinnedChats}
-                    currentChatId={currentChatId}
-                  />
-                </div>
-              )}
-              {groupedChats?.map((group) => (
-                <SidebarList
-                  key={group.name}
-                  title={group.name}
-                  items={group.chats}
-                  currentChatId={currentChatId}
-                />
-              ))}
+            <div className="mt-3 pb-4">
+              <VirtualizedChatList
+                pinnedChats={pinnedChats}
+                groupedChats={groupedChats}
+                currentChatId={currentChatId}
+                viewportRef={scrollViewportRef}
+              />
             </div>
           ) : (
             <div className="flex h-[calc(100vh-160px)] flex-col items-center justify-center">
