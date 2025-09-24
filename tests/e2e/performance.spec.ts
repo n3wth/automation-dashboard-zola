@@ -1,6 +1,25 @@
 import { test, expect } from '@playwright/test'
 import { TestHelpers, TEST_DATA } from '../utils/test-helpers'
 
+type PerformanceWithMemory = Performance & {
+  memory?: {
+    usedJSHeapSize: number
+    totalJSHeapSize: number
+    jsHeapSizeLimit: number
+  }
+}
+
+type WebVitals = {
+  fcp?: number
+  lcp?: number
+}
+
+type BundleRequest = {
+  url: string
+  size: string | undefined
+  type: 'js' | 'css' | 'other'
+}
+
 test.describe('Performance Tests', () => {
   test('page load performance', async ({ page }) => {
     const helpers = new TestHelpers(page)
@@ -15,13 +34,13 @@ test.describe('Performance Tests', () => {
 
     // Check Core Web Vitals
     const webVitals = await page.evaluate(() => {
-      return new Promise((resolve) => {
-        const vitals: any = {}
+      return new Promise<WebVitals>((resolve) => {
+        const vitals: WebVitals = {}
 
         // First Contentful Paint
         if ('performance' in window && 'getEntriesByType' in window.performance) {
           const paintEntries = window.performance.getEntriesByType('paint')
-          const fcpEntry = paintEntries.find(entry => entry.name === 'first-contentful-paint')
+          const fcpEntry = paintEntries.find((entry) => entry.name === 'first-contentful-paint')
           if (fcpEntry) vitals.fcp = fcpEntry.startTime
         }
 
@@ -95,11 +114,15 @@ test.describe('Performance Tests', () => {
 
     // Get initial memory usage
     const initialMemory = await page.evaluate(() => {
-      return (performance as any).memory ? {
-        usedJSHeapSize: (performance as any).memory.usedJSHeapSize,
-        totalJSHeapSize: (performance as any).memory.totalJSHeapSize,
-        jsHeapSizeLimit: (performance as any).memory.jsHeapSizeLimit
-      } : null
+      const perf = performance as PerformanceWithMemory
+      if (!perf.memory) {
+        return null
+      }
+      return {
+        usedJSHeapSize: perf.memory.usedJSHeapSize,
+        totalJSHeapSize: perf.memory.totalJSHeapSize,
+        jsHeapSizeLimit: perf.memory.jsHeapSizeLimit,
+      }
     })
 
     if (initialMemory) {
@@ -113,12 +136,20 @@ test.describe('Performance Tests', () => {
 
       // Check memory after interactions
       const finalMemory = await page.evaluate(() => {
+        const perf = performance as PerformanceWithMemory
+        if (!perf.memory) {
+          return null
+        }
         return {
-          usedJSHeapSize: (performance as any).memory.usedJSHeapSize,
-          totalJSHeapSize: (performance as any).memory.totalJSHeapSize,
-          jsHeapSizeLimit: (performance as any).memory.jsHeapSizeLimit
+          usedJSHeapSize: perf.memory.usedJSHeapSize,
+          totalJSHeapSize: perf.memory.totalJSHeapSize,
+          jsHeapSizeLimit: perf.memory.jsHeapSizeLimit,
         }
       })
+
+      if (!finalMemory) {
+        return
+      }
 
       console.log('Final memory usage:', finalMemory)
 
@@ -132,7 +163,7 @@ test.describe('Performance Tests', () => {
     const helpers = new TestHelpers(page)
 
     // Track network requests to measure bundle size
-    const networkRequests: any[] = []
+    const networkRequests: BundleRequest[] = []
 
     page.on('response', response => {
       if (response.url().includes('/_next/static/') || response.url().includes('.js') || response.url().includes('.css')) {
@@ -149,7 +180,7 @@ test.describe('Performance Tests', () => {
 
     // Calculate total bundle size
     const totalSize = networkRequests.reduce((total, req) => {
-      const size = parseInt(req.size || '0', 10)
+      const size = parseInt(req.size ?? '0', 10)
       return total + size
     }, 0)
 

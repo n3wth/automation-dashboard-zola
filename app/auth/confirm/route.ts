@@ -1,8 +1,9 @@
+import type { EmailOtpType } from "@supabase/auth-js"
+import { trackEvent, MonitoringEvent } from "@/lib/monitoring"
 import { isSupabaseEnabled } from "@/lib/supabase/config"
 import { createClient } from "@/lib/supabase/server"
 import { createGuestServerClient } from "@/lib/supabase/server-guest"
 import { NextResponse } from "next/server"
-import { trackEvent, MonitoringEvent } from "@/lib/monitoring"
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -46,6 +47,13 @@ export async function GET(request: Request) {
     )
   }
 
+  if (!isEmailOtpType(type)) {
+    console.error("Unsupported email confirmation type:", type)
+    return NextResponse.redirect(
+      `${origin}/auth/error?message=${encodeURIComponent("Invalid confirmation type in confirmation link.")}`
+    )
+  }
+
   const supabase = await createClient()
   const supabaseAdmin = await createGuestServerClient()
 
@@ -59,7 +67,7 @@ export async function GET(request: Request) {
     // Verify the email confirmation token
     const { data, error: verifyError } = await supabase.auth.verifyOtp({
       token_hash: tokenHash,
-      type: type as any,
+      type,
     })
 
     if (verifyError) {
@@ -132,3 +140,14 @@ export async function GET(request: Request) {
     )
   }
 }
+const EMAIL_OTP_TYPES: EmailOtpType[] = [
+  "signup",
+  "invite",
+  "magiclink",
+  "recovery",
+  "email_change",
+  "email",
+]
+
+const isEmailOtpType = (value: string): value is EmailOtpType =>
+  EMAIL_OTP_TYPES.includes(value as EmailOtpType)

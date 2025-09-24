@@ -122,7 +122,7 @@ export function useChatPreview(userId?: string): UseChatPreviewReturn {
         }
       }
     }, 200) // 200ms debounce to prevent rapid calls
-  }, [])
+  }, [userId])
 
   const clearPreview = useCallback(() => {
     // Clear debounce timeout

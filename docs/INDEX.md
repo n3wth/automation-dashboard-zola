@@ -294,6 +294,7 @@ docker run -p 3000:3000 bob
 ## 📖 Additional Resources
 
 ### Internal Documentation
+- [Quick Start Guide](./QUICK_START.md)
 - [API Documentation](./API.md)
 - [Component Guide](./COMPONENTS.md)
 - [State Management](./STATE.md)

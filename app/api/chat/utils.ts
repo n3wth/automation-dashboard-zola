@@ -1,5 +1,40 @@
 import { Message as MessageAISDK } from "ai"
 
+type ToolLikeMessage = MessageAISDK & {
+  role?: string
+  content?: unknown
+}
+
+type ToolContentPart = {
+  type?: string
+  text?: string
+}
+
+type AIErrorShape = {
+  statusCode?: number
+  responseBody?: string
+  message?: string
+}
+
+type AIErrorWrapper = {
+  error?: AIErrorShape
+}
+
+const isToolRole = (message: ToolLikeMessage): boolean =>
+  (message.role as string | undefined) === 'tool'
+
+const filterToolContent = (content: ToolLikeMessage['content']): ToolContentPart[] => {
+  if (!Array.isArray(content)) return []
+
+  return content.filter((part): part is ToolContentPart => {
+    if (!part || typeof part !== 'object') return true
+    if (!('type' in part)) return true
+    const { type } = part as ToolContentPart
+    if (!type) return true
+    return !['tool-call', 'tool-result', 'tool-invocation'].includes(type)
+  })
+}
+
 /**
  * Clean messages when switching between agents with different tool capabilities.
  * This removes tool invocations and tool-related content from messages when tools are not available
@@ -18,7 +53,7 @@ export function cleanMessagesForTools(
     .map((message) => {
       // Skip tool messages entirely when no tools are available
       // Note: Using type assertion since AI SDK types might not include 'tool' role
-      if ((message as { role: string }).role === "tool") {
+      if (isToolRole(message)) {
         return null
       }
 
@@ -30,30 +65,17 @@ export function cleanMessagesForTools(
         }
 
         if (Array.isArray(message.content)) {
-          const filteredContent = (
-            message.content as Array<{ type?: string; text?: string }>
-          ).filter((part: { type?: string }) => {
-            if (part && typeof part === "object" && part.type) {
-              // Remove tool-call, tool-result, and tool-invocation parts
-              const isToolPart =
-                part.type === "tool-call" ||
-                part.type === "tool-result" ||
-                part.type === "tool-invocation"
-              return !isToolPart
-            }
-            return true
-          })
+          const filteredContent = filterToolContent(message.content)
 
           // Extract text content
           const textParts = filteredContent.filter(
-            (part: { type?: string }) =>
-              part && typeof part === "object" && part.type === "text"
+            (part) => part && typeof part === "object" && part.type === "text"
           )
 
           if (textParts.length > 0) {
             // Combine text parts into a single string
             const textContent = textParts
-              .map((part: { text?: string }) => part.text || "")
+              .map((part) => part.text || "")
               .join("\n")
               .trim()
             cleanedMessage.content = textContent || "[Assistant response]"
@@ -80,18 +102,7 @@ export function cleanMessagesForTools(
 
       // For user messages, clean any tool-related content from array content
       if (message.role === "user" && Array.isArray(message.content)) {
-        const filteredContent = (
-          message.content as Array<{ type?: string }>
-        ).filter((part: { type?: string }) => {
-          if (part && typeof part === "object" && part.type) {
-            const isToolPart =
-              part.type === "tool-call" ||
-              part.type === "tool-result" ||
-              part.type === "tool-invocation"
-            return !isToolPart
-          }
-          return true
-        })
+        const filteredContent = filterToolContent(message.content)
 
         if (
           filteredContent.length !== (message.content as Array<unknown>).length
@@ -117,17 +128,10 @@ export function cleanMessagesForTools(
 export function messageHasToolContent(message: MessageAISDK): boolean {
   return !!(
     message.toolInvocations?.length ||
-    (message as { role: string }).role === "tool" ||
+    isToolRole(message) ||
     (Array.isArray(message.content) &&
-      (message.content as Array<{ type?: string }>).some(
-        (part: { type?: string }) =>
-          part &&
-          typeof part === "object" &&
-          part.type &&
-          (part.type === "tool-call" ||
-            part.type === "tool-result" ||
-            part.type === "tool-invocation")
-      ))
+      filterToolContent(message.content).length !==
+        (message.content as Array<unknown>).length)
   )
 }
 
@@ -150,8 +154,7 @@ export function handleStreamError(err: unknown): ApiError {
   console.error("🛑 streamText error:", err)
 
   // Extract error details from the AI SDK error
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const aiError = (err as { error?: any })?.error
+  const aiError = (err as AIErrorWrapper)?.error
 
   if (aiError) {
     // Try to extract detailed error message from response body
@@ -172,8 +175,10 @@ export function handleStreamError(err: unknown): ApiError {
       }
     }
 
+    const statusCode = aiError.statusCode ?? null
+
     // Handle specific API errors with proper status codes
-    if (aiError.statusCode === 402) {
+    if (statusCode === 402) {
       // Payment required
       const message =
         detailedMessage || "Insufficient credits or payment required"
@@ -181,7 +186,7 @@ export function handleStreamError(err: unknown): ApiError {
         statusCode: 402,
         code: "PAYMENT_REQUIRED",
       })
-    } else if (aiError.statusCode === 401) {
+    } else if (statusCode === 401) {
       // Authentication error - use detailed message if available
       const message =
         detailedMessage ||
@@ -190,7 +195,7 @@ export function handleStreamError(err: unknown): ApiError {
         statusCode: 401,
         code: "AUTHENTICATION_ERROR",
       })
-    } else if (aiError.statusCode === 429) {
+    } else if (statusCode === 429) {
       // Rate limit
       const message =
         detailedMessage || "Rate limit exceeded. Please try again later."
@@ -198,18 +203,18 @@ export function handleStreamError(err: unknown): ApiError {
         statusCode: 429,
         code: "RATE_LIMIT_EXCEEDED",
       })
-    } else if (aiError.statusCode >= 400 && aiError.statusCode < 500) {
+    } else if (statusCode !== null && statusCode >= 400 && statusCode < 500) {
       // Other client errors
       const message = detailedMessage || aiError.message || "Request failed"
       return Object.assign(new Error(message), {
-        statusCode: aiError.statusCode,
+        statusCode,
         code: "CLIENT_ERROR",
       })
     } else {
       // Server errors or other issues
       const message = detailedMessage || aiError.message || "AI service error"
       return Object.assign(new Error(message), {
-        statusCode: aiError.statusCode || 500,
+        statusCode: statusCode ?? 500,
         code: "SERVER_ERROR",
       })
     }
@@ -267,8 +272,7 @@ export function extractErrorMessage(error: unknown): string {
   }
 
   // Handle AI SDK error objects
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const aiError = (error as any)?.error
+  const aiError = (error as AIErrorWrapper)?.error
   if (aiError) {
     if (aiError.statusCode === 401) {
       return "Invalid API key or authentication failed. Please check your API key in settings."

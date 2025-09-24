@@ -1,6 +1,7 @@
 "use client"
 
 import { useBreakpoint } from "@/app/hooks/use-breakpoint"
+import { useKeyShortcut } from "@/app/hooks/use-key-shortcut"
 import { useChats } from "@/lib/chat-store/chats/provider"
 import { useMessages } from "@/lib/chat-store/messages/provider"
 import { useChatSession } from "@/lib/chat-store/session/provider"
@@ -8,8 +9,8 @@ import { cn } from "@/lib/utils"
 import { ListMagnifyingGlass } from "@phosphor-icons/react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { CommandHistory } from "./command-history"
 import { DrawerHistory } from "./drawer-history"
+import { HistorySidebar } from "./history-sidebar"
 
 type HistoryTriggerProps = {
   hasSidebar: boolean
@@ -26,12 +27,19 @@ export function HistoryTrigger({
   label,
   hasPopover = true,
 }: HistoryTriggerProps) {
+  void hasPopover
   const isMobile = useBreakpoint(768)
   const router = useRouter()
   const { chats, updateTitle, deleteChat } = useChats()
   const { deleteMessages } = useMessages()
   const [isOpen, setIsOpen] = useState(false)
   const { chatId } = useChatSession()
+
+  useKeyShortcut(
+    (e: KeyboardEvent) =>
+      !isMobile && e.key === "k" && (e.metaKey || e.ctrlKey),
+    () => setIsOpen((open) => !open)
+  )
 
   const handleSaveEdit = async (id: string, newTitle: string) => {
     await updateTitle(id, newTitle)
@@ -76,7 +84,7 @@ export function HistoryTrigger({
   }
 
   return (
-    <CommandHistory
+    <HistorySidebar
       chatHistory={chats}
       onSaveEdit={handleSaveEdit}
       onConfirmDelete={handleConfirmDelete}
@@ -84,7 +92,6 @@ export function HistoryTrigger({
       isOpen={isOpen}
       setIsOpen={setIsOpen}
       onOpenChange={setIsOpen}
-      hasPopover={hasPopover}
     />
   )
 }

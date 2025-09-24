@@ -2,6 +2,7 @@
 
 import { ChatInput } from "@/app/components/chat-input/chat-input"
 import { Conversation } from "@/app/components/chat/conversation"
+import { ChatInputSkeleton, ConversationSkeleton } from "@/app/components/chat/chat-skeleton"
 import { useModel } from "@/app/components/chat/use-model"
 import { useChatDraft } from "@/app/hooks/use-chat-draft"
 import { useChats } from "@/lib/chat-store/chats/provider"
@@ -46,7 +47,11 @@ export function Chat() {
     [chatId, getChatById]
   )
 
-  const { messages: initialMessages, cacheAndAddMessage } = useMessages()
+  const {
+    messages: initialMessages,
+    cacheAndAddMessage,
+    isLoading: areMessagesLoading,
+  } = useMessages()
   const { user } = useUser()
   const { preferences } = useUserPreferences()
   const { draftValue, clearDraft } = useChatDraft(chatId)
@@ -252,9 +257,13 @@ export function Chat() {
     redirect("/")
   }
 
-  const showOnboarding = !chatId && messages.length === 0
   const showLoadingForDirectFetch = chatId && fetchingDirectChat === chatId && !currentChat
+  const showOnboarding = !chatId && messages.length === 0
   const hasMessages = messages.length > 0
+  const isInitialDataLoading =
+    (areMessagesLoading || isChatsLoading) && !showLoadingForDirectFetch
+  const showInitialLoading =
+    Boolean(chatId) && isInitialDataLoading && !hasMessages
 
   return (
     <div
@@ -289,6 +298,19 @@ export function Chat() {
               </p>
             </div>
           </motion.div>
+        ) : showInitialLoading ? (
+          <motion.div
+            key="conversation-loading"
+            className="w-full flex-1 overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{
+              duration: 0.2,
+            }}
+          >
+            <ConversationSkeleton />
+          </motion.div>
         ) : hasMessages ? (
           <Conversation key="conversation" {...conversationProps} />
         ) : showOnboarding ? (
@@ -315,7 +337,14 @@ export function Chat() {
           "relative inset-x-0 bottom-0 z-50 mx-auto w-full max-w-3xl"
         )}
       >
-        <ChatInput {...chatInputProps} />
+        {showInitialLoading ? (
+          <ChatInputSkeleton
+            className="bg-black/60 border-white/20"
+            withModelSelector={false}
+          />
+        ) : (
+          <ChatInput {...chatInputProps} />
+        )}
       </div>
 
       <FeedbackWidget authUserId={user?.id} />
