@@ -1,5 +1,6 @@
 "use client"
 
+import { useKeyShortcut } from "@/app/hooks/use-key-shortcut"
 import { ChatInput } from "@/app/components/chat-input/chat-input"
 import { Conversation } from "@/app/components/chat/conversation"
 import { ChatInputSkeleton, ConversationSkeleton } from "@/app/components/chat/chat-skeleton"
@@ -14,13 +15,37 @@ import { SYSTEM_PROMPT_DEFAULT } from "@/lib/config"
 import { useUserPreferences } from "@/lib/user-preference-store/provider"
 import { useUser } from "@/lib/user-store/provider"
 import { cn } from "@/lib/utils"
+import { toast } from "@/components/ui/toast"
 import { AnimatePresence, motion } from "motion/react"
 import dynamic from "next/dynamic"
-import { redirect } from "next/navigation"
+<<<<<<< HEAD
+import { redirect, useRouter } from "next/navigation"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useChatCore } from "./use-chat-core"
 import { useChatOperations } from "./use-chat-operations"
 import { useFileUpload } from "./use-file-upload"
+
+const isEditableElement = (target: EventTarget | null) => {
+  const element = target as HTMLElement | null
+  if (!element) return false
+
+  const tagName = element.tagName
+  if (!tagName) return false
+
+  return (
+    tagName === "INPUT" ||
+    tagName === "TEXTAREA" ||
+    tagName === "SELECT" ||
+    element.isContentEditable ||
+    element.getAttribute("role") === "textbox"
+  )
+}
+
+const isMacOs = () => {
+  if (typeof navigator === "undefined") return false
+  const platform = navigator.userAgent || ""
+  return /Mac|iPhone|iPad|iPod/i.test(platform)
+}
 
 const FeedbackWidget = dynamic(
   () => import("./feedback-widget").then((mod) => mod.FeedbackWidget),
@@ -33,8 +58,10 @@ const DialogAuth = dynamic(
 )
 
 export function Chat() {
+  const router = useRouter()
   const { chatId } = useChatSession()
   const {
+    chats,
     createNewChat,
     getChatById,
     updateChatModel,
@@ -52,6 +79,7 @@ export function Chat() {
   const {
     messages: initialMessages,
     cacheAndAddMessage,
+    deleteMessages: deleteMessagesFromStore,
     isLoading: areMessagesLoading,
   } = useMessages()
   const { user } = useUser()
@@ -117,6 +145,7 @@ export function Chat() {
     input,
     status,
     stop,
+    setMessages,
     hasSentFirstMessageRef,
     isSubmitting,
     enableSearch,
@@ -135,11 +164,11 @@ export function Chat() {
     createOptimisticAttachments,
     setFiles,
     checkLimitsAndNotify,
-    cleanupOptimisticAttachments,
-    ensureChatExists,
-    handleFileUploads,
-    selectedModel,
-    clearDraft,
+      cleanupOptimisticAttachments,
+      ensureChatExists,
+      handleFileUploads,
+      selectedModel,
+      clearDraft,
     bumpChat,
   })
 
@@ -245,6 +274,132 @@ export function Chat() {
       enableSearch,
       quotedText,
     ]
+  )
+
+  const chatOrder = chats
+    .map((chat) => chat.id)
+    .filter((id): id is string => Boolean(id))
+
+  const navigateChat = useCallback(
+    (offset: number) => {
+      if (!chatId || chatOrder.length <= 1) {
+        return
+      }
+
+      const currentIndex = chatOrder.findIndex((id) => id === chatId)
+      if (currentIndex === -1) {
+        return
+      }
+
+      const nextIndex = (currentIndex + offset + chatOrder.length) % chatOrder.length
+      const nextChatId = chatOrder[nextIndex]
+
+      if (nextChatId && nextChatId !== chatId) {
+        router.push(`/c/${nextChatId}`)
+      }
+    },
+    [chatId, chatOrder, router]
+  )
+
+  useKeyShortcut(
+    useCallback((event: KeyboardEvent) => {
+      if (event.repeat) return false
+      if (isEditableElement(event.target)) return false
+
+      if (isMacOs()) {
+        return event.metaKey && event.altKey && !event.shiftKey && event.key === "ArrowUp"
+      }
+
+      return event.ctrlKey && event.shiftKey && event.key === "ArrowUp"
+    }, []),
+    useCallback(() => {
+      navigateChat(-1)
+    }, [navigateChat])
+  )
+
+  useKeyShortcut(
+    useCallback((event: KeyboardEvent) => {
+      if (event.repeat) return false
+      if (isEditableElement(event.target)) return false
+
+      if (isMacOs()) {
+        return event.metaKey && event.altKey && !event.shiftKey && event.key === "ArrowDown"
+      }
+
+      return event.ctrlKey && event.shiftKey && event.key === "ArrowDown"
+    }, []),
+    useCallback(() => {
+      navigateChat(1)
+    }, [navigateChat])
+  )
+
+  const handleClearChat = useCallback(async () => {
+    if (!chatId || messages.length === 0) {
+      return
+    }
+
+    const shouldClear =
+      typeof window === "undefined" ||
+      window.confirm("Clear all messages in this chat? This action cannot be undone.")
+
+    if (!shouldClear) {
+      return
+    }
+
+    if (status === "streaming" || status === "submitted") {
+      stop()
+    }
+
+    setMessages([])
+    handleInputChange("")
+
+    try {
+      await deleteMessagesFromStore()
+      toast({
+        title: "Chat cleared",
+        description: "All messages were removed from this conversation.",
+        status: "success",
+      })
+    } catch (error) {
+      console.error("Failed to clear chat:", error)
+      toast({ title: "Failed to clear chat", status: "error" })
+    }
+  }, [
+    chatId,
+    deleteMessagesFromStore,
+    handleInputChange,
+    messages.length,
+    setMessages,
+    status,
+    stop,
+  ])
+
+  useKeyShortcut(
+    useCallback((event: KeyboardEvent) => {
+      if (event.repeat) return false
+      if (!event.shiftKey) return false
+      if (!(event.metaKey || event.ctrlKey)) return false
+
+      return event.key.toLowerCase() === "x"
+    }, []),
+    useCallback(() => {
+      void handleClearChat()
+    }, [handleClearChat])
+  )
+
+  const handleStopShortcut = useCallback(() => {
+    if (status === "streaming" || status === "submitted") {
+      stop()
+    }
+  }, [status, stop])
+
+  useKeyShortcut(
+    useCallback(
+      (event: KeyboardEvent) =>
+        !event.repeat && (event.metaKey || event.ctrlKey) && !event.shiftKey && event.key === ".",
+      []
+    ),
+    handleStopShortcut
   )
 
   // Handle redirect for invalid chatId - only redirect if we're certain the chat doesn't exist

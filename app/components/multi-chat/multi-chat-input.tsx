@@ -64,6 +64,29 @@ export function MultiChatInput({
         return
       }
 
+      if (e.key === "Escape" && (status === "streaming" || status === "submitted")) {
+        e.preventDefault()
+        stop()
+        return
+      }
+
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+        if (status === "streaming") {
+          e.preventDefault()
+          stop()
+          return
+        }
+
+        if (isOnlyWhitespace(value)) {
+          e.preventDefault()
+          return
+        }
+
+        e.preventDefault()
+        onSend()
+        return
+      }
+
       if (e.key === "Enter" && status === "streaming") {
         e.preventDefault()
         return
@@ -78,7 +101,7 @@ export function MultiChatInput({
         onSend()
       }
     },
-    [isSubmitting, anyLoading, onSend, status, value]
+    [anyLoading, isSubmitting, onSend, status, stop, value]
   )
 
   // Update button disabled state after hydration
