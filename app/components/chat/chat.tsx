@@ -366,7 +366,7 @@ export function Chat() {
           >
             <PixelArtHome />
             <div className="text-center mb-8 relative z-20">
-              <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight leading-tight mt-24">
+              <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight leading-tight">
                 What&apos;s on your mind?
               </h1>
             </div>
