@@ -12,14 +12,14 @@ export async function GET() {
       return NextResponse.json({ models: [] }, { status: 200 })
     }
 
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from('monitoring')
       .select('value')
       .eq('type', MonitoringEvent.AI_MODEL_USAGE)
 
     if (error) throw error
 
-    const modelCounts = (data as any[]).reduce((acc: Record<string, number>, { value }: any) => {
+    const modelCounts = (data || []).reduce((acc: Record<string, number>, { value }: { value: string }) => {
       if (value) {
         acc[value] = (acc[value] || 0) + 1
       }

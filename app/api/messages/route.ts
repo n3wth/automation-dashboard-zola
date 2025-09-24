@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform the data to match the expected format
-    const messages = (data || []).map((message: any) => ({
+    const messages = (data || []).map((message: Record<string, unknown>) => ({
       ...message,
       id: String(message.id),
       content: message.content ?? "",
