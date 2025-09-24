@@ -10,6 +10,12 @@ const nextConfig: NextConfig = bundleAnalyzer({
   output: "standalone",
   outputFileTracingRoot: path.join(__dirname),
   experimental: {},
+  reactStrictMode: true,
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
   images: {
     remotePatterns: [
       {

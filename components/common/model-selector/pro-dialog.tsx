@@ -53,8 +53,8 @@ export function ProModelDialog({
     <div className="flex max-h-[70vh] flex-col" key={currentModel}>
       <div className="relative">
         <Image
-          src="/banner_ocean.jpg"
-          alt={`calm paint generate by ${APP_NAME}`}
+          src="/bob-banner.png"
+          alt={`Bob retro celebration banner - ${APP_NAME}`}
           width={400}
           height={128}
           className="h-32 w-full object-cover"
