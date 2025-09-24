@@ -102,6 +102,7 @@ export function useChatCore({
     initialInput: draftValue,
     onFinish: cacheAndAddMessage,
     onError: handleError,
+    streamProtocol: "data",
   })
 
   // Handle search params on mount
@@ -181,6 +182,9 @@ export function useChatCore({
         return
       }
 
+      hasSentFirstMessageRef.current = true
+      void bumpChat(currentChatId)
+
       if (input.length > MESSAGE_MAX_LENGTH) {
         toast({
           title: `The message you submitted was too long, please submit something shorter. (Max ${MESSAGE_MAX_LENGTH} characters)`,
@@ -220,10 +224,6 @@ export function useChatCore({
       cleanupOptimisticAttachments(optimisticMessage.experimental_attachments)
       cacheAndAddMessage(optimisticMessage)
       clearDraft()
-
-      if (messages.length > 0) {
-        bumpChat(currentChatId)
-      }
     } catch {
       setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId))
       cleanupOptimisticAttachments(optimisticMessage.experimental_attachments)
@@ -250,7 +250,6 @@ export function useChatCore({
     handleSubmit,
     cacheAndAddMessage,
     clearDraft,
-    messages.length,
     bumpChat,
     setIsSubmitting,
   ])
@@ -290,6 +289,9 @@ export function useChatCore({
           return
         }
 
+        hasSentFirstMessageRef.current = true
+        void bumpChat(currentChatId)
+
         const options = {
           body: {
             chatId: currentChatId,
@@ -323,6 +325,7 @@ export function useChatCore({
       checkLimitsAndNotify,
       isAuthenticated,
       setMessages,
+      bumpChat,
       setIsSubmitting,
     ]
   )
