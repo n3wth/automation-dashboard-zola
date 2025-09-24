@@ -1,183 +1,77 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+# CLAUDE.md - Bob Dashboard Configuration
 
 ## Project Overview
+Bob is an intelligent automation dashboard and open-source chat interface supporting multiple AI models.
+Tech Stack: Next.js 15, TypeScript, React Query, Tailwind CSS, shadcn/ui, Supabase
 
-Bob is an intelligent automation dashboard and open-source chat interface supporting multiple AI models. Built with Next.js 15, TypeScript, React Query, Tailwind CSS, and shadcn/ui components.
-
-## Development Commands - Optimized for Claude Code
-
-### Docker Development (Recommended - Full Stack)
+## Quick Start Commands
 ```bash
-# Development with hot reload and local Supabase
+# Docker Development (Recommended - Full Stack)
 docker compose -f docker-compose.dev.yml up    # Start dev environment
 docker compose -f docker-compose.dev.yml down  # Stop all services
 
-# Production build testing
-docker compose up      # Start production build
-docker compose down    # Stop production services
+# Quick Frontend Development
+npm ci                    # Faster than npm install
+npm run dev              # Turbopack enabled on localhost:3000
 
-# The app runs on http://localhost:3000
-# PostgreSQL runs on localhost:54322
+# Validation (ALWAYS run before marking complete)
+npm run type-check
+npm run lint
+npm run test:run
+npm run test:e2e:chromium  # E2E tests in CI mode
 ```
 
-### Quick Start (Minimal Setup)
-```bash
-# For rapid development without full Supabase stack
-npm ci                 # Install dependencies (faster than npm install)
-npm run dev            # Start dev server with Turbopack on localhost:3000
-```
-
-### Essential Commands for Claude Code
-```bash
-npm run type-check     # Run before committing - TypeScript validation
-npm run lint           # Run before committing - ESLint checks
-npm run test:run       # Run unit tests once
-npm run test:e2e:chromium  # Run E2E tests in CI mode
-```
-
-### Testing
-```bash
-npm run test           # Run Vitest in watch mode
-npm run test:run       # Single test run
-npm run test:coverage  # Coverage report
-npm run test:ui        # Interactive test UI
-
-# E2E Testing with Playwright
-npm run test:e2e                  # Run all E2E tests
-npm run test:e2e:ui              # Interactive Playwright UI
-npm run test:e2e:chromium        # Chromium only (CI mode)
-npm run test:visual              # Visual regression tests
-npm run test:performance         # Performance tests
-```
-
-### Analysis
-```bash
-ANALYZE=true npm run build       # Bundle analysis with @next/bundle-analyzer
-```
-
-## Architecture
-
-### Route Structure
-- `/` - Main chat interface
-- `/c/[chatId]` - Individual chat sessions
-- `/p/[projectId]` - Project workspaces
-- `/share/[chatId]` - Shared chat views
-- `/auth` - Authentication flow (Google OAuth via Supabase)
-
-### Core Systems
-
-**State Management**
-- Zustand stores in `lib/*-store/` directories
-- React Query for server state (`lib/tanstack-query/`)
-- Session persistence via IndexedDB (`idb-keyval`)
-
-**AI Integration**
-- Multi-provider support via Vercel AI SDK in `lib/models/`
-- Model configs in `lib/models/constants.ts`
-- Streaming responses with `ai` package hooks
-- Local models via Ollama integration
-
-**Authentication & Users**
-- Supabase Auth with Google OAuth
-- Anonymous session support with rate limiting
-- User profiles stored in Supabase
-- Dev mode authentication bypass (`NEXT_PUBLIC_DEV_AUTH=true`)
-
-**File Handling**
-- File uploads via Supabase Storage
-- Image/document processing in `lib/file-handling.ts`
-- MIME type validation with `file-type` package
-
-## Environment Configuration
-
-Required variables in `.env.local`:
-- `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
-- `SUPABASE_SERVICE_ROLE` - Service role for server operations
-- `CSRF_SECRET` - 32-character CSRF token (generate: `openssl rand -hex 16`)
-- `ENCRYPTION_KEY` - Base64 encryption key (generate: `openssl rand -base64 32`)
-
-AI Provider Keys (optional, BYOK supported):
-- `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_GENERATIVE_AI_API_KEY`
-- `MISTRAL_API_KEY`, `OPENROUTER_API_KEY`, `XAI_API_KEY`
-
-## Testing Approach
-
-**Unit Tests** - Vitest with React Testing Library
-- Test files: `*.test.ts` or `*.spec.ts` in `src/` directory
-- Setup in `tests/setup.ts`
-- Run specific test: `npm run test -- path/to/test`
-
-**E2E Tests** - Playwright
-- Test files in `tests/e2e/` and `tests/visual/`
-- Page objects pattern for maintainability
-- Visual regression with screenshot comparison
-
-## Key Dependencies (Cleaned Up)
-
-**UI Framework**
-- `shadcn/ui` components in `components/ui/`
-- `motion` & `framer-motion` for animations
-- `lucide-react` and `@phosphor-icons/react` for icons
-
-**AI & Chat**
-- `ai` SDK for streaming responses
-- Multiple provider SDKs (`@ai-sdk/*`)
-- `react-markdown` with GitHub flavored markdown
-
-**Data & State**
-- `@tanstack/react-query` for server state
-- `@supabase/supabase-js` & `@supabase/ssr` for auth/database
-- Session persistence via `idb-keyval`
+## Architecture Rules
+- **Routes**: `/c/[chatId]` (chats), `/p/[projectId]` (projects), `/share/[chatId]` (shared)
+- **State**: Zustand stores in `lib/*-store/`, React Query for server state
+- **Auth**: Supabase with Google OAuth, anonymous sessions supported
+- **Files**: Supabase Storage with MIME validation
+- **AI**: Multi-provider via Vercel AI SDK, configs in `lib/models/`
 
 ## Development Patterns
+- **ALWAYS** run type-check and lint before completing tasks
+- Use Docker dev for full-stack features (includes Supabase)
+- Prefer Read/Grep/Glob tools over bash cat/grep/find
+- Batch file operations when possible
+- Use absolute paths in all file operations
+- Never create README/docs unless explicitly requested
 
-**API Routes**
-- Server actions in `app/api/` directory
-- CSRF protection via `lib/csrf.ts`
-- Rate limiting checks in `lib/api.ts`
+## Testing Strategy
+- **Unit**: Vitest + React Testing Library (`*.test.ts` in `src/`)
+- **E2E**: Playwright (`tests/e2e/`)
+- **Visual**: Screenshot comparison (`tests/visual/`)
+- **Performance**: `npm run test:performance`
 
-**Component Structure**
-- Shared components in `components/`
-- Feature-specific components co-located with routes
-- Provider components wrap functionality in `lib/providers/`
+## Environment Setup
+Required in `.env.local`:
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE=your_service_role
+CSRF_SECRET=$(openssl rand -hex 16)  # 32 chars
+ENCRYPTION_KEY=$(openssl rand -base64 32)
+```
 
-**Error Handling**
-- Custom error classes (e.g., `UsageLimitError`)
-- Error boundaries in React components
-- Consistent error responses from API routes
+## Docker Workflow
+- Dev includes hot reload and local Supabase
+- App: `localhost:3000`, PostgreSQL: `localhost:54322`
+- Volumes preserve node_modules between runs
+- Production test: `docker compose up` (without -f flag)
 
-## Performance Considerations
+## Performance Optimization
+- Turbopack enabled in dev mode
+- Bundle analysis: `ANALYZE=true npm run build`
+- Parallel test execution with Vitest
+- Standalone Docker output for production
 
-- Turbopack enabled for faster dev builds (`--turbopack` flag)
-- Standalone output mode for optimized Docker deployments
-- Bundle analysis available for optimization
-- Parallel test execution with Vitest forks
+## Common Fixes
+```bash
+# Module issues
+rm -rf node_modules package-lock.json && npm ci
 
-## Deployment
+# Port conflicts
+lsof -ti:3000 | xargs kill -9
 
-- Vercel deployment ready with `vercel.json` configuration
-- Docker support with standalone output
-- Environment-specific builds with `.env.production`
-- Official deployment flag: `BOB_OFFICIAL=true`
-
-## Claude Code Optimization Notes
-
-**Project Structure**
-- Cleaned dependencies - removed unused packages
-- Optimized Docker setup with `docker-compose.dev.yml` for development
-- Separate `Dockerfile.dev` for hot-reload development
-- Removed standalone test files (use proper test framework)
-
-**Best Practices for Claude Code**
-1. Use `npm ci` instead of `npm install` for faster dependency installation
-2. Run `npm run type-check` and `npm run lint` before marking tasks complete
-3. Use Docker development setup for full-stack features
-4. Quick iteration: `npm run dev` for frontend-only changes
-
-**Performance Tips**
-- Turbopack enabled by default in dev mode for faster builds
-- Docker volumes configured to preserve node_modules between runs
-- Minimal dependency set reduces install time and build size
+# Docker cleanup
+docker compose -f docker-compose.dev.yml down -v
+```

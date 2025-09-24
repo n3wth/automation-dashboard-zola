@@ -7,11 +7,13 @@ import {
   convertToApiFormat,
   defaultPreferences,
   type LayoutType,
+  type ThemeType,
   type UserPreferences,
 } from "./utils"
 
 export {
   type LayoutType,
+  type ThemeType,
   type UserPreferences,
   convertFromApiFormat,
   convertToApiFormat,
@@ -23,6 +25,7 @@ const LAYOUT_STORAGE_KEY = "preferred-layout"
 interface UserPreferencesContextType {
   preferences: UserPreferences
   setLayout: (layout: LayoutType) => void
+  setTheme: (theme: ThemeType) => void
   setPromptSuggestions: (enabled: boolean) => void
   setShowToolInvocations: (enabled: boolean) => void
   setShowConversationPreviews: (enabled: boolean) => void
@@ -192,6 +195,10 @@ export function UserPreferencesProvider({
     updatePreferences({ layout })
   }
 
+  const setTheme = (theme: ThemeType) => {
+    updatePreferences({ theme })
+  }
+
   const setPromptSuggestions = (enabled: boolean) => {
     updatePreferences({ promptSuggestions: enabled })
   }
@@ -227,6 +234,7 @@ export function UserPreferencesProvider({
       value={{
         preferences,
         setLayout,
+        setTheme,
         setPromptSuggestions,
         setShowToolInvocations,
         setShowConversationPreviews,

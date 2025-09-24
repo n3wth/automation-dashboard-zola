@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+.yarn/
+
+# Build outputs
+.next/
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Docker
+docker/volumes/
+
+# Large files
+*.mp4
+*.mov
+*.zip
+*.tar.gz
+*.dmg
+*.iso
+
+# Logs and temp
+*.log
+logs/
+tmp/
+temp/
+.DS_Store
+
+# Test artifacts
+coverage/
+.nyc_output/
+**/__snapshots__/
+test-results/
+playwright-report/
+
+# Database files
+*.db
+*.sqlite
+*.sql
+
+# Environment files (already protected in settings.json)
+.env
+.env.*
+
+# IDE
+.idea/
+.vscode/settings.json
+*.swp
+*.swo
+
+# Cache
+.cache/
+.turbo/
+.parcel-cache/

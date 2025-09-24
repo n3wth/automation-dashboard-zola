@@ -1,12 +1,13 @@
 "use client"
 
+import { useUserPreferences, type ThemeType } from "@/lib/user-preference-store/provider"
 import { cn } from "@/lib/utils"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 
 export function ThemeSelection() {
-  const { theme, setTheme } = useTheme()
-  const [selectedTheme, setSelectedTheme] = useState(theme || "system")
+  const { preferences, setTheme: setUserTheme } = useUserPreferences()
+  const { setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
   // Ensure component is mounted to avoid hydration mismatches
@@ -14,11 +15,12 @@ export function ThemeSelection() {
     setMounted(true)
   }, [])
 
+  // Sync next-themes with user preferences
   useEffect(() => {
-    if (mounted && theme) {
-      setSelectedTheme(theme)
+    if (mounted) {
+      setTheme(preferences.theme)
     }
-  }, [theme, mounted])
+  }, [preferences.theme, setTheme, mounted])
 
   const themes = [
     {
@@ -41,8 +43,8 @@ export function ThemeSelection() {
     },
   ]
 
-  const handleThemeChange = (themeId: string) => {
-    setSelectedTheme(themeId)
+  const handleThemeChange = (themeId: ThemeType) => {
+    setUserTheme(themeId)
     setTheme(themeId)
   }
 
@@ -81,7 +83,7 @@ export function ThemeSelection() {
             key={themeOption.id}
             className={cn(
               "relative flex items-center gap-3 rounded-lg border p-3 cursor-pointer transition-all hover:bg-muted/50",
-              selectedTheme === themeOption.id
+              preferences.theme === themeOption.id
                 ? "border-primary ring-2 ring-primary/30 bg-primary/5"
                 : "border-border"
             )}
@@ -90,8 +92,8 @@ export function ThemeSelection() {
               type="radio"
               name="theme"
               value={themeOption.id}
-              checked={selectedTheme === themeOption.id}
-              onChange={() => handleThemeChange(themeOption.id)}
+              checked={preferences.theme === themeOption.id}
+              onChange={() => handleThemeChange(themeOption.id as ThemeType)}
               className="sr-only"
             />
             <div className="flex shrink-0 space-x-1">
@@ -108,12 +110,12 @@ export function ThemeSelection() {
                 <div
                   className={cn(
                     "h-4 w-4 rounded-full border-2 flex items-center justify-center",
-                    selectedTheme === themeOption.id
+                    preferences.theme === themeOption.id
                       ? "border-primary bg-primary"
                       : "border-muted-foreground/30"
                   )}
                 >
-                  {selectedTheme === themeOption.id && (
+                  {preferences.theme === themeOption.id && (
                     <div className="h-2 w-2 rounded-full bg-primary-foreground" />
                   )}
                 </div>

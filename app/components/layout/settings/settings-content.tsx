@@ -106,7 +106,7 @@ export function SettingsContent({
             </div>
 
             {/* Mobile tabs content */}
-            <TabsContent value="general" className="space-y-6 px-6">
+            <TabsContent value="general" className="space-y-6 px-6 pb-8">
               <UserProfile />
               {isSupabaseEnabled && (
                 <>
@@ -115,22 +115,22 @@ export function SettingsContent({
               )}
             </TabsContent>
 
-            <TabsContent value="appearance" className="space-y-6 px-6">
+            <TabsContent value="appearance" className="space-y-6 px-6 pb-8">
               <ThemeSelection />
               <LayoutSettings />
               <InteractionPreferences />
             </TabsContent>
 
-            <TabsContent value="apikeys" className="px-6">
+            <TabsContent value="apikeys" className="px-6 pb-8">
               <ByokSection />
             </TabsContent>
 
-            <TabsContent value="models" className="px-6">
+            <TabsContent value="models" className="px-6 pb-8">
               <ModelsSettings />
               {/* <ModelVisibilitySettings /> */}
             </TabsContent>
 
-            <TabsContent value="connections" className="space-y-6 px-6">
+            <TabsContent value="connections" className="space-y-6 px-6 pb-8">
               {!isDev && <ConnectionsPlaceholder />}
               {isDev && <OllamaSection />}
               {isDev && <DeveloperTools />}
@@ -139,11 +139,11 @@ export function SettingsContent({
         ) : (
           // Desktop version - tabs on left
           <>
-            <TabsList className="h-full w-48 flex-col items-stretch justify-start rounded-none border-r bg-muted/30 p-2">
+            <TabsList className="h-full w-48 flex-col items-stretch justify-start rounded-none border-r bg-transparent p-2">
               <div className="flex h-full w-full flex-col gap-1">
                 <TabsTrigger
                   value="general"
-                  className="w-full justify-start rounded-md px-3 py-2 text-left transition-colors hover:bg-accent hover:text-accent-foreground data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
+                  className="w-full justify-start rounded-md px-3 py-2 text-left transition-colors hover:bg-muted data-[state=active]:bg-muted data-[state=active]:shadow-sm"
                 >
                   <div className="flex items-center gap-2">
                     <GearSixIcon className="size-4" />
@@ -153,7 +153,7 @@ export function SettingsContent({
 
                 <TabsTrigger
                   value="appearance"
-                  className="w-full justify-start rounded-md px-3 py-2 text-left transition-colors hover:bg-accent hover:text-accent-foreground data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
+                  className="w-full justify-start rounded-md px-3 py-2 text-left transition-colors hover:bg-muted data-[state=active]:bg-muted data-[state=active]:shadow-sm"
                 >
                   <div className="flex items-center gap-2">
                     <PaintBrushIcon className="size-4" />
@@ -163,7 +163,7 @@ export function SettingsContent({
 
                 <TabsTrigger
                   value="apikeys"
-                  className="w-full justify-start rounded-md px-3 py-2 text-left transition-colors hover:bg-accent hover:text-accent-foreground data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
+                  className="w-full justify-start rounded-md px-3 py-2 text-left transition-colors hover:bg-muted data-[state=active]:bg-muted data-[state=active]:shadow-sm"
                 >
                   <div className="flex items-center gap-2">
                     <KeyIcon className="size-4" />
@@ -172,7 +172,7 @@ export function SettingsContent({
                 </TabsTrigger>
                 <TabsTrigger
                   value="models"
-                  className="w-full justify-start rounded-md px-3 py-2 text-left transition-colors hover:bg-accent hover:text-accent-foreground data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
+                  className="w-full justify-start rounded-md px-3 py-2 text-left transition-colors hover:bg-muted data-[state=active]:bg-muted data-[state=active]:shadow-sm"
                 >
                   <div className="flex items-center gap-2">
                     <CubeIcon className="size-4" />
@@ -181,7 +181,7 @@ export function SettingsContent({
                 </TabsTrigger>
                 <TabsTrigger
                   value="connections"
-                  className="w-full justify-start rounded-md px-3 py-2 text-left transition-colors hover:bg-accent hover:text-accent-foreground data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
+                  className="w-full justify-start rounded-md px-3 py-2 text-left transition-colors hover:bg-muted data-[state=active]:bg-muted data-[state=active]:shadow-sm"
                 >
                   <div className="flex items-center gap-2">
                     <PlugsConnectedIcon className="size-4" />
@@ -192,8 +192,8 @@ export function SettingsContent({
             </TabsList>
 
             {/* Desktop tabs content */}
-            <div className="flex-1 overflow-auto px-6 py-6">
-              <TabsContent value="general" className="mt-0 space-y-6">
+            <div className="flex-1 overflow-y-auto px-6 py-6">
+              <TabsContent value="general" className="mt-0 space-y-6 pb-6">
                 <UserProfile />
                 {isSupabaseEnabled && (
                   <>
@@ -202,22 +202,22 @@ export function SettingsContent({
                 )}
               </TabsContent>
 
-              <TabsContent value="appearance" className="mt-0 space-y-6">
+              <TabsContent value="appearance" className="mt-0 space-y-6 pb-6">
                 <ThemeSelection />
                 <LayoutSettings />
                 <InteractionPreferences />
               </TabsContent>
 
-              <TabsContent value="apikeys" className="mt-0 space-y-6">
+              <TabsContent value="apikeys" className="mt-0 space-y-6 pb-6">
                 <ByokSection />
               </TabsContent>
 
-              <TabsContent value="models" className="mt-0 space-y-6">
+              <TabsContent value="models" className="mt-0 space-y-6 pb-6">
                 <ModelsSettings />
                 {/* <ModelVisibilitySettings /> */}
               </TabsContent>
 
-              <TabsContent value="connections" className="mt-0 space-y-6">
+              <TabsContent value="connections" className="mt-0 space-y-6 pb-6">
                 {!isDev && <ConnectionsPlaceholder />}
                 {isDev && <OllamaSection />}
                 {isDev && <DeveloperTools />}

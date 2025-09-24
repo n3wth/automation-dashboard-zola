@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-filesystem"],
+      "env": {
+        "DIRECTORIES": ["/Users/oliver/GitHub/bob"]
+      }
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-memory"]
+    },
+    "git": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-git"],
+      "env": {
+        "REPO_PATH": "/Users/oliver/GitHub/bob"
+      }
+    }
+  }
+}

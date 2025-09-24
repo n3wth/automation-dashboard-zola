@@ -39,7 +39,7 @@ export function SettingsTrigger({ onOpenChange }: SettingsTriggerProps) {
     return (
       <Drawer open={open} onOpenChange={handleOpenChange}>
         <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-        <DrawerContent>
+        <DrawerContent className="max-h-[85vh]">
           <SettingsContent isDrawer />
         </DrawerContent>
       </Drawer>
