@@ -24,7 +24,7 @@ if [ -n "$SHELL_PROFILE" ]; then
     echo "Adding 'bw' alias to $SHELL_PROFILE..."
     echo "" >> $SHELL_PROFILE
     echo "# Bob Worktree Manager" >> $SHELL_PROFILE
-    echo "alias bw='bash $PWD/scripts/bob-worktree.sh'" >> $SHELL_PROFILE
+    echo "alias bw='zsh $PWD/scripts/bob-worktree.sh'" >> $SHELL_PROFILE
     echo "✅ Alias added"
 fi
 

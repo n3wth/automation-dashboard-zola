@@ -36,12 +36,27 @@ npm run test:e2e:chromium  # E2E tests in CI mode
 - Use absolute paths in all file operations
 - Never create README/docs unless explicitly requested
 
-## Available CLI Tools
-- **fd**: Modern file finder (`fd pattern` or `fd -t f -d 2` for depth limit)
-- **rg**: Fast text search (`rg pattern --type typescript`)
-- **bat**: Better file viewer with syntax highlighting
-- **eza**: Enhanced ls with git status (`eza -la --git`)
-- Use these modern tools for better performance than find/grep/cat/ls
+## Available Modern CLI Tools
+
+### Core System Tools (10x faster than Unix equivalents)
+- **fd**: Modern file finder (`fd pattern` or `fd -t f -d 2` for depth limit) - faster than find
+- **rg (ripgrep)**: Ultra-fast text search (`rg pattern --type typescript`) - faster than grep
+- **bat**: Better file viewer with syntax highlighting (`bat file.tsx`) - better than cat
+- **eza**: Enhanced ls with git status (`eza -la --git`) - better than ls
+- **fzf**: Fuzzy finder (`fd | fzf` or `rg pattern | fzf`) - interactive selection
+- **zoxide**: Smart cd (`z project-name`) - jumps to frequently used directories
+- **jq**: JSON processor (`curl api | jq '.data'`) - parse JSON responses
+- **bash 5.3**: Modern Bash available at `/opt/homebrew/bin/bash` (vs system Bash 3.2 from 2007)
+
+### AI CLI Tools (complement Claude)
+- **aichat** (alias: `ai`): Multi-model AI chat (`ai "explain this code"`)
+- **sgpt** (alias: `ask`): Shell GPT (`asksh "find large files"`, `askcode "write function"`)
+- **mods**: Pipe content to AI (`git log | mods "summarize commits"`)
+- **fabric**: AI pattern processing (`curl url | fabric --pattern summarize`)
+
+### Useful Aliases Available
+- `search='rg -i'`, `preview='fzf --preview "bat {}"'`, `tree='eza --tree'`
+- `ask=sgpt`, `askcode='sgpt --code'`, `asksh='sgpt --shell'`
 
 ## Testing Strategy
 - **Unit**: Vitest + React Testing Library (`*.test.ts` in `src/`)

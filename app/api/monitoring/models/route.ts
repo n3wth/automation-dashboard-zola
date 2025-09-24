@@ -12,10 +12,15 @@ export async function GET() {
       return NextResponse.json({ models: [] }, { status: 200 })
     }
 
-    const { data, error } = await supabase
-      .from('monitoring')
-      .select('value')
-      .eq('type', MonitoringEvent.AI_MODEL_USAGE)
+    // TODO: Implement monitoring table or remove this endpoint
+    // const { data, error } = await supabase
+    //   .from('monitoring')
+    //   .select('value')
+    //   .eq('type', MonitoringEvent.AI_MODEL_USAGE)
+
+    // Return mock data for now
+    const data: { value: string }[] = []
+    const error = null
 
     if (error) throw error
 

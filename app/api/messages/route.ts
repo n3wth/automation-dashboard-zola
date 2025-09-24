@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       ...message,
       id: String(message.id),
       content: message.content ?? "",
-      createdAt: new Date(message.created_at || ""),
+      createdAt: new Date(String(message.created_at || new Date())),
       parts: message?.parts || undefined,
       message_group_id: message.message_group_id,
       model: message.model,

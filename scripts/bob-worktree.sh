@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 # Bob Project Worktree Management System
 # Enables parallel Claude Code development with isolated environments
@@ -11,21 +11,23 @@ BASE_DIR=$(pwd)
 WORKTREE_BASE="${BASE_DIR}-worktrees"
 MAIN_BRANCH="main"
 
-# Port allocation
-declare -A PORT_MAP=(
-    ["main"]=3000
-    ["feature"]=3001
-    ["hotfix"]=3002
-    ["experiment"]=3003
-    ["perf"]=3004
+# Port allocation using zsh associative arrays
+typeset -A PORT_MAP
+PORT_MAP=(
+    main 3000
+    feature 3001
+    hotfix 3002
+    experiment 3003
+    perf 3004
 )
 
-declare -A DB_PORT_MAP=(
-    ["main"]=54322
-    ["feature"]=54323
-    ["hotfix"]=54324
-    ["experiment"]=54325
-    ["perf"]=54326
+typeset -A DB_PORT_MAP
+DB_PORT_MAP=(
+    main 54322
+    feature 54323
+    hotfix 54324
+    experiment 54325
+    perf 54326
 )
 
 # Colors for output
