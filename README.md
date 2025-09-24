@@ -92,6 +92,8 @@ The application is built with a local-first approach—core functionality works 
 
 **Requirements**: Node.js 18+, npm or pnpm
 
+Refer to [Repository Guidelines](./AGENTS.md) for contribution standards, testing expectations, and PR checklists.
+
 **Commands**:
 - `npm run dev` — Development server with Turbopack
 - `npm run build` — Production build
