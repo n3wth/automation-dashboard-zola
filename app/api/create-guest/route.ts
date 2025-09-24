@@ -14,11 +14,9 @@ export async function POST(request: Request) {
     // We don't create a user record in the database
     // Instead, we just track their usage in the anonymous_usage table
     if (userId.startsWith('anon-')) {
-      // Get IP and user agent for tracking (currently unused but kept for future use)
-      const _ip = request.headers.get('x-forwarded-for') ||
-                 request.headers.get('x-real-ip') ||
-                 'unknown'
-      const _userAgent = request.headers.get('user-agent') || 'unknown'
+      // Skip IP and user agent tracking for anonymous users for now
+      // const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
+      // const userAgent = request.headers.get('user-agent') || 'unknown'
 
       // Return a mock user object for the frontend
       // The actual tracking will happen when they make queries
