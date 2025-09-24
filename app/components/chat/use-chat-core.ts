@@ -95,7 +95,7 @@ export function useChatCore({
     stop,
     setMessages,
     setInput,
-    append,
+    handleSubmit,
   } = useChat({
     api: API_ROUTE_CHAT,
     initialMessages,
