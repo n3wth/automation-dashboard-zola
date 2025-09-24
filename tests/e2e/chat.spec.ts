@@ -172,7 +172,7 @@ test.describe('Chat Functionality', () => {
 })
 
 test.describe('Model Selection', () => {
-  test.skip('should allow a user to switch between different models', async ({ page }) => {
+  test.skip('should allow a user to switch between different models', async () => {
     // 1. Navigate to a chat
     // 2. Open the model selection menu
     // 3. Select a different model
@@ -181,18 +181,18 @@ test.describe('Model Selection', () => {
 })
 
 test.describe('Chat History Management', () => {
-  test.skip('should allow a user to create a new chat', async ({ page }) => {
+  test.skip('should allow a user to create a new chat', async () => {
     // 1. Click the "New Chat" button
     // 2. Verify a new chat is created and the URL is updated
   })
 
-  test.skip('should allow a user to switch between chats', async ({ page }) => {
+  test.skip('should allow a user to switch between chats', async () => {
     // 1. Navigate to a chat
     // 2. Click on a different chat in the history sidebar
     // 3. Verify the new chat is loaded
   })
 
-  test.skip('should allow a user to delete a chat', async ({ page }) => {
+  test.skip('should allow a user to delete a chat', async () => {
     // 1. Create a new chat
     // 2. Find the chat in the history sidebar
     // 3. Click the delete button
