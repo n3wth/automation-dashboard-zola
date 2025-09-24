@@ -10,13 +10,22 @@ import {
 import { Button } from "@/components/ui/button"
 import { getModelInfo } from "@/lib/models"
 import { isSupabaseEnabled } from "@/lib/supabase/config"
-import { ArrowUpIcon, StopIcon } from "@phosphor-icons/react"
+import { cn } from "@/lib/utils"
+import { ArrowUpIcon, Spinner, StopIcon } from "@phosphor-icons/react"
 import { useCallback, useEffect, useMemo, useRef } from "react"
 import Link from "next/link"
 import { PromptSystem } from "../suggestions/prompt-system"
 import { ButtonFileUpload } from "./button-file-upload"
 import { ButtonSearch } from "./button-search"
 import { FileList } from "./file-list"
+
+const MAX_CHAT_INPUT_CHARACTERS = 4000
+const LONG_INPUT_HINT_THRESHOLD = Math.floor(MAX_CHAT_INPUT_CHARACTERS * 0.75)
+
+const clampChatInputValue = (text: string) =>
+  text.length > MAX_CHAT_INPUT_CHARACTERS
+    ? text.slice(0, MAX_CHAT_INPUT_CHARACTERS)
+    : text
 
 type ChatInputProps = {
   value: string
@@ -71,12 +80,70 @@ export function ChatInput({
   const shouldShowAuthReminder =
     isSupabaseEnabled && !isUserAuthenticated && !hasAnyMessages
 
-  const hasInput = value.length > 0 && !isOnlyWhitespace(value)
+  const handleValueChange = useCallback(
+    (nextValue: string) => {
+      onValueChange(clampChatInputValue(nextValue))
+    },
+    [onValueChange]
+  )
+
+  useEffect(() => {
+    if (value.length > MAX_CHAT_INPUT_CHARACTERS) {
+      handleValueChange(value)
+    }
+  }, [value, handleValueChange])
+
+  const inputLength = value.length
+  const hasInput = inputLength > 0 && !isOnlyWhitespace(value)
   const isStreaming = status === "streaming"
   const isAwaitingResponse = status === "submitted"
+  const isProcessingMessage = !isStreaming && (isSubmitting || isAwaitingResponse)
   const isSendDisabled = !isStreaming && (!hasInput || isSubmitting || isAwaitingResponse)
   const isErrored = status === "error"
   const errorMessageId = isErrored ? "chat-input-error" : undefined
+  const isAtCharacterLimit = inputLength >= MAX_CHAT_INPUT_CHARACTERS
+  const shouldShowLongInputHint =
+    !isAtCharacterLimit && inputLength >= LONG_INPUT_HINT_THRESHOLD
+  const formattedInputLength = inputLength.toLocaleString()
+  const formattedMaxLength = MAX_CHAT_INPUT_CHARACTERS.toLocaleString()
+
+  let lengthMessageId: string | undefined
+  let lengthMessage: string | undefined
+  let lengthMessageTone: "warning" | "error" | undefined
+
+  if (isAtCharacterLimit) {
+    lengthMessageId = "chat-input-character-limit"
+    lengthMessage = `You've reached the ${formattedMaxLength}-character limit.`
+    lengthMessageTone = "error"
+  } else if (shouldShowLongInputHint) {
+    lengthMessageId = "chat-input-length-warning"
+    lengthMessage = "Long prompts may slow things down. Consider trimming your message."
+    lengthMessageTone = "warning"
+  }
+
+  const describedByIds = [errorMessageId, lengthMessageId]
+    .filter(Boolean)
+    .join(" ")
+    .trim()
+  const textareaDescribedBy = describedByIds.length > 0 ? describedByIds : undefined
+
+  const sendButtonState = isStreaming
+    ? "streaming"
+    : isProcessingMessage
+      ? "loading"
+      : "idle"
+  const sendButtonTooltip =
+    sendButtonState === "streaming"
+      ? "Stop"
+      : sendButtonState === "loading"
+        ? "Sending"
+        : "Send"
+  const sendButtonAriaLabel =
+    sendButtonState === "streaming"
+      ? "Stop response"
+      : sendButtonState === "loading"
+        ? "Sending message"
+        : "Send message"
 
   const handleSend = useCallback(() => {
     if (isSubmitting) {
@@ -98,6 +165,29 @@ export function ChatInput({
         return
       }
 
+      if (e.key === "Escape" && (status === "streaming" || status === "submitted")) {
+        e.preventDefault()
+        stop()
+        return
+      }
+
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+        if (status === "streaming") {
+          e.preventDefault()
+          stop()
+          return
+        }
+
+        if (isOnlyWhitespace(value)) {
+          e.preventDefault()
+          return
+        }
+
+        e.preventDefault()
+        onSend()
+        return
+      }
+
       if (e.key === "Enter" && status === "streaming") {
         e.preventDefault()
         return
@@ -112,7 +202,7 @@ export function ChatInput({
         onSend()
       }
     },
-    [isSubmitting, onSend, status, value]
+    [isSubmitting, onSend, status, stop, value]
   )
 
   const handlePaste = useCallback(
@@ -161,14 +251,14 @@ export function ChatInput({
         .split("\n")
         .map((line) => `> ${line}`)
         .join("\n")
-      onValueChange(value ? `${value}\n\n${quoted}\n\n` : `${quoted}\n\n`)
+      handleValueChange(value ? `${value}\n\n${quoted}\n\n` : `${quoted}\n\n`)
 
       requestAnimationFrame(() => {
         textareaRef.current?.focus()
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quotedText, onValueChange])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run only when quoting new text
+  }, [quotedText, handleValueChange])
 
   useMemo(() => {
     if (!hasSearchSupport && enableSearch) {
@@ -180,7 +270,7 @@ export function ChatInput({
     <div className="relative flex w-full flex-col gap-4">
       {hasSuggestions && (
         <PromptSystem
-          onValueChange={onValueChange}
+          onValueChange={handleValueChange}
           onSuggestion={onSuggestion}
           value={value}
         />
@@ -190,10 +280,14 @@ export function ChatInput({
         onClick={() => textareaRef.current?.focus()}
       >
         <PromptInput
-          className="bg-black text-white relative z-10 p-0 pt-1 shadow-xs backdrop-blur-xl border-white/20"
+          className={cn(
+            "relative z-10 border-border/60 bg-background/95 p-0 pt-1 text-foreground shadow-xs backdrop-blur-xl",
+            isAtCharacterLimit && "border-destructive focus-within:border-destructive",
+            !isAtCharacterLimit && shouldShowLongInputHint && "border-amber-400/80 focus-within:border-amber-400/90"
+          )}
           maxHeight={200}
           value={value}
-          onValueChange={onValueChange}
+          onValueChange={handleValueChange}
         >
           {shouldShowAuthReminder ? (
             <div
@@ -218,12 +312,15 @@ export function ChatInput({
           <FileList files={files} onFileRemove={onFileRemove} />
           <PromptInputTextarea
             ref={textareaRef}
+            data-testid="chat-input-textarea"
             placeholder={placeholder}
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}
             className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"
             aria-invalid={isErrored}
-            aria-describedby={errorMessageId}
+            aria-describedby={textareaDescribedBy}
+            aria-label="Message input"
+            maxLength={MAX_CHAT_INPUT_CHARACTERS}
           />
           <PromptInputActions className="mt-3 w-full justify-between p-2">
             <div className="flex gap-2">
@@ -246,28 +343,68 @@ export function ChatInput({
                 />
               ) : null}
             </div>
-            <PromptInputAction
-              tooltip={status === "streaming" ? "Stop" : "Send"}
-            >
-              <Button
-                id="chat-send-button"
-                data-testid="chat-send-button"
-                size="sm"
-                className="size-9 rounded-full transition-all duration-300 ease-out"
-                disabled={isSendDisabled}
-                type="button"
-                onClick={handleSend}
-                aria-label={status === "streaming" ? "Stop" : "Send message"}
-                aria-busy={isSubmitting || isStreaming || isAwaitingResponse}
-              >
-                {status === "streaming" ? (
-                  <StopIcon className="size-4" />
-                ) : (
-                  <ArrowUpIcon className="size-4" />
+            <div className="flex items-center gap-3">
+              <span
+                data-testid="chat-input-character-count"
+                aria-live="polite"
+                className={cn(
+                  "text-xs font-medium tabular-nums transition-colors",
+                  isAtCharacterLimit
+                    ? "text-destructive"
+                    : shouldShowLongInputHint
+                      ? "text-amber-400"
+                      : "text-muted-foreground"
                 )}
-              </Button>
-            </PromptInputAction>
+              >
+                {formattedInputLength} / {formattedMaxLength}
+              </span>
+              <PromptInputAction tooltip={sendButtonTooltip}>
+                <Button
+                  id="chat-send-button"
+                  data-testid="chat-send-button"
+                  size="icon"
+                  className={cn(
+                    "group relative size-9 rounded-full bg-white text-black shadow-[0_10px_30px_rgba(15,15,15,0.2)]",
+                    "transition-all duration-200 ease-out",
+                    "hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_18px_40px_rgba(15,15,15,0.28)]",
+                    "active:scale-95",
+                    "disabled:translate-y-0 disabled:bg-white/15 disabled:text-white/50 disabled:shadow-none disabled:!opacity-80 disabled:!cursor-not-allowed",
+                    "data-[state=streaming]:bg-rose-500 data-[state=streaming]:text-white",
+                    "data-[state=streaming]:hover:bg-rose-500/90 data-[state=streaming]:shadow-[0_16px_36px_rgba(244,63,94,0.45)] data-[state=streaming]:hover:shadow-[0_20px_44px_rgba(244,63,94,0.5)]",
+                    "data-[state=loading]:bg-white/70 data-[state=loading]:text-black/70 data-[state=loading]:shadow-[0_10px_30px_rgba(255,255,255,0.2)]",
+                    "data-[state=loading]:!cursor-wait data-[state=loading]:!opacity-100"
+                  )}
+                  disabled={isSendDisabled}
+                  type="button"
+                  onClick={handleSend}
+                  aria-label={sendButtonAriaLabel}
+                  aria-busy={isSubmitting || isStreaming || isAwaitingResponse}
+                  data-state={sendButtonState}
+                  data-testid="send-button"
+                >
+                  {sendButtonState === "streaming" ? (
+                    <StopIcon className="size-4 transition-transform duration-200 group-hover:scale-105" />
+                  ) : sendButtonState === "loading" ? (
+                    <Spinner className="size-4 animate-spin" />
+                  ) : (
+                    <ArrowUpIcon className="size-4 transition-transform duration-200 group-hover:-translate-y-0.5 group-active:translate-y-0 group-active:scale-90" />
+                  )}
+                </Button>
+              </PromptInputAction>
+            </div>
           </PromptInputActions>
+          {lengthMessage && (
+            <p
+              id={lengthMessageId}
+              aria-live="polite"
+              className={cn(
+                "px-4 pb-3 text-xs",
+                lengthMessageTone === "error" ? "text-destructive" : "text-amber-400"
+              )}
+            >
+              {lengthMessage}
+            </p>
+          )}
           {isErrored ? (
             <div
               id={errorMessageId}

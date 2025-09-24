@@ -24,16 +24,18 @@ Built on Next.js 15 with TypeScript. Supabase backend for authentication and dat
 
 ## Getting Started
 
-Clone and run locally with your preferred AI models:
+Clone and run locally with your preferred AI models. See
+[docs/QUICK_START.md](./docs/QUICK_START.md) for the complete onboarding guide
+and troubleshooting tips.
 
 ```bash
 git clone https://github.com/n3wth/bob.git
 cd bob
-npm install
-cp .env.example .env.local
+npm ci
+cp .env.local.example .env.local
 ```
 
-Add your API keys to `.env.local`:
+Add your secrets to `.env.local` (minimum required for local development):
 ```bash
 # Choose one or more AI providers
 OPENAI_API_KEY=sk-...
@@ -45,12 +47,33 @@ CSRF_SECRET=$(openssl rand -hex 16)
 ENCRYPTION_KEY=$(openssl rand -base64 32)
 ```
 
-Start the development server:
+Start the development server on a fixed port to avoid conflicts with other
+Next.js projects you might have running:
 ```bash
-npm run dev
+npm run dev -- --port=3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and start chatting.
+If `3000` is already in use, pick another port (for example `3001`) and update
+the URLs in `.env.local` accordingly. Playwright end-to-end tests boot on port
+`3100`, so they will not interfere with your manual dev server.
+
+Open [http://localhost:3000](http://localhost:3000) (or whichever port you
+selected) and start chatting.
+
+## Keyboard Shortcuts
+
+Stay in the flow with built-in shortcuts (use `Ctrl` on Windows/Linux and `⌘` on macOS):
+
+- `Enter` — Send your message
+- `Shift` + `Enter` — Insert a new line
+- `Ctrl`/`⌘` + `Enter` — Send while keeping focus in the composer
+- `Esc` or `Ctrl`/`⌘` + `.` — Stop the current assistant response
+- `Ctrl`/`⌘` + `Shift` + `X` — Clear the active chat (confirmation required)
+- `Ctrl` + `Shift` + `↑` / `⌘` + `⌥` + `↑` — Jump to the previous conversation
+- `Ctrl` + `Shift` + `↓` / `⌘` + `⌥` + `↓` — Jump to the next conversation
+- `⌘` + `Shift` + `U` — Start a new chat
+- `⌘` + `K` — Open chat history search
+- `⌘` + `Shift` + `P` — Switch the active model
 
 ### Local AI with Ollama
 
@@ -70,12 +93,15 @@ npm run dev
 For advanced features including authentication, file uploads, and persistent chat history:
 
 ```bash
-cp .env.example .env.local
+cp .env.local.example .env.local
 # Configure Supabase variables in .env.local
-docker-compose -f docker-compose.dev.yml up
+docker-compose -f docker-compose.dev.yml up --build
 ```
 
-Includes PostgreSQL database, file storage, and hot reload.
+Docker maps the application to [http://localhost:3001](http://localhost:3001)
+by default to avoid clashes with a locally running Next.js instance. The stack
+includes hot reload; configure Supabase if you need authentication or
+persistent storage.
 
 ## Architecture
 

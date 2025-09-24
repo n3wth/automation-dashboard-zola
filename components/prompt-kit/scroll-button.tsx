@@ -19,20 +19,24 @@ function ScrollButton({
   ...props
 }: ScrollButtonProps) {
   const { isAtBottom, scrollToBottom } = useStickToBottomContext()
+  const { ["aria-label"]: ariaLabel = "Scroll to latest messages", ...rest } =
+    props
 
   return (
     <Button
       variant={variant}
       size={size}
       className={cn(
-        "h-10 w-10 rounded-full transition-all duration-150 ease-out",
+        "h-10 w-10 rounded-full transition-all duration-150 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
         !isAtBottom
           ? "translate-y-0 scale-100 opacity-100"
           : "pointer-events-none translate-y-4 scale-95 opacity-0",
         className
       )}
       onClick={() => scrollToBottom()}
-      {...props}
+      type="button"
+      aria-label={ariaLabel}
+      {...rest}
     >
       <ChevronDown className="h-5 w-5" />
     </Button>

@@ -117,15 +117,21 @@ export function MessageAssistant({
         )}
 
         {contentNullOrEmpty ? null : (
-          <MessageContent
-            className={cn(
-              "prose dark:prose-invert relative min-w-full bg-transparent p-0",
-              "prose-h1:scroll-m-20 prose-h1:text-2xl prose-h1:font-semibold prose-h2:mt-8 prose-h2:scroll-m-20 prose-h2:text-xl prose-h2:mb-3 prose-h2:font-medium prose-h3:scroll-m-20 prose-h3:text-base prose-h3:font-medium prose-h4:scroll-m-20 prose-h5:scroll-m-20 prose-h6:scroll-m-20 prose-strong:font-medium prose-table:block prose-table:overflow-y-auto"
-            )}
-            markdown={true}
-          >
-            {children}
-          </MessageContent>
+          <>
+            <span className="sr-only" aria-hidden="false">
+              Assistant responded:
+            </span>
+            <MessageContent
+              className={cn(
+                "prose dark:prose-invert relative min-w-full bg-transparent p-0",
+                "prose-h1:scroll-m-20 prose-h1:text-2xl prose-h1:font-semibold prose-h2:mt-8 prose-h2:scroll-m-20 prose-h2:text-xl prose-h2:mb-3 prose-h2:font-medium prose-h3:scroll-m-20 prose-h3:text-base prose-h3:font-medium prose-h4:scroll-m-20 prose-h5:scroll-m-20 prose-h6:scroll-m-20 prose-strong:font-medium prose-table:block prose-table:overflow-y-auto"
+              )}
+              markdown={true}
+              aria-live={isLastStreaming ? "polite" : undefined}
+            >
+              {children}
+            </MessageContent>
+          </>
         )}
 
         {sources && sources.length > 0 && <SourcesList sources={sources} />}
@@ -141,7 +147,7 @@ export function MessageAssistant({
               side="bottom"
             >
               <button
-                className="hover:bg-accent/60 text-muted-foreground hover:text-foreground flex size-7.5 items-center justify-center rounded-full bg-transparent transition"
+                className="flex size-7.5 items-center justify-center rounded-full bg-transparent text-muted-foreground transition hover:bg-accent/60 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                 aria-label="Copy text"
                 onClick={copyToClipboard}
                 type="button"
@@ -160,7 +166,7 @@ export function MessageAssistant({
                 delayDuration={0}
               >
                 <button
-                  className="hover:bg-accent/60 text-muted-foreground hover:text-foreground flex size-7.5 items-center justify-center rounded-full bg-transparent transition"
+                  className="flex size-7.5 items-center justify-center rounded-full bg-transparent text-muted-foreground transition hover:bg-accent/60 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                   aria-label="Regenerate"
                   onClick={onReload}
                   type="button"

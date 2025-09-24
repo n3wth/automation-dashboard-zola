@@ -15,11 +15,12 @@ import { cn } from "@/lib/utils"
 import { AnimatePresence, motion } from "motion/react"
 import dynamic from "next/dynamic"
 import Link from "next/link"
-import { redirect } from "next/navigation"
-import { useCallback, useMemo, useState } from "react"
+import { redirect, useRouter } from "next/navigation"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useChatCore } from "./use-chat-core"
 import { useChatOperations } from "./use-chat-operations"
 import { useFileUpload } from "./use-file-upload"
+import { useOnboardingTour } from "@/app/hooks/use-onboarding-tour"
 
 const FeedbackWidget = dynamic(
   () => import("./feedback-widget").then((mod) => mod.FeedbackWidget),
@@ -28,6 +29,11 @@ const FeedbackWidget = dynamic(
 
 const DialogAuth = dynamic(
   () => import("./dialog-auth").then((mod) => mod.DialogAuth),
+  { ssr: false }
+)
+
+const OnboardingTour = dynamic(
+  () => import("../onboarding/onboarding-tour").then((mod) => mod.OnboardingTour),
   { ssr: false }
 )
 
@@ -52,6 +58,15 @@ export function Chat() {
   const { user } = useUser()
   const { preferences } = useUserPreferences()
   const { draftValue, clearDraft } = useChatDraft(chatId)
+
+  // Onboarding tour functionality
+  const {
+    isTourActive,
+    hasCompletedTour,
+    isOnboardingStateLoading,
+    completeTour,
+    skipTour,
+  } = useOnboardingTour()
 
   // File upload functionality
   const {
@@ -137,6 +152,26 @@ export function Chat() {
     clearDraft,
     bumpChat,
   })
+
+  const router = useRouter()
+
+  // Handle tour completion
+  const handleTourComplete = useCallback(() => {
+    completeTour()
+  }, [completeTour])
+
+  // Handle tour skip
+  const handleTourSkip = useCallback(() => {
+    skipTour()
+  }, [skipTour])
+
+  // Handle prefill from tour
+  const handlePrefillFromTour = useCallback(
+    (prompt: string) => {
+      handleInputChange({ target: { value: prompt } } as React.ChangeEvent<HTMLTextAreaElement>)
+    },
+    [handleInputChange]
+  )
 
   // Memoize the conversation props to prevent unnecessary rerenders
   const conversationProps = useMemo(
@@ -257,10 +292,16 @@ export function Chat() {
     redirect("/")
   }
 
-  const showOnboarding = !chatId && !hasMessages
+  const baseShowOnboarding = !chatId && !hasMessages
   const showLoadingForDirectFetch = chatId && fetchingDirectChat === chatId && !currentChat
+  const showOnboarding = baseShowOnboarding
+  const shouldShowTour =
+    showOnboarding && isTourActive && !isOnboardingStateLoading && !hasCompletedTour
+  const shouldShowDefaultOnboarding = showOnboarding && !shouldShowTour
   const shouldShowAuthNotice =
     isSupabaseEnabled && !isAuthenticated && showOnboarding
+  const showInitialLoading =
+    Boolean(chatId) && isChatsLoading && !showLoadingForDirectFetch && !hasMessages
 
   return (
     <div
@@ -294,10 +335,10 @@ export function Chat() {
           </motion.div>
         ) : hasMessages ? (
           <Conversation key="conversation" {...conversationProps} />
-        ) : (
+        ) : showOnboarding ? (
           <motion.div
-            key="onboarding"
-            className="mx-auto max-w-[50rem] mb-8"
+            key={shouldShowTour ? "onboarding-tour" : "onboarding-heading"}
+            className="mx-auto mb-8 w-full max-w-[50rem] px-3 sm:px-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -322,7 +363,7 @@ export function Chat() {
               </p>
             ) : null}
           </motion.div>
-        )}
+        ) : null}
       </AnimatePresence>
 
       <div

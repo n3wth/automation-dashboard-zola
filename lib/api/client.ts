@@ -1,17 +1,11 @@
 import { API_ENDPOINTS, DEV_CONFIG } from '@/lib/constants/app'
 import { ErrorHandler, ErrorType } from '@/lib/utils/error-handler'
 
-interface RequestConfig {
+interface RequestConfig<TBody = unknown> {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
   headers?: Record<string, string>
-  body?: any
+  body?: TBody
   timeout?: number
-}
-
-interface ApiResponse<T> {
-  data: T
-  success: boolean
-  error?: string
 }
 
 /**
@@ -27,10 +21,10 @@ export class ApiClient {
     this.defaultTimeout = timeout
   }
 
-  private async request<T>(
+  private async request<TResponse, TBody = unknown>(
     endpoint: string,
-    config: RequestConfig = {}
-  ): Promise<T> {
+    config: RequestConfig<TBody> = {}
+  ): Promise<TResponse> {
     const {
       method = 'GET',
       headers = {},
@@ -74,7 +68,7 @@ export class ApiClient {
       }
 
       const data = await response.json()
-      return data
+      return data as TResponse
     } catch (error) {
       clearTimeout(timeoutId)
 
@@ -104,20 +98,20 @@ export class ApiClient {
   }
 
   // Convenience methods
-  async get<T>(endpoint: string, config?: Omit<RequestConfig, 'method' | 'body'>): Promise<T> {
-    return this.request<T>(endpoint, { ...config, method: 'GET' })
+  async get<TResponse>(endpoint: string, config?: Omit<RequestConfig, 'method' | 'body'>): Promise<TResponse> {
+    return this.request<TResponse>(endpoint, { ...config, method: 'GET' })
   }
 
-  async post<T>(endpoint: string, data?: any, config?: Omit<RequestConfig, 'method'>): Promise<T> {
-    return this.request<T>(endpoint, { ...config, method: 'POST', body: data })
+  async post<TResponse, TBody = unknown>(endpoint: string, data?: TBody, config?: Omit<RequestConfig<TBody>, 'method'>): Promise<TResponse> {
+    return this.request<TResponse, TBody>(endpoint, { ...config, method: 'POST', body: data })
   }
 
-  async put<T>(endpoint: string, data?: any, config?: Omit<RequestConfig, 'method'>): Promise<T> {
-    return this.request<T>(endpoint, { ...config, method: 'PUT', body: data })
+  async put<TResponse, TBody = unknown>(endpoint: string, data?: TBody, config?: Omit<RequestConfig<TBody>, 'method'>): Promise<TResponse> {
+    return this.request<TResponse, TBody>(endpoint, { ...config, method: 'PUT', body: data })
   }
 
-  async delete<T>(endpoint: string, config?: Omit<RequestConfig, 'method' | 'body'>): Promise<T> {
-    return this.request<T>(endpoint, { ...config, method: 'DELETE' })
+  async delete<TResponse>(endpoint: string, config?: Omit<RequestConfig, 'method' | 'body'>): Promise<TResponse> {
+    return this.request<TResponse>(endpoint, { ...config, method: 'DELETE' })
   }
 
   // Specific API methods

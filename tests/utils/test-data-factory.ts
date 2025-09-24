@@ -119,7 +119,7 @@ export class MockApiResponses {
     }
   }
 
-  static success(data: any) {
+  static success<T>(data: T) {
     return {
       success: true,
       data,

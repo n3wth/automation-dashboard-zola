@@ -3,6 +3,14 @@ import { Page, expect } from '@playwright/test'
 export class TestHelpers {
   constructor(private page: Page) {}
 
+  getChatInput() {
+    return this.page.getByTestId('chat-input-textarea').first()
+  }
+
+  getSendButton() {
+    return this.page.getByTestId('send-button').first()
+  }
+
   // Navigation helpers
   async navigateToChat(chatId: string) {
     await this.page.goto(`/c/${chatId}`)
@@ -35,13 +43,28 @@ export class TestHelpers {
 
   // Chat helpers
   async waitForChatInterface() {
-    await expect(this.page.locator('textarea')).toBeVisible({ timeout: 10000 })
+    const chatInput = this.getChatInput()
+    await expect(chatInput).toBeVisible({ timeout: 10000 })
+    await expect(chatInput).toBeEnabled({ timeout: 10000 })
     await expect(this.page.locator('[role="main"], main, .chat-container')).toBeVisible({ timeout: 5000 })
   }
 
   async sendMessage(message: string) {
-    const textarea = this.page.locator('textarea')
+    const textarea = this.getChatInput()
     await textarea.fill(message)
+
+    const sendButton = this.getSendButton()
+    if (await sendButton.isVisible()) {
+      await expect(sendButton).toBeEnabled({ timeout: 5000 })
+      try {
+        await sendButton.click()
+        return
+      } catch (error) {
+        // Fall back to keyboard interaction if the click fails
+        console.warn('Falling back to keyboard submission:', error)
+      }
+    }
+
     await textarea.press('Enter')
   }
 
@@ -112,8 +135,10 @@ export class TestHelpers {
   // Error helpers
   async checkForErrors() {
     const errors = await this.page.evaluate(() => {
-      const consoleErrors = (window as any).__playwrightErrors || []
-      return consoleErrors
+      const globalWindow = window as typeof window & {
+        __playwrightErrors?: unknown[]
+      }
+      return globalWindow.__playwrightErrors ?? []
     })
     return errors
   }

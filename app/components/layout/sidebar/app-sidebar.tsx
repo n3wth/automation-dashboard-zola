@@ -7,9 +7,11 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  SidebarMenuSkeleton,
   useSidebar,
 } from "@/components/ui/sidebar"
 import { Logo } from "@/components/ui/logo"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useChats } from "@/lib/chat-store/chats/provider"
 import {
   ChatTeardropText,
@@ -18,14 +20,13 @@ import {
   NotePencilIcon,
   X,
 } from "@phosphor-icons/react"
-import { Pin } from "lucide-react"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
-import { useMemo } from "react"
+import { useMemo, useRef } from "react"
 import { groupChatsByDate } from "../../history/utils"
 import { HistoryTrigger } from "../../history/history-trigger"
-import { SidebarList } from "./sidebar-list"
 import { SidebarProject } from "./sidebar-project"
+import { VirtualizedChatList } from "./virtualized-chat-list"
 
 export function AppSidebar() {
   const { isMobile, isMounted } = useSsrBreakpoint(768)
@@ -33,6 +34,7 @@ export function AppSidebar() {
   const { chats, pinnedChats, isLoading } = useChats()
   const params = useParams<{ chatId: string }>()
   const currentChatId = params.chatId
+  const scrollViewportRef = useRef<HTMLDivElement | null>(null)
 
   const groupedChats = useMemo(() => {
     const result = groupChatsByDate(chats, "")
@@ -50,7 +52,11 @@ export function AppSidebar() {
       <SidebarHeader className="h-14 px-3">
         <div className="flex items-center justify-between h-full">
           <Link href="/" className="inline-flex" onClick={() => router.push("/")}>
-            <Logo size="md" variant="text" className="text-white" />
+            <Logo
+              size="md"
+              variant="text"
+              className="text-sidebar-foreground"
+            />
           </Link>
           {isMounted && isMobile && (
             <button
@@ -64,7 +70,10 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
       <SidebarContent className="border-border/40 border-t">
-        <ScrollArea className="flex h-full px-3 [&>div>div]:!block">
+        <ScrollArea
+          className="flex h-full px-3 [&>div>div]:!block"
+          viewportRef={scrollViewportRef}
+        >
           <div className="mt-3 mb-5 flex w-full flex-col items-start gap-0">
             <button
               className="hover:bg-accent/80 hover:text-foreground text-primary group/new-chat relative inline-flex w-full items-center rounded-md bg-transparent px-2 py-2 text-sm transition-colors"
@@ -96,28 +105,36 @@ export function AppSidebar() {
           </div>
           <SidebarProject />
           {isLoading ? (
-            <div className="h-full" />
-          ) : hasChats ? (
-            <div className="space-y-5">
-              {pinnedChats.length > 0 && (
-                <div className="space-y-5">
-                  <SidebarList
-                    key="pinned"
-                    title="Pinned"
-                    icon={<Pin className="size-3" />}
-                    items={pinnedChats}
-                    currentChatId={currentChatId}
+            <div className="space-y-6 py-2">
+              <div className="space-y-2">
+                <Skeleton className="mx-2 h-3 w-20 rounded-full" />
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <SidebarMenuSkeleton
+                    key={`sidebar-loading-${index}`}
+                    className="px-2"
+                    showIcon
                   />
-                </div>
-              )}
-              {groupedChats?.map((group) => (
-                <SidebarList
-                  key={group.name}
-                  title={group.name}
-                  items={group.chats}
-                  currentChatId={currentChatId}
-                />
-              ))}
+                ))}
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="mx-2 h-3 w-24 rounded-full" />
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <SidebarMenuSkeleton
+                    key={`sidebar-loading-secondary-${index}`}
+                    className="px-2"
+                    showIcon
+                  />
+                ))}
+              </div>
+            </div>
+          ) : hasChats ? (
+            <div className="mt-3 pb-4">
+              <VirtualizedChatList
+                pinnedChats={pinnedChats}
+                groupedChats={groupedChats}
+                currentChatId={currentChatId}
+                viewportRef={scrollViewportRef}
+              />
             </div>
           ) : (
             <div className="flex h-[calc(100vh-160px)] flex-col items-center justify-center">

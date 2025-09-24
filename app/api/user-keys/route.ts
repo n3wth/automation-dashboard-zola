@@ -1,6 +1,6 @@
 import { encryptKey } from "@/lib/encryption"
 import { getModelsForProvider } from "@/lib/models"
-import { createClient } from "@/lib/supabase/server"
+import { createClientSafe } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 
 export async function POST(request: Request) {
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = await createClient()
+    const supabase = await createClientSafe()
     if (!supabase) {
       return NextResponse.json(
         { error: "Supabase not available" },
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
           .eq("id", authData.user.id)
           .single()
 
-        const currentFavorites = (userData as any)?.favorite_models || []
+        const currentFavorites = userData?.favorite_models ?? []
 
         // Get models for this provider
         const providerModels = await getModelsForProvider(provider)
@@ -128,7 +128,7 @@ export async function DELETE(request: Request) {
       )
     }
 
-    const supabase = await createClient()
+    const supabase = await createClientSafe()
     if (!supabase) {
       return NextResponse.json(
         { error: "Supabase not available" },
