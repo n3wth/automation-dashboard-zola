@@ -112,8 +112,10 @@ export class TestHelpers {
   // Error helpers
   async checkForErrors() {
     const errors = await this.page.evaluate(() => {
-      const consoleErrors = (window as any).__playwrightErrors || []
-      return consoleErrors
+      const globalWindow = window as typeof window & {
+        __playwrightErrors?: unknown[]
+      }
+      return globalWindow.__playwrightErrors ?? []
     })
     return errors
   }

@@ -1,0 +1,27 @@
+[
+  {
+    "title": "Redesign chat message bubbles with improved readability",
+    "body": "**Description**: Update the chat message bubble design for both user and assistant messages to improve contrast, spacing, and readability. Introduce a compact density option and better timestamp alignment. Include support for code blocks with copy-to-clipboard and soft wrap toggle.\n\n**Acceptance Criteria**:\n1. Message bubbles meet WCAG AA contrast\n2. Compact density reduces vertical padding by ~30% and is user-toggleable\n3. Timestamps align consistently at the bottom-right of each bubble with relative time hover for absolute timestamp\n4. Code blocks render with monospaced font, soft wrap toggle, and a copy button\n5. Visual QA across light and dark themes with no overflow issues\n\n**Labels**: area/ui, type/feature, priority/P2, design",
+    "labels": ["area/ui", "type/feature", "priority/P2", "design", "codex-generated"]
+  },
+  {
+    "title": "Add inline message actions (edit, delete, regenerate, bookmark)",
+    "body": "**Description**: Provide quick inline actions on hover for each message: edit (for user messages), delete, regenerate (for assistant messages), and bookmark/star. Include keyboard shortcuts and an actions menu for touch devices.\n\n**Acceptance Criteria**:\n1. Hover reveals actions on desktop; long-press brings actions on mobile\n2. Edit is only available for the user's own messages and updates the conversation state\n3. Regenerate triggers a new completion with previous prompt context\n4. Bookmarked messages persist and are filterable in a \"Starred\" view\n5. All actions are accessible via keyboard and meet a11y focus states\n\n**Labels**: area/ui, type/feature, priority/P2, accessibility",
+    "labels": ["area/ui", "type/feature", "priority/P2", "accessibility", "codex-generated"]
+  },
+  {
+    "title": "Optimize initial bundle size and enable route-level code splitting",
+    "body": "**Description**: Reduce interactive TTI by splitting the dashboard into code-split routes (chat, settings, conversations). Lazy-load heavy components like code highlighter and charts. Replace large libraries with lighter alternatives where possible.\n\n**Acceptance Criteria**:\n1. Initial bundle shrinks by at least 30%\n2. Lighthouse Performance score improves by 10+ points on cold load\n3. No regressions in navigation or component behavior under lazy load\n4. Error boundaries added around all lazy-loaded components\n5. Build artifacts verified with bundle analyzer output attached\n\n**Labels**: area/performance, type/chore, priority/P1",
+    "labels": ["area/performance", "type/chore", "priority/P1", "codex-generated"]
+  },
+  {
+    "title": "Implement streaming rendering for assistant messages",
+    "body": "**Description**: Stream tokens from the backend to the UI using Server-Sent Events or WebSockets and render incrementally with minimal reflows. Apply diffing so only appended tokens update the DOM.\n\n**Acceptance Criteria**:\n1. First token visible within 300ms of stream start on local network\n2. Average reflows per message under 5 during streaming\n3. Graceful fallback to non-streaming when connection drops\n4. Copy and pause/resume controls work during streaming\n5. No layout shift >0.05 CLS during stream\n\n**Labels**: area/performance, type/feature, priority/P1",
+    "labels": ["area/performance", "type/feature", "priority/P1", "codex-generated"]
+  },
+  {
+    "title": "Add mobile-responsive chat interface",
+    "body": "**Description**: Optimize the chat interface for mobile devices with proper touch interactions, responsive layout, and mobile-specific UX patterns.\n\n**Acceptance Criteria**:\n1. Chat interface works seamlessly on screens 320px and up\n2. Touch interactions for message actions work properly\n3. Virtual keyboard doesn't obscure input area\n4. Swipe gestures for navigation work as expected\n5. Performance maintained on lower-end mobile devices\n\n**Labels**: area/ui, type/feature, priority/P2, mobile",
+    "labels": ["area/ui", "type/feature", "priority/P2", "mobile", "codex-generated"]
+  }
+]

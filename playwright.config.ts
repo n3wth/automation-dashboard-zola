@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test'
 
+const e2ePort = process.env.E2E_PORT ?? '3100'
+const e2eBaseUrl = `http://127.0.0.1:${e2ePort}`
+
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
@@ -15,7 +18,7 @@ export default defineConfig({
   ],
 
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: e2eBaseUrl,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -47,14 +50,21 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:3000',
+    command: `npm run dev -- --port=${e2ePort}`,
+    url: e2eBaseUrl,
     reuseExistingServer: !process.env.CI,
     timeout: 180 * 1000, // 3 minutes for unstable server startup
     stderr: 'pipe',
     stdout: 'pipe',
     env: {
       NODE_ENV: 'test', // Use test environment
+      PORT: e2ePort,
+      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://example.supabase.co',
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'test-anon-key',
+      SUPABASE_SERVICE_ROLE: process.env.SUPABASE_SERVICE_ROLE ?? 'test-service-role',
+      CSRF_SECRET: process.env.CSRF_SECRET ?? '0123456789abcdef0123456789abcdef',
+      ENCRYPTION_KEY:
+        process.env.ENCRYPTION_KEY ?? 'c2ltcGxlLXRlc3QtZW5jcnlwdGlvbi1rZXkzMg==',
     },
   },
 })

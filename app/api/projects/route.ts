@@ -1,9 +1,9 @@
-import { createClient } from "@/lib/supabase/server"
+import { createClientSafe } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient()
+    const supabase = await createClientSafe()
 
     if (!supabase) {
       return new Response(
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 
     const { data, error } = await supabase
       .from("projects")
-      .insert({ name, user_id: userId } as any)
+      .insert({ name, user_id: userId })
       .select()
       .single()
 
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
-  const supabase = await createClient()
+  const supabase = await createClientSafe()
 
   if (!supabase) {
     return new Response(

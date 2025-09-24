@@ -13,7 +13,7 @@ export interface AppError {
   type: ErrorType
   message: string
   originalError?: Error
-  details?: Record<string, any>
+  details?: Record<string, unknown>
 }
 
 /**
@@ -25,7 +25,7 @@ export class ErrorHandler {
     type: ErrorType,
     message: string,
     originalError?: Error,
-    details?: Record<string, any>
+    details?: Record<string, unknown>
   ): AppError {
     return {
       type,
@@ -99,7 +99,7 @@ export class ErrorHandler {
     return process.env.NODE_ENV === 'development'
   }
 
-  static logDev(message: string, data?: any): void {
+  static logDev(message: string, data?: unknown): void {
     if (this.isDevelopment()) {
       console.log(`[DEV]`, message, data)
     }

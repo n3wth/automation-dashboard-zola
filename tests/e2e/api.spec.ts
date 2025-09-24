@@ -1,9 +1,9 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type WebSocket } from '@playwright/test'
 import { TestHelpers, TEST_DATA } from '../utils/test-helpers'
 import { TestDataFactory, MockApiResponses } from '../utils/test-data-factory'
 
 test.describe('API Testing', () => {
-  test('chat API responds correctly', async ({ page, request }) => {
+  test('chat API responds correctly', async ({ page }) => {
     const helpers = new TestHelpers(page)
 
     // Mock chat API response
@@ -27,15 +27,16 @@ test.describe('API Testing', () => {
     await helpers.sendMessage('Hello API test')
 
     // Verify API was called
-    const apiCalls = []
-    page.on('request', request => {
-      if (request.url().includes('/api/chat')) {
-        apiCalls.push(request)
+    const apiCalls: string[] = []
+    page.on('request', req => {
+      if (req.url().includes('/api/chat')) {
+        apiCalls.push(req.url())
       }
     })
 
     // Verify response appears
     await expect(page.locator('text="Hello! How can I help you today?"')).toBeVisible()
+    expect(apiCalls.length).toBeGreaterThan(0)
   })
 
   test('handles API errors gracefully', async ({ page }) => {
@@ -137,7 +138,7 @@ test.describe('API Testing', () => {
     const helpers = new TestHelpers(page)
 
     // Monitor WebSocket connections
-    const wsConnections: any[] = []
+    const wsConnections: WebSocket[] = []
 
     page.on('websocket', ws => {
       wsConnections.push(ws)

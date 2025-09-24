@@ -1,8 +1,21 @@
 import { createClientSafe, isSupabaseClientAvailable } from "@/lib/supabase/client"
 import { isSupabaseEnabled } from "@/lib/supabase/config"
 import type { Message as MessageAISDK } from "ai"
-import { readFromIndexedDB, writeToIndexedDB } from "../persist"
 import { cacheWithTTL } from "@/lib/utils/request-deduplication"
+import { readFromIndexedDB, writeToIndexedDB } from "../persist"
+
+const getMessageMetadata = (message: MessageAISDK) => {
+  const meta = message as Partial<MessageAISDK> & {
+    message_group_id?: unknown
+    model?: unknown
+  }
+
+  return {
+    messageGroupId:
+      typeof meta.message_group_id === 'string' ? meta.message_group_id : null,
+    model: typeof meta.model === 'string' ? meta.model : null,
+  }
+}
 
 export async function getMessagesFromDb(
   chatId: string,
@@ -83,14 +96,16 @@ async function insertMessageToDb(chatId: string, message: MessageAISDK) {
     return
   }
 
+  const { messageGroupId, model } = getMessageMetadata(message)
+
   const { error } = await supabase.from("messages").insert({
     chat_id: chatId,
     role: message.role,
     content: message.content,
     experimental_attachments: message.experimental_attachments,
     created_at: message.createdAt?.toISOString() || new Date().toISOString(),
-    message_group_id: (message as any).message_group_id || null,
-    model: (message as any).model || null,
+    message_group_id: messageGroupId,
+    model,
   })
 
   if (error) {
@@ -115,15 +130,19 @@ async function insertMessagesToDb(chatId: string, messages: MessageAISDK[]) {
     return
   }
 
-  const payload = messages.map((message) => ({
-    chat_id: chatId,
-    role: message.role,
-    content: message.content,
-    experimental_attachments: message.experimental_attachments,
-    created_at: message.createdAt?.toISOString() || new Date().toISOString(),
-    message_group_id: (message as any).message_group_id || null,
-    model: (message as any).model || null,
-  }))
+  const payload = messages.map((message) => {
+    const { messageGroupId, model } = getMessageMetadata(message)
+
+    return {
+      chat_id: chatId,
+      role: message.role,
+      content: message.content,
+      experimental_attachments: message.experimental_attachments,
+      created_at: message.createdAt?.toISOString() || new Date().toISOString(),
+      message_group_id: messageGroupId,
+      model,
+    }
+  })
 
   const { error } = await supabase.from("messages").insert(payload)
   if (error) {

@@ -4,13 +4,13 @@ export interface LoadingState {
   error: string | null
 }
 
-export interface AsyncAction<T> {
-  (...args: any[]): Promise<T>
+export interface AsyncAction<TResult = void, TArgs extends unknown[] = []> {
+  (...args: TArgs): Promise<TResult>
 }
 
 export interface StoreConfig {
   persistKey?: string
-  middleware?: any[]
+  middleware?: unknown[]
 }
 
 // Common patterns for all stores
