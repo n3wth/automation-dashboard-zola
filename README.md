@@ -4,7 +4,7 @@
 
 **Bob** is an intelligent automation dashboard and open-source chat interface supporting multiple AI models with advanced features like file uploads, authentication, and local model support.
 
-![Bob dashboard](./public/cover_bob.jpg)
+![Bob dashboard](./public/cover_bob.png)
 
 ## ✨ Features
 
