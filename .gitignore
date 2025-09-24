@@ -111,7 +111,7 @@ setup-database.sql
 
 # Temporary scripts and artifacts
 execute-*.sh
-healthcheck.js
+# healthcheck.js - removed, needed for Docker builds
 crew-integration.py
 
 # Generated documentation (per project preference)
