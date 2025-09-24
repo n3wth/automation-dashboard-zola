@@ -1,19 +1,22 @@
 #!/usr/bin/env node
 
-const fs = require('fs')
-const path = require('path')
-const { execSync } = require('child_process')
+import fs from 'node:fs'
+import path from 'node:path'
+import { execSync } from 'node:child_process'
 
 console.log('🧪 Comprehensive Test Dashboard\n')
 
 // Unit Test Results
 console.log('📊 UNIT TESTS (Vitest)')
-console.log('=' .repeat(50))
+console.log('='.repeat(50))
 try {
-  const unitResult = execSync('npm run test:run', { encoding: 'utf8', cwd: process.cwd() })
+  const unitResult = execSync('npm run test:run', {
+    encoding: 'utf8',
+    cwd: process.cwd(),
+  })
   console.log(unitResult)
 } catch (error) {
-  console.log('❌ Unit tests failed:', error.message)
+  console.log('❌ Unit tests failed:', error instanceof Error ? error.message : String(error))
 }
 
 // Check if coverage exists
@@ -25,10 +28,8 @@ if (fs.existsSync(coveragePath)) {
 }
 
 console.log('\n🎭 E2E TESTS (Playwright)')
-console.log('=' .repeat(50))
+console.log('='.repeat(50))
 
-// Check test results directory
-const testResultsPath = path.join(process.cwd(), 'test-results')
 const playwrightReportPath = path.join(process.cwd(), 'playwright-report', 'index.html')
 
 if (fs.existsSync(playwrightReportPath)) {
@@ -43,17 +44,17 @@ const testFiles = {
   unit: path.join(process.cwd(), 'src', 'components', '__tests__'),
   e2e: path.join(process.cwd(), 'tests', 'e2e'),
   visual: path.join(process.cwd(), 'tests', 'visual'),
-  utils: path.join(process.cwd(), 'tests', 'utils')
+  utils: path.join(process.cwd(), 'tests', 'utils'),
 }
 
 console.log('\n📁 TEST INFRASTRUCTURE')
-console.log('=' .repeat(50))
+console.log('='.repeat(50))
 
 Object.entries(testFiles).forEach(([type, dir]) => {
   if (fs.existsSync(dir)) {
-    const files = fs.readdirSync(dir).filter(f => f.includes('.test.') || f.includes('.spec.'))
+    const files = fs.readdirSync(dir).filter((file) => file.match(/\.(test|spec)\.[tj]sx?$/))
     console.log(`${type.toUpperCase()}: ${files.length} files`)
-    files.forEach(file => console.log(`  ✓ ${file}`))
+    files.forEach((file) => console.log(`  ✓ ${file}`))
   } else {
     console.log(`${type.toUpperCase()}: Directory not found`)
   }
@@ -61,7 +62,7 @@ Object.entries(testFiles).forEach(([type, dir]) => {
 })
 
 console.log('🚀 QUICK COMMANDS')
-console.log('=' .repeat(50))
+console.log('='.repeat(50))
 console.log('npm run test:ui          # Interactive unit test runner')
 console.log('npm run test:e2e:ui      # Interactive E2E test runner')
 console.log('npm run test:coverage    # Generate coverage report')
@@ -70,14 +71,17 @@ console.log('npm run test:report      # Open Playwright report')
 
 // Package.json test scripts
 console.log('\n⚙️  AVAILABLE TEST SCRIPTS')
-console.log('=' .repeat(50))
+console.log('='.repeat(50))
 try {
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'))
-  Object.entries(pkg.scripts)
+  Object.entries(pkg.scripts ?? {})
     .filter(([key]) => key.startsWith('test'))
     .forEach(([key, value]) => {
       console.log(`${key.padEnd(20)}: ${value}`)
     })
 } catch (error) {
   console.log('❌ Could not read package.json')
+  if (error instanceof Error) {
+    console.debug(error.message)
+  }
 }

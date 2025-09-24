@@ -8,9 +8,11 @@ import type {
 import { FREE_MODELS_IDS, NON_AUTH_ALLOWED_MODELS } from "@/lib/config"
 import { getProviderForModel } from "@/lib/openproviders/provider-map"
 import { sanitizeUserInput } from "@/lib/sanitize"
+import type { Database, TablesInsert } from "@/app/types/database.types"
 import { validateUserIdentity } from "@/lib/server/api"
 import { checkUsageByModel, incrementUsage } from "@/lib/usage"
 import { getUserKey, type ProviderWithoutOllama } from "@/lib/user-keys"
+import type { SupabaseClient } from "@supabase/supabase-js"
 
 export async function validateAndTrackUsage({
   userId,
@@ -81,13 +83,15 @@ export async function logUserMessage({
 }: LogUserMessageParams): Promise<void> {
   if (!supabase) return
 
+  const db = supabase as unknown as SupabaseClient<Database>
+
   // Use anonymous user UUID for dev users to ensure valid UUID format
   const dbUserId = process.env.NODE_ENV === 'development' && userId.startsWith('dev-')
     ? '00000000-0000-0000-0000-000000000001'
     : userId
 
   // First ensure the chat exists
-  const chatExists = await supabase
+  const chatExists = await db
     .from("chats")
     .select("id")
     .eq("id", chatId)
@@ -95,13 +99,15 @@ export async function logUserMessage({
 
   if (!chatExists.data) {
     // Create the chat first
-    const { error: chatError } = await supabase.from("chats").insert({
+    const chatPayload: TablesInsert<'chats'> = {
       id: chatId,
       user_id: dbUserId,
       title: "New Chat",
       model: model || "gpt-4",
       system_prompt: "",
-    })
+    }
+
+    const { error: chatError } = await db.from("chats").insert(chatPayload)
 
     if (chatError) {
       console.error("Error creating chat:", chatError)
@@ -109,14 +115,16 @@ export async function logUserMessage({
     }
   }
 
-  const { error } = await supabase.from("messages").insert({
+  const messagePayload: TablesInsert<'messages'> = {
     chat_id: chatId,
     role: "user",
     content: sanitizeUserInput(content),
     experimental_attachments: attachments,
     user_id: dbUserId,
     message_group_id,
-  })
+  }
+
+  const { error } = await db.from("messages").insert(messagePayload)
 
   if (error) {
     console.error("Error saving user message:", error)

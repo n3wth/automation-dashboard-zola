@@ -27,6 +27,12 @@ export interface ProviderConfig {
   apiKeyEnv: string
 }
 
+interface ProviderSelectionOptions {
+  prioritizeSpeed?: boolean
+  prioritizeCost?: boolean
+  maxCostPerToken?: number
+}
+
 export class AIProviderOrchestrator {
   private providers: Map<string, ProviderConfig> = new Map()
   private healthStatus: Map<string, ProviderHealth> = new Map()
@@ -46,11 +52,7 @@ export class AIProviderOrchestrator {
    * - Performance characteristics
    * - Circuit breaker state
    */
-  async selectProvider(model: string, options: {
-    prioritizeSpeed?: boolean
-    prioritizeCost?: boolean
-    maxCostPerToken?: number
-  } = {}): Promise<string> {
+  async selectProvider(model: string, options: ProviderSelectionOptions = {}): Promise<string> {
     const availableProviders = this.getProvidersForModel(model)
     const healthyProviders = availableProviders.filter(id =>
       this.isProviderHealthy(id) && !this.circuitBreakers.get(id)?.isOpen()
@@ -118,7 +120,7 @@ export class AIProviderOrchestrator {
     throw new Error(`All providers failed after ${maxRetries} attempts. Last error: ${lastError.message}`)
   }
 
-  private calculateProviderScore(providerId: string, options: any): number {
+  private calculateProviderScore(providerId: string, options: ProviderSelectionOptions): number {
     const health = this.healthStatus.get(providerId)!
     const config = this.providers.get(providerId)!
 
@@ -174,6 +176,7 @@ export class AIProviderOrchestrator {
   }
 
   private async checkProviderHealth(providerId: string): Promise<void> {
+    void providerId
     // Implementation would ping provider health endpoints
   }
 
@@ -226,18 +229,25 @@ class CircuitBreaker {
  */
 class ProviderMetrics {
   recordProviderSelection(providerId: string, model: string): void {
+    void providerId
+    void model
     // Track provider selection patterns
   }
 
   recordSuccess(providerId: string, duration: number): void {
+    void providerId
+    void duration
     // Track successful requests and performance
   }
 
   recordFailure(providerId: string, error: string): void {
+    void providerId
+    void error
     // Track failures for analysis
   }
 
   getProviderInsights(timeRange: string = '24h') {
+    void timeRange
     // Return analytics for provider performance optimization
   }
 }

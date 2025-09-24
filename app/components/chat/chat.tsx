@@ -252,7 +252,6 @@ export function Chat() {
     redirect("/")
   }
 
-  const showOnboarding = !chatId && messages.length === 0
   const showLoadingForDirectFetch = chatId && fetchingDirectChat === chatId && !currentChat
   const hasMessages = messages.length > 0
 

@@ -1,12 +1,12 @@
 import { PROVIDERS } from "@/lib/providers"
-import { createClient } from "@/lib/supabase/server"
+import { createClientSafe } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 
 const SUPPORTED_PROVIDERS = PROVIDERS.map((p) => p.id)
 
 export async function GET() {
   try {
-    const supabase = await createClient()
+    const supabase = await createClientSafe()
     if (!supabase) {
       return NextResponse.json(
         { error: "Supabase not available" },
@@ -30,7 +30,7 @@ export async function GET() {
     }
 
     // Create status object for all supported providers
-    const userProviders = (data as any)?.map((k: any) => k.provider) || []
+    const userProviders = (data ?? []).map(({ provider }) => provider)
     const providerStatus = SUPPORTED_PROVIDERS.reduce(
       (acc, provider) => {
         acc[provider] = userProviders.includes(provider)

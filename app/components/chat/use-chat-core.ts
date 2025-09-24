@@ -121,7 +121,7 @@ export function useChatCore({
       setMessages([])
     }
     prevChatIdRef.current = chatId
-  }, [chatId, messages.length])
+  }, [chatId, messages.length, setMessages])
 
   // Submit action
   const submit = useCallback(async () => {

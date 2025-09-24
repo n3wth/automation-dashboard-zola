@@ -30,6 +30,11 @@ type GroupedMessage = {
   onReload: (model: string) => void
 }
 
+const getMessageModel = (message: MessageType): string | null => {
+  const value = (message as { model?: unknown }).model
+  return typeof value === "string" ? value : null
+}
+
 export function MultiChat() {
   const [prompt, setPrompt] = useState("")
   const [selectedModelIds, setSelectedModelIds] = useState<string[]>([])
@@ -55,8 +60,8 @@ export function MultiChat() {
 
   const modelsFromPersisted = useMemo(() => {
     return persistedMessages
-      .filter((msg) => (msg as any).model)
-      .map((msg) => (msg as any).model)
+      .map(getMessageModel)
+      .filter((model): model is string => model !== null)
   }, [persistedMessages])
 
   const modelsFromLastGroup = useMemo(() => {
@@ -70,8 +75,11 @@ export function MultiChat() {
     for (let i = lastUserIndex + 1; i < persistedMessages.length; i++) {
       const msg = persistedMessages[i]
       if (msg.role === "user") break
-      if (msg.role === "assistant" && (msg as any).model) {
-        modelsInLastGroup.push((msg as any).model)
+      if (msg.role === "assistant") {
+        const model = getMessageModel(msg)
+        if (model) {
+          modelsInLastGroup.push(model)
+        }
       }
     }
     return modelsInLastGroup
@@ -144,9 +152,9 @@ export function MultiChat() {
       if (group.userMessage) {
         persistedGroups[groupKey] = {
           userMessage: group.userMessage,
-          responses: group.assistantMessages.map((msg, index) => {
-            const model =
-              (msg as any).model || selectedModelIds[index] || `model-${index}`
+            responses: group.assistantMessages.map((msg, index) => {
+              const model =
+                getMessageModel(msg) ?? selectedModelIds[index] ?? `model-${index}`
             const provider =
               models.find((m) => m.id === model)?.provider || "unknown"
 
