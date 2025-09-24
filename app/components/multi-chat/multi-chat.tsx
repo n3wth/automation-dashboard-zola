@@ -82,9 +82,11 @@ export function MultiChat() {
     return availableModels.filter((model) => combined.includes(model.id))
   }, [availableModels, selectedModelIds, modelsFromPersisted])
 
-  if (selectedModelIds.length === 0 && modelsFromLastGroup.length > 0) {
-    setSelectedModelIds(modelsFromLastGroup)
-  }
+  useEffect(() => {
+    if (selectedModelIds.length === 0 && modelsFromLastGroup.length > 0) {
+      setSelectedModelIds(modelsFromLastGroup)
+    }
+  }, [modelsFromLastGroup, selectedModelIds.length])
 
   const modelChats = useMultiChat(allModelsToMaintain)
   const systemPrompt = useMemo(
