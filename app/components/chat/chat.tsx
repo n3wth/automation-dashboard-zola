@@ -21,6 +21,7 @@ import { useChatCore } from "./use-chat-core"
 import { useChatOperations } from "./use-chat-operations"
 import { useFileUpload } from "./use-file-upload"
 import { useOnboardingTour } from "@/app/hooks/use-onboarding-tour"
+import { PixelArtHome } from "@/components/ui/pixel-art-home"
 
 const FeedbackWidget = dynamic(
   () => import("./feedback-widget").then((mod) => mod.FeedbackWidget),
@@ -363,24 +364,23 @@ export function Chat() {
               ease: "easeOut",
             }}
           >
-            <div className="text-center mb-8">
+            <PixelArtHome />
+            <div className="text-center mb-8 relative z-20">
               <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight leading-tight">
                 What&apos;s on your mind?
               </h1>
             </div>
             {shouldShowAuthNotice ? (
-              <div className="bg-zinc-900/30 backdrop-blur-sm border border-white/10 rounded-2xl p-5 max-w-2xl mx-auto">
-                <p className="text-white/60 text-[15px] leading-relaxed text-center">
-                You&apos;re exploring Bob as a guest.{' '}
+              <p className="text-white/60 text-[15px] text-center max-w-2xl mx-auto">
+                Guest mode •{' '}
                 <Link
                   href="/auth"
                   className="text-white underline decoration-white/60 underline-offset-4 hover:text-white"
                 >
                   Sign in
                 </Link>{' '}
-                    to save your conversations and unlock higher daily limits, or start a quick chat below to try things out.
-                </p>
-              </div>
+                to save
+              </p>
             ) : null}
           </motion.div>
         ) : null}
