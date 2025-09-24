@@ -13,32 +13,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 8
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Type check
-        run: pnpm run type-check
+        run: npm run type-check
 
       # TODO: Re-enable after fixing 124 lint errors
       # - name: Lint
-      #   run: pnpm run lint
+      #   run: npm run lint
 
       - name: Unit tests
-        run: pnpm run test:coverage
+        run: npm run test:coverage
 
       - name: Build
-        run: pnpm run build
+        run: npm run build
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
@@ -53,25 +48,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 8
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Install Playwright
-        run: pnpm run test:install
+        run: npm run test:install
 
       - name: E2E tests
-        run: pnpm run test:e2e:chromium
+        run: npm run test:e2e:chromium
         env:
           CI: true
 
@@ -90,30 +80,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 8
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Install Playwright
-        run: pnpm run test:install
+        run: npm run test:install
 
       - name: Performance tests
-        run: pnpm run test:performance
+        run: npm run test:performance
         env:
           CI: true
 
       - name: Visual tests
-        run: pnpm run test:visual
+        run: npm run test:visual
         env:
           CI: true
 

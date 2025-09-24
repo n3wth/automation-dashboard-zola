@@ -1,7 +1,6 @@
 "use client"
 
 import { Logo } from "@/components/ui/logo"
-import { Robot, Lightning, ChartBar, Wrench } from "@phosphor-icons/react"
 import { useEffect } from "react"
 
 export default function CoverPage() {
@@ -69,15 +68,17 @@ export default function CoverPage() {
     const hideDevElements = () => {
       // Hide all buttons and dev indicators
       document.querySelectorAll('button, [class*="nextjs"], [data-nextjs], [style*="position: fixed"]').forEach(el => {
-        el.style.display = 'none !important'
-        el.style.visibility = 'hidden !important'
+        const htmlEl = el as HTMLElement
+        htmlEl.style.display = 'none'
+        htmlEl.style.visibility = 'hidden'
         el.remove()
       })
 
       // Specifically target the N indicator
       document.querySelectorAll('*').forEach(el => {
+        const htmlEl = el as HTMLElement
         if (el.textContent?.trim() === 'N' &&
-            (el.style.position === 'fixed' || el.style.position === 'absolute')) {
+            (htmlEl.style.position === 'fixed' || htmlEl.style.position === 'absolute')) {
           el.remove()
         }
       })
@@ -107,29 +108,6 @@ export default function CoverPage() {
         <h1 className="text-[clamp(2rem,5vw,4rem)] font-medium text-center leading-tight max-w-[80vw]">
           Intelligent automation dashboard & multi-model AI chat interface
         </h1>
-
-        {/* Features */}
-        <div className="flex flex-wrap items-center justify-center gap-[4vw] text-[clamp(1rem,2vw,1.5rem)] font-medium opacity-95">
-          <div className="flex items-center gap-[1vw]">
-            <Robot weight="bold" className="text-white feature-icon" />
-            <span>Multi-Model AI</span>
-          </div>
-
-          <div className="flex items-center gap-[1vw]">
-            <Lightning weight="bold" className="text-white feature-icon" />
-            <span>Real-time Chat</span>
-          </div>
-
-          <div className="flex items-center gap-[1vw]">
-            <ChartBar weight="bold" className="text-white feature-icon" />
-            <span>Smart Dashboard</span>
-          </div>
-
-          <div className="flex items-center gap-[1vw]">
-            <Wrench weight="bold" className="text-white feature-icon" />
-            <span>Automation Tools</span>
-          </div>
-        </div>
       </div>
     </div>
   )

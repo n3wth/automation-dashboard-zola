@@ -1,242 +1,121 @@
-# Bob by Newth.ai
+# Bob
+
+**Intelligent automation dashboard with multi-model AI chat**
 
 [bob.newth.ai](https://bob.newth.ai)
 
-**Bob** is an intelligent automation dashboard and open-source chat interface supporting multiple AI models with advanced features like file uploads, authentication, and local model support.
+Bob delivers complete control over your AI interactions through a self-hosted dashboard that works with any AI model—from cloud providers to local instances running on your hardware.
 
 ![Bob dashboard](./public/cover_bob.png)
 
-## ✨ Features
+## Why Bob
 
-### 🤖 Multi-Model AI Support
-- **Cloud Models**: OpenAI, Anthropic Claude, Google Gemini, Mistral, xAI Grok, Perplexity
-- **Local Models**: Ollama with automatic model detection
-- **BYOK Support**: Bring your own API keys via OpenRouter
-- **Model Switching**: Seamless switching between providers in conversations
+**Own Your AI Infrastructure**
+Run everything on your own servers. Your conversations, files, and data never leave your control. Built for teams and individuals who need privacy without compromising functionality.
 
-### 🎨 Modern Interface
-- **Responsive Design**: Works on desktop, tablet, and mobile
-- **Theme Support**: Light/dark themes with system preference detection
-- **Customizable Layouts**: Multiple chat layout options
-- **shadcn/ui Components**: Beautiful, accessible UI components
+**Multi-Model Flexibility**
+Switch seamlessly between OpenAI, Anthropic Claude, Google Gemini, Mistral, xAI Grok, Perplexity, and local models via Ollama. No vendor lock-in. Use your own API keys or run models locally.
 
-### 📁 Advanced Features
-- **File Uploads**: Support for documents, images, and various file types
-- **Authentication**: Supabase-powered auth with Google OAuth
-- **Data Persistence**: Chat history and user preferences
-- **Real-time Updates**: Live chat synchronization
-- **MCP Integration**: Model Context Protocol support (in development)
+**Professional Interface**
+Clean, responsive design built with modern React components. Dark/light themes, customizable layouts, file uploads, and real-time synchronization. Designed for daily professional use.
 
-### 🔒 Self-Hostable & Secure
-- **Open Source**: Apache 2.0 license
-- **Self-Hosting**: Complete Docker setup included
-- **Environment Isolation**: Secure environment variable handling
-- **Privacy First**: Your data stays in your infrastructure
+**Enterprise-Ready Architecture**
+Built on Next.js 15 with TypeScript. Supabase backend for authentication and data persistence when needed. Comprehensive testing with Vitest and Playwright. Docker-first deployment.
 
-## 🚀 Quick Start
+## Getting Started
 
-### Option 1: Cloud Models (Fastest)
+Clone and run locally with your preferred AI models:
 
 ```bash
 git clone https://github.com/n3wth/bob.git
 cd bob
 npm install
 cp .env.example .env.local
-# Add your API keys to .env.local
+```
+
+Add your API keys to `.env.local`:
+```bash
+# Choose one or more AI providers
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+GOOGLE_GENERATIVE_AI_API_KEY=...
+
+# Security keys (required)
+CSRF_SECRET=$(openssl rand -hex 16)
+ENCRYPTION_KEY=$(openssl rand -base64 32)
+```
+
+Start the development server:
+```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and start chatting!
+Open [http://localhost:3000](http://localhost:3000) and start chatting.
 
-### Option 2: Local AI with Ollama
+### Local AI with Ollama
+
+For complete independence from cloud providers:
 
 ```bash
 # Install Ollama
 curl -fsSL https://ollama.ai/install.sh | sh
-ollama pull llama3.2  # or your preferred model
+ollama pull llama3.2
 
-# Setup Bob
-git clone https://github.com/n3wth/bob.git
-cd bob
-npm install
+# Bob will auto-detect your local models
 npm run dev
 ```
 
-Bob will automatically detect your local Ollama models!
+### Full Stack Development
 
-### Option 3: Full Stack with Docker
+For advanced features including authentication, file uploads, and persistent chat history:
 
 ```bash
-git clone https://github.com/n3wth/bob.git
-cd bob
 cp .env.example .env.local
-# Configure environment variables
+# Configure Supabase variables in .env.local
 docker-compose -f docker-compose.dev.yml up
 ```
 
-This includes:
-- Next.js app with hot reload
-- Local Supabase instance
-- PostgreSQL database
-- File storage
+Includes PostgreSQL database, file storage, and hot reload.
 
-### Option 4: Production Docker
+## Architecture
 
-```bash
-git clone https://github.com/n3wth/bob.git
-cd bob
-docker-compose up
-```
+**Frontend**: Next.js 15 with TypeScript and Tailwind CSS
+**UI Components**: shadcn/ui with Radix primitives
+**AI Integration**: Vercel AI SDK for unified provider interface
+**Backend**: Supabase for auth, database, and storage
+**Testing**: Vitest for units, Playwright for E2E
+**Deployment**: Docker with standalone output optimization
 
-## 🔧 Development
+The application is built with a local-first approach—core functionality works without external services. Authentication, file uploads, and chat persistence are optional features that enhance the experience when configured.
 
-### Prerequisites
-- Node.js 18+
-- npm or pnpm
-- Docker (optional, for full-stack development)
+## Development
 
-### Setup
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Copy environment file: `cp .env.example .env.local`
-4. Configure your API keys (see Configuration section)
-5. Start development server: `npm run dev`
+**Requirements**: Node.js 18+, npm or pnpm
 
-### Available Scripts
-- `npm run dev` - Start development server with Turbopack
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run type-check` - TypeScript type checking
-- `npm run test` - Run unit tests
-- `npm run test:e2e` - Run Playwright E2E tests
+**Commands**:
+- `npm run dev` — Development server with Turbopack
+- `npm run build` — Production build
+- `npm run type-check` — TypeScript validation
+- `npm run lint` — Code linting
+- `npm run test` — Unit tests with Vitest
+- `npm run test:e2e` — End-to-end tests with Playwright
 
-### Testing
-- **Unit Tests**: Vitest + React Testing Library
-- **E2E Tests**: Playwright across multiple browsers
-- **Visual Testing**: Screenshot comparison tests
-- **Performance Tests**: Core Web Vitals monitoring
+**Testing Strategy**:
+Unit tests for components and utilities, E2E tests for critical user flows, visual regression testing for UI consistency, and performance monitoring for Core Web Vitals.
 
-## ⚙️ Configuration
+## Deployment
 
-### Required Environment Variables
-```bash
-# Security (generate with provided commands)
-CSRF_SECRET=$(openssl rand -hex 16)
-ENCRYPTION_KEY=$(openssl rand -base64 32)
-
-# At least one AI provider
-OPENAI_API_KEY=sk-...
-ANTHROPIC_API_KEY=sk-ant-...
-GOOGLE_GENERATIVE_AI_API_KEY=...
-```
-
-### Full Stack Features (Optional)
-```bash
-# Supabase (for auth, file uploads, chat history)
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE=your-service-role-key
-
-# Google OAuth
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-```
-
-See `.env.example` for complete configuration options.
-
-## 📋 Deployment
-
-### One-Click Deploy
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/n3wth/bob)
-
-### Manual Deployment
-1. Build the application: `npm run build`
-2. Set production environment variables
-3. Deploy to your preferred platform (Vercel, Railway, DigitalOcean, etc.)
-
-### Docker Production
+**Docker Production**:
 ```bash
 docker-compose up
 ```
 
-### Supabase Setup
-If using authentication and file uploads:
-1. Create a Supabase project
-2. Run the provided SQL migrations
-3. Configure OAuth providers
-4. Update environment variables
+**Manual Deployment**:
+Build with `npm run build` and deploy the `dist/` directory to any static hosting provider or Node.js environment.
 
-See the deployment guides in the `scripts/` directory for detailed instructions.
+**Configuration**:
+See `.env.example` for all environment variables. Minimum requirement is one AI provider API key and security keys for encryption.
 
-## 🛠️ Built With
+## License
 
-### Core Framework
-- **[Next.js 15](https://nextjs.org/)** — React framework with App Router
-- **[TypeScript](https://www.typescriptlang.org/)** — Type-safe JavaScript
-- **[Tailwind CSS](https://tailwindcss.com/)** — Utility-first CSS framework
-
-### UI Components
-- **[shadcn/ui](https://ui.shadcn.com)** — Beautiful, accessible React components
-- **[Radix UI](https://radix-ui.com/)** — Low-level UI primitives
-- **[Lucide Icons](https://lucide.dev/)** — Beautiful & consistent icon pack
-- **[Framer Motion](https://framer.com/motion/)** — Motion library for React
-
-### AI Integration
-- **[Vercel AI SDK](https://sdk.vercel.ai/)** — Unified AI provider interface
-- **[prompt-kit](https://prompt-kit.com/)** — AI components and utilities
-
-### Backend & Database
-- **[Supabase](https://supabase.com/)** — Backend-as-a-Service (auth, database, storage)
-- **[PostgreSQL](https://postgresql.org/)** — Robust relational database
-- **[TanStack Query](https://tanstack.com/query)** — Data fetching and state management
-
-### Development & Testing
-- **[Vitest](https://vitest.dev/)** — Fast unit testing framework
-- **[Playwright](https://playwright.dev/)** — End-to-end testing
-- **[ESLint](https://eslint.org/)** — JavaScript linting
-- **[Docker](https://docker.com/)** — Containerization
-
-## 📖 Documentation
-
-- **[API Reference](./docs/api/)** — Complete API documentation
-- **[Deployment Guide](./scripts/)** — Production deployment instructions
-- **[Contributing Guide](./CONTRIBUTING.md)** — How to contribute
-- **[Worktree Development](./docs/WORKTREE_WORKFLOW.md)** — Parallel development workflow
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
-
-### Development Workflow
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Make your changes
-4. Run tests: `npm run test && npm run test:e2e`
-5. Submit a pull request
-
-### Code Style
-- TypeScript with strict mode
-- ESLint + Prettier for formatting
-- Conventional commits for commit messages
-
-## 📝 License
-
-Licensed under the Apache License 2.0. See [LICENSE](./LICENSE) for details.
-
-## 💎 Sponsors
-
-<a href="https://vercel.com/oss">
-  <img alt="Vercel OSS Program" src="https://vercel.com/oss/program-badge.svg" />
-</a>
-
-## 🔗 Links
-
-- **Website**: [bob.newth.ai](https://bob.newth.ai)
-- **Documentation**: [docs.bob.newth.ai](https://docs.bob.newth.ai)
-- **Discord**: [Join our community](https://discord.gg/newth-ai)
-- **Twitter**: [@newthai](https://twitter.com/newthai)
-
----
-
-**Note**: This is an active open-source project. The codebase is continuously evolving with new features and improvements.
+Apache License 2.0 - See [LICENSE](./LICENSE) for details.
