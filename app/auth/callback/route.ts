@@ -62,8 +62,23 @@ export async function GET(request: Request) {
     )
   }
 
-  // User record is automatically created by the database trigger
-  // No manual insertion needed
+  // Try to create user record with minimal data - Supabase auth may need this
+  try {
+    const { error: insertError } = await supabaseAdmin.from("users").upsert({
+      id: user.id,
+      email: user.email,
+    }, {
+      onConflict: 'id',
+      ignoreDuplicates: false
+    })
+
+    // Only log if it's not a duplicate key error
+    if (insertError && insertError.code !== "23505") {
+      console.error("Error upserting user:", insertError)
+    }
+  } catch (err) {
+    console.error("Unexpected user upsert error:", err)
+  }
 
   // Handle custom domain redirects properly
   const forwardedHost = request.headers.get("x-forwarded-host")
