@@ -29,7 +29,7 @@ export async function generateMetadata({
     .eq("id", chatId)
     .single()
 
-  const title = (chat as any)?.title || "Chat"
+  const title = chat?.title ?? "Chat"
   const description = "A chat in Bob"
 
   return {
@@ -85,11 +85,14 @@ export default async function ShareChat({
     redirect("/")
   }
 
+  const createdAt = chatData.created_at ?? ""
+  const chatTitle = chatData.title ?? ""
+
   return (
     <Article
       messages={messagesData}
-      date={(chatData as any).created_at || ""}
-      title={(chatData as any).title || ""}
+      date={createdAt}
+      title={chatTitle}
       subtitle={"A conversation in Bob"}
     />
   )

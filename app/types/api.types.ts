@@ -1,4 +1,4 @@
-import type { Database, Json } from "@/app/types/database.types"
+import type { Json } from "@/app/types/database.types"
 import type { Attachment } from "@ai-sdk/ui-utils"
 import type { TypedSupabaseClient } from "@/lib/supabase/client"
 import type { TypedSupabaseServerClient } from "@/lib/supabase/server"

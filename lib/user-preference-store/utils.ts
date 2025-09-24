@@ -1,3 +1,5 @@
+import type { Tables, TablesUpdate } from "@/app/types/database.types"
+
 export type LayoutType = "sidebar" | "fullscreen"
 export type ThemeType = "light" | "dark" | "system"
 
@@ -21,21 +23,25 @@ export const defaultPreferences: UserPreferences = {
   hiddenModels: [],
 }
 
+type UserPreferencesRow = Tables<'user_preferences'>
+
 // Helper functions to convert between API format (snake_case) and frontend format (camelCase)
-export function convertFromApiFormat(apiData: any): UserPreferences {
+export function convertFromApiFormat(apiData: UserPreferencesRow): UserPreferences {
   return {
-    layout: apiData.layout || "fullscreen",
-    theme: apiData.theme || "system",
+    layout: (apiData.layout as LayoutType | null) ?? "fullscreen",
+    theme: (apiData.theme as ThemeType | null) ?? "system",
     promptSuggestions: apiData.prompt_suggestions ?? true,
     showToolInvocations: apiData.show_tool_invocations ?? true,
     showConversationPreviews: apiData.show_conversation_previews ?? true,
     multiModelEnabled: apiData.multi_model_enabled ?? false,
-    hiddenModels: apiData.hidden_models || [],
+    hiddenModels: Array.isArray(apiData.hidden_models)
+      ? apiData.hidden_models.filter((value): value is string => typeof value === 'string')
+      : [],
   }
 }
 
-export function convertToApiFormat(preferences: Partial<UserPreferences>) {
-  const apiData: any = {}
+export function convertToApiFormat(preferences: Partial<UserPreferences>): TablesUpdate<'user_preferences'> {
+  const apiData: TablesUpdate<'user_preferences'> = {}
   if (preferences.layout !== undefined) apiData.layout = preferences.layout
   if (preferences.theme !== undefined) apiData.theme = preferences.theme
   if (preferences.promptSuggestions !== undefined)

@@ -3,6 +3,7 @@
 // ts-node scripts/monitoring-check.ts
 
 import { createClient } from '@supabase/supabase-js'
+import type { Database } from '@/app/types/database.types'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -12,7 +13,7 @@ if (!supabaseUrl || !supabaseServiceKey) {
   process.exit(1)
 }
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
+const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey)
 
 async function checkHealth() {
   console.log('Running monitoring check...')
@@ -21,7 +22,6 @@ async function checkHealth() {
 
   // 1. Check for a spike in errors (e.g., more than 10 in the last hour)
   // This is a placeholder. In a real scenario, you would query your error tracking system (e.g., Sentry).
-  const errorThreshold = 10 
   // const { count: errorCount } = await supabase.from('errors').select('*', { count: 'exact' }).gte('timestamp', oneHourAgo)
   // if (errorCount > errorThreshold) {
   //   console.log(`ALERT: High number of errors detected: ${errorCount} in the last hour.`)
@@ -46,11 +46,15 @@ async function checkHealth() {
 
   if (modelUsageError) {
     console.error('Could not fetch model usage data.')
-  } else if (modelUsage.length > 100) { // Example threshold
-    console.log(`ALERT: High AI model usage detected: ${modelUsage.length} requests in the last hour.`)
-    // Send alert
   } else {
-    console.log(`AI model usage is normal (${modelUsage.length} requests in the last hour).`)
+    const usageCount = modelUsage?.length ?? 0
+    if (usageCount > 100) { // Example threshold
+      console.log(`ALERT: High AI model usage detected: ${usageCount} requests in the last hour.`)
+      // Send alert
+    } else {
+      console.log(`AI model usage is normal (${usageCount} requests in the last hour).`)
+    }
+    // Send alert
   }
 
   console.log('Monitoring check complete.')

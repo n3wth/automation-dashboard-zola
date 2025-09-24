@@ -46,7 +46,7 @@ function CodeBlockCode({
   return (
     <div className={classNames} {...props}>
       <pre className="px-4 py-4 !bg-background">
-        <code className="language-{language}">{code || ""}</code>
+        <code className={cn(`language-${language}`)}>{code || ""}</code>
       </pre>
     </div>
   )
