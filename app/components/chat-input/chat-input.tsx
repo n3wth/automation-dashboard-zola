@@ -9,12 +9,21 @@ import {
 } from "@/components/prompt-kit/prompt-input"
 import { Button } from "@/components/ui/button"
 import { getModelInfo } from "@/lib/models"
+import { cn } from "@/lib/utils"
 import { ArrowUpIcon, StopIcon } from "@phosphor-icons/react"
 import { useCallback, useEffect, useMemo, useRef } from "react"
 import { PromptSystem } from "../suggestions/prompt-system"
 import { ButtonFileUpload } from "./button-file-upload"
 import { ButtonSearch } from "./button-search"
 import { FileList } from "./file-list"
+
+const MAX_CHAT_INPUT_CHARACTERS = 4000
+const LONG_INPUT_HINT_THRESHOLD = Math.floor(MAX_CHAT_INPUT_CHARACTERS * 0.75)
+
+const clampChatInputValue = (text: string) =>
+  text.length > MAX_CHAT_INPUT_CHARACTERS
+    ? text.slice(0, MAX_CHAT_INPUT_CHARACTERS)
+    : text
 
 type ChatInputProps = {
   value: string
@@ -64,12 +73,51 @@ export function ChatInput({
   // Fix hydration mismatch by using client-side state
   const placeholder = "Ask Bob..."
 
-  const hasInput = value.length > 0 && !isOnlyWhitespace(value)
+  const handleValueChange = useCallback(
+    (nextValue: string) => {
+      onValueChange(clampChatInputValue(nextValue))
+    },
+    [onValueChange]
+  )
+
+  useEffect(() => {
+    if (value.length > MAX_CHAT_INPUT_CHARACTERS) {
+      handleValueChange(value)
+    }
+  }, [value, handleValueChange])
+
+  const inputLength = value.length
+  const hasInput = inputLength > 0 && !isOnlyWhitespace(value)
   const isStreaming = status === "streaming"
   const isAwaitingResponse = status === "submitted"
   const isSendDisabled = !isStreaming && (!hasInput || isSubmitting || isAwaitingResponse)
   const isErrored = status === "error"
   const errorMessageId = isErrored ? "chat-input-error" : undefined
+  const isAtCharacterLimit = inputLength >= MAX_CHAT_INPUT_CHARACTERS
+  const shouldShowLongInputHint =
+    !isAtCharacterLimit && inputLength >= LONG_INPUT_HINT_THRESHOLD
+  const formattedInputLength = inputLength.toLocaleString()
+  const formattedMaxLength = MAX_CHAT_INPUT_CHARACTERS.toLocaleString()
+
+  let lengthMessageId: string | undefined
+  let lengthMessage: string | undefined
+  let lengthMessageTone: "warning" | "error" | undefined
+
+  if (isAtCharacterLimit) {
+    lengthMessageId = "chat-input-character-limit"
+    lengthMessage = `You've reached the ${formattedMaxLength}-character limit.`
+    lengthMessageTone = "error"
+  } else if (shouldShowLongInputHint) {
+    lengthMessageId = "chat-input-length-warning"
+    lengthMessage = "Long prompts may slow things down. Consider trimming your message."
+    lengthMessageTone = "warning"
+  }
+
+  const describedByIds = [errorMessageId, lengthMessageId]
+    .filter(Boolean)
+    .join(" ")
+    .trim()
+  const textareaDescribedBy = describedByIds.length > 0 ? describedByIds : undefined
 
   const handleSend = useCallback(() => {
     if (isSubmitting) {
@@ -154,14 +202,14 @@ export function ChatInput({
         .split("\n")
         .map((line) => `> ${line}`)
         .join("\n")
-      onValueChange(value ? `${value}\n\n${quoted}\n\n` : `${quoted}\n\n`)
+      handleValueChange(value ? `${value}\n\n${quoted}\n\n` : `${quoted}\n\n`)
 
       requestAnimationFrame(() => {
         textareaRef.current?.focus()
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quotedText, onValueChange])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run only when quoting new text
+  }, [quotedText, handleValueChange])
 
   useMemo(() => {
     if (!hasSearchSupport && enableSearch) {
@@ -173,7 +221,7 @@ export function ChatInput({
     <div className="relative flex w-full flex-col gap-4">
       {hasSuggestions && (
         <PromptSystem
-          onValueChange={onValueChange}
+          onValueChange={handleValueChange}
           onSuggestion={onSuggestion}
           value={value}
         />
@@ -183,10 +231,14 @@ export function ChatInput({
         onClick={() => textareaRef.current?.focus()}
       >
         <PromptInput
-          className="bg-black text-white relative z-10 p-0 pt-1 shadow-xs backdrop-blur-xl border-white/20"
+          className={cn(
+            "bg-black text-white relative z-10 p-0 pt-1 shadow-xs backdrop-blur-xl border-white/20",
+            isAtCharacterLimit && "border-destructive focus-within:border-destructive",
+            !isAtCharacterLimit && shouldShowLongInputHint && "border-amber-400/80 focus-within:border-amber-400/90"
+          )}
           maxHeight={200}
           value={value}
-          onValueChange={onValueChange}
+          onValueChange={handleValueChange}
         >
           <FileList files={files} onFileRemove={onFileRemove} />
           <PromptInputTextarea
@@ -196,7 +248,8 @@ export function ChatInput({
             onPaste={handlePaste}
             className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"
             aria-invalid={isErrored}
-            aria-describedby={errorMessageId}
+            aria-describedby={textareaDescribedBy}
+            maxLength={MAX_CHAT_INPUT_CHARACTERS}
           />
           <PromptInputActions className="mt-3 w-full justify-between p-2">
             <div className="flex gap-2">
@@ -219,28 +272,56 @@ export function ChatInput({
                 />
               ) : null}
             </div>
-            <PromptInputAction
-              tooltip={status === "streaming" ? "Stop" : "Send"}
-            >
-              <Button
-                id="chat-send-button"
-                data-testid="chat-send-button"
-                size="sm"
-                className="size-9 rounded-full transition-all duration-300 ease-out"
-                disabled={isSendDisabled}
-                type="button"
-                onClick={handleSend}
-                aria-label={status === "streaming" ? "Stop" : "Send message"}
-                aria-busy={isSubmitting || isStreaming || isAwaitingResponse}
-              >
-                {status === "streaming" ? (
-                  <StopIcon className="size-4" />
-                ) : (
-                  <ArrowUpIcon className="size-4" />
+            <div className="flex items-center gap-3">
+              <span
+                data-testid="chat-input-character-count"
+                aria-live="polite"
+                className={cn(
+                  "text-xs font-medium tabular-nums transition-colors",
+                  isAtCharacterLimit
+                    ? "text-destructive"
+                    : shouldShowLongInputHint
+                      ? "text-amber-400"
+                      : "text-muted-foreground"
                 )}
-              </Button>
-            </PromptInputAction>
+              >
+                {formattedInputLength} / {formattedMaxLength}
+              </span>
+              <PromptInputAction
+                tooltip={status === "streaming" ? "Stop" : "Send"}
+              >
+                <Button
+                  id="chat-send-button"
+                  data-testid="chat-send-button"
+                  size="sm"
+                  className="size-9 rounded-full transition-all duration-300 ease-out"
+                  disabled={isSendDisabled}
+                  type="button"
+                  onClick={handleSend}
+                  aria-label={status === "streaming" ? "Stop" : "Send message"}
+                  aria-busy={isSubmitting || isStreaming || isAwaitingResponse}
+                >
+                  {status === "streaming" ? (
+                    <StopIcon className="size-4" />
+                  ) : (
+                    <ArrowUpIcon className="size-4" />
+                  )}
+                </Button>
+              </PromptInputAction>
+            </div>
           </PromptInputActions>
+          {lengthMessage && (
+            <p
+              id={lengthMessageId}
+              aria-live="polite"
+              className={cn(
+                "px-4 pb-3 text-xs",
+                lengthMessageTone === "error" ? "text-destructive" : "text-amber-400"
+              )}
+            >
+              {lengthMessage}
+            </p>
+          )}
           {isErrored ? (
             <div
               id={errorMessageId}
