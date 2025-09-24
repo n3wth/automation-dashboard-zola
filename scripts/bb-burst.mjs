@@ -35,7 +35,7 @@ Constraints:
     const title = data?.choices?.[0]?.message?.content?.trim()
     if (title && title.length > 0) return title
     throw new Error('empty-title')
-  } catch (e) {
+  } catch {
     // Fallback heuristic
     if (kind === 'UX') {
       const first = (details || '').split('\n').find(Boolean) || 'UX observations'

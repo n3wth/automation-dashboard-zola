@@ -15,7 +15,7 @@ export type UserPreferences = {
 
 export const defaultPreferences: UserPreferences = {
   layout: "fullscreen",
-  theme: "system",
+  theme: "dark",
   promptSuggestions: true,
   showToolInvocations: true,
   showConversationPreviews: true,

@@ -6,7 +6,7 @@
 
 Bob delivers complete control over your AI interactions through a self-hosted dashboard that works with any AI model—from cloud providers to local instances running on your hardware.
 
-![Bob dashboard](./public/cover_bob.png)
+![Bob dashboard](./public/bob-banner.png)
 
 ## Why Bob
 

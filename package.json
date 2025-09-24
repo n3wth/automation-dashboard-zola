@@ -30,7 +30,15 @@
     "pr": "gh pr create",
     "pr-list": "gh pr list",
     "pr-check": "./scripts/merge-prs.sh",
-    "bb:long": "node scripts/bb-longflows.mjs --n 3 --engine gm --minutes 3"
+    "bb:long": "node scripts/bb-longflows.mjs --n 3 --engine gm --minutes 3",
+    "watch:auto-merge": "bash scripts/auto-merge-watch.sh",
+    "watch:auto-rebase": "bash scripts/auto-rebase-watch.sh",
+    "watch:aggressive": "bash scripts/aggressive-rebase-merge.sh",
+    "watch:issue-sync": "bash scripts/issue-sync.sh --watch",
+    "watch:test-issues": "bash scripts/test-file-issues.sh --watch",
+    "watch:smoke": "bash scripts/browserbase-smoke-watch.sh",
+    "watch:bb-flows": "bash scripts/browserbase-flows-watch.sh",
+    "watch:logs": "bash scripts/monitor-logs.sh"
   },
   "overrides": {
     "jsondiffpatch": "^0.7.2"

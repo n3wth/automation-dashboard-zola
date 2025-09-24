@@ -222,7 +222,16 @@ Make sure to maintain code quality and follow project conventions."
 
         # Commit changes if any
         git add .
-        if git commit -m "Fix #$number: $title
+
+        # Try commit, but handle lint/type errors if they occur
+        local commit_success=false
+        local attempt=1
+        local max_attempts=2
+
+        while [[ $attempt -le $max_attempts && $commit_success == false ]]; do
+            log "${BLUE}🔍 Attempting commit (attempt $attempt/$max_attempts)${NC}"
+
+            if git commit -m "Fix #$number: $title
 
 Automated fix by Cursor Agent CLI
 
@@ -231,6 +240,29 @@ Automated fix by Cursor Agent CLI
 - Maintained code quality standards
 
 Closes #$number"; then
+                commit_success=true
+            else
+                # If commit failed due to quality checks, try to fix common issues
+                if [[ $attempt -lt $max_attempts ]]; then
+                    log "${YELLOW}⚠️  Commit failed, attempting to fix quality issues${NC}"
+
+                    # Try to fix unused catch variables automatically
+                    find . -name "*.mjs" -o -name "*.js" -o -name "*.ts" -o -name "*.tsx" | while read -r file; do
+                        if [[ -f "$file" ]]; then
+                            sed -i.bak 's/} catch (e) {/} catch {/g' "$file" 2>/dev/null || true
+                            sed -i.bak 's/}catch(e){/}catch{/g' "$file" 2>/dev/null || true
+                            rm -f "$file.bak" 2>/dev/null || true
+                        fi
+                    done
+
+                    # Stage any fixes
+                    git add .
+                fi
+                ((attempt++))
+            fi
+        done
+
+        if [[ $commit_success == true ]]; then
 
             # Push branch
             if git push origin "$branch_name"; then
