@@ -89,24 +89,11 @@ export async function GET(request: Request) {
 
     // Handle different confirmation types
     if (type === "signup" || type === "email") {
-      // Email signup confirmation - create user record if needed
-      try {
-        const { error: insertError } = await supabaseAdmin.from("users").insert({
-          id: user.id,
-          email: user.email,
-        } as any)
-
-        if (insertError && insertError.code !== "23505") {
-          console.error("Error inserting user after email confirmation:", insertError)
-        }
-
-        await trackEvent({
-          type: MonitoringEvent.USER_LOGIN,
-          userId: user.id,
-        })
-      } catch (err) {
-        console.error("Unexpected user insert error:", err)
-      }
+      // Email signup confirmation - user record is automatically created by database trigger
+      await trackEvent({
+        type: MonitoringEvent.USER_LOGIN,
+        userId: user.id,
+      })
     } else if (type === "recovery") {
       // Password recovery - user already exists, just track the login
       await trackEvent({
