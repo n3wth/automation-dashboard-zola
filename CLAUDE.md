@@ -1,3 +1,20 @@
+# Worktree Context: improve-docs
+
+## Configuration
+- **Branch Type**: feature
+- **App Port**: 3001
+- **Database Port**: 54323
+- **Docker Volume**: bob-improve-docs-data
+
+## Active Worktrees
+Run `bob-worktree list` to see all active worktrees and their ports.
+
+## Important
+This is a worktree of the main Bob repository. Changes here are isolated from other worktrees.
+Use the assigned ports to avoid conflicts with other running instances.
+
+---
+
 # CLAUDE.md - Bob Dashboard Configuration
 
 ## Project Overview
