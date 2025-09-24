@@ -17,13 +17,18 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        cache: 'npm'
+        cache: 'pnpm'
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 8
 
     - name: Install dependencies
-      run: npm ci
+      run: pnpm install --frozen-lockfile
 
     - name: Run unit tests with coverage
-      run: npm run test:coverage
+      run: pnpm run test:coverage
 
     - name: Upload coverage reports
       uses: codecov/codecov-action@v4
@@ -41,16 +46,21 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        cache: 'npm'
+        cache: 'pnpm'
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 8
 
     - name: Install dependencies
-      run: npm ci
+      run: pnpm install --frozen-lockfile
 
     - name: Install Playwright browsers
-      run: npm run test:install
+      run: pnpm run test:install
 
     - name: Run E2E tests
-      run: npm run test:e2e:chromium
+      run: pnpm run test:e2e:chromium
       env:
         CI: true
 
@@ -72,16 +82,21 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        cache: 'npm'
+        cache: 'pnpm'
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 8
 
     - name: Install dependencies
-      run: npm ci
+      run: pnpm install --frozen-lockfile
 
     - name: Install Playwright browsers
-      run: npm run test:install
+      run: pnpm run test:install
 
     - name: Run visual regression tests
-      run: npm run test:visual
+      run: pnpm run test:visual
       env:
         CI: true
 
@@ -104,16 +119,21 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        cache: 'npm'
+        cache: 'pnpm'
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 8
 
     - name: Install dependencies
-      run: npm ci
+      run: pnpm install --frozen-lockfile
 
     - name: Install Playwright browsers
-      run: npm run test:install
+      run: pnpm run test:install
 
     - name: Run performance tests
-      run: npm run test:performance
+      run: pnpm run test:performance
       env:
         CI: true
 
