@@ -39,8 +39,8 @@ export function SettingsContent({
   return (
     <div
       className={cn(
-        "flex w-full flex-col overflow-y-auto",
-        isDrawer ? "p-0 pb-16" : "py-0"
+        "flex w-full flex-col",
+        isDrawer ? "overflow-y-auto p-0 pb-16" : "h-full"
       )}
     >
       {isDrawer && (
@@ -58,8 +58,8 @@ export function SettingsContent({
         value={activeTab}
         onValueChange={(value) => setActiveTab(value as TabType)}
         className={cn(
-          "flex w-full flex-row",
-          isDrawer ? "" : "flex min-h-[400px]"
+          "flex w-full",
+          isDrawer ? "flex-col" : "h-full flex-row"
         )}
       >
         {isDrawer ? (
@@ -139,11 +139,11 @@ export function SettingsContent({
         ) : (
           // Desktop version - tabs on left
           <>
-            <TabsList className="h-full w-48 flex-col items-stretch justify-start rounded-none border-r bg-background p-2">
-              <div className="flex w-full flex-col gap-1">
+            <TabsList className="h-full w-48 flex-col items-stretch justify-start rounded-none border-r bg-muted/30 p-2">
+              <div className="flex h-full w-full flex-col gap-1">
                 <TabsTrigger
                   value="general"
-                  className="w-full justify-start rounded-md px-3 py-2 text-left"
+                  className="w-full justify-start rounded-md px-3 py-2 text-left transition-colors hover:bg-accent hover:text-accent-foreground data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
                 >
                   <div className="flex items-center gap-2">
                     <GearSixIcon className="size-4" />
@@ -153,7 +153,7 @@ export function SettingsContent({
 
                 <TabsTrigger
                   value="appearance"
-                  className="w-full justify-start rounded-md px-3 py-2 text-left"
+                  className="w-full justify-start rounded-md px-3 py-2 text-left transition-colors hover:bg-accent hover:text-accent-foreground data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
                 >
                   <div className="flex items-center gap-2">
                     <PaintBrushIcon className="size-4" />
@@ -163,7 +163,7 @@ export function SettingsContent({
 
                 <TabsTrigger
                   value="apikeys"
-                  className="w-full justify-start rounded-md px-3 py-2 text-left"
+                  className="w-full justify-start rounded-md px-3 py-2 text-left transition-colors hover:bg-accent hover:text-accent-foreground data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
                 >
                   <div className="flex items-center gap-2">
                     <KeyIcon className="size-4" />
@@ -172,7 +172,7 @@ export function SettingsContent({
                 </TabsTrigger>
                 <TabsTrigger
                   value="models"
-                  className="w-full justify-start rounded-md px-3 py-2 text-left"
+                  className="w-full justify-start rounded-md px-3 py-2 text-left transition-colors hover:bg-accent hover:text-accent-foreground data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
                 >
                   <div className="flex items-center gap-2">
                     <CubeIcon className="size-4" />
@@ -181,7 +181,7 @@ export function SettingsContent({
                 </TabsTrigger>
                 <TabsTrigger
                   value="connections"
-                  className="w-full justify-start rounded-md px-3 py-2 text-left"
+                  className="w-full justify-start rounded-md px-3 py-2 text-left transition-colors hover:bg-accent hover:text-accent-foreground data-[state=active]:bg-accent data-[state=active]:text-accent-foreground"
                 >
                   <div className="flex items-center gap-2">
                     <PlugsConnectedIcon className="size-4" />
@@ -192,7 +192,7 @@ export function SettingsContent({
             </TabsList>
 
             {/* Desktop tabs content */}
-            <div className="flex-1 overflow-auto bg-background px-6 py-6">
+            <div className="flex-1 overflow-auto px-6 py-6">
               <TabsContent value="general" className="mt-0 space-y-6">
                 <UserProfile />
                 {isSupabaseEnabled && (
