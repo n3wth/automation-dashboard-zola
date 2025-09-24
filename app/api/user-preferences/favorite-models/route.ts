@@ -110,7 +110,7 @@ export async function GET() {
     }
 
     return NextResponse.json({
-      favorite_models: (data as any).favorite_models || [],
+      favorite_models: data.favorite_models || [],
     })
   } catch (error) {
     console.error("Error in favorite-models GET API:", error)

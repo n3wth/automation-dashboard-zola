@@ -51,13 +51,13 @@ export async function GET() {
     }
 
     return NextResponse.json({
-      layout: (data as any).layout,
-      theme: (data as any).theme,
-      prompt_suggestions: (data as any).prompt_suggestions,
-      show_tool_invocations: (data as any).show_tool_invocations,
-      show_conversation_previews: (data as any).show_conversation_previews,
-      multi_model_enabled: (data as any).multi_model_enabled,
-      hidden_models: (data as any).hidden_models || [],
+      layout: data.layout,
+      theme: data.theme || "system",
+      prompt_suggestions: data.prompt_suggestions,
+      show_tool_invocations: data.show_tool_invocations,
+      show_conversation_previews: data.show_conversation_previews,
+      multi_model_enabled: data.multi_model_enabled,
+      hidden_models: data.hidden_models || [],
     })
   } catch (error) {
     console.error("Error in user-preferences GET API:", error)
@@ -124,7 +124,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Prepare update object with only provided fields
-    const updateData: any = {}
+    const updateData: Record<string, unknown> = {}
     if (layout !== undefined) updateData.layout = layout
     if (theme !== undefined) updateData.theme = theme
     if (prompt_suggestions !== undefined)
@@ -163,7 +163,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({
       success: true,
       layout: data.layout,
-      theme: (data as any).theme || "system",
+      theme: data.theme || "system",
       prompt_suggestions: data.prompt_suggestions,
       show_tool_invocations: data.show_tool_invocations,
       show_conversation_previews: data.show_conversation_previews,
