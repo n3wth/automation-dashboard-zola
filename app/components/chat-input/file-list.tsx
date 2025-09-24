@@ -24,7 +24,11 @@ export function FileList({ files, onFileRemove }: FileListProps) {
           transition={TRANSITION}
           className="overflow-hidden"
         >
-          <div className="flex flex-row overflow-x-auto pl-3">
+          <div
+            className="flex flex-row overflow-x-auto pl-3"
+            role="list"
+            aria-live="polite"
+          >
             <AnimatePresence initial={false}>
               {files.map((file) => (
                 <motion.div
@@ -34,6 +38,7 @@ export function FileList({ files, onFileRemove }: FileListProps) {
                   exit={{ width: 0 }}
                   transition={TRANSITION}
                   className="relative shrink-0 overflow-hidden pt-2"
+                  role="listitem"
                 >
                   <FileItem
                     key={file.name}
