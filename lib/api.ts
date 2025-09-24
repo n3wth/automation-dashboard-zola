@@ -61,6 +61,17 @@ export async function checkRateLimits(
     )
     const responseData = await res.json()
     if (!res.ok) {
+      // For rate limit scenarios, return structured error info instead of throwing
+      if (res.status === 429 || res.status === 403) {
+        return {
+          error: true,
+          status: res.status,
+          message: responseData.error || "Rate limit exceeded",
+          remaining: 0,
+          remainingPro: 0,
+        }
+      }
+
       throw new Error(
         responseData.error ||
           `Failed to check rate limits: ${res.status} ${res.statusText}`
