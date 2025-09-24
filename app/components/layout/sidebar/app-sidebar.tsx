@@ -50,7 +50,11 @@ export function AppSidebar() {
       <SidebarHeader className="h-14 px-3">
         <div className="flex items-center justify-between h-full">
           <Link href="/" className="inline-flex" onClick={() => router.push("/")}>
-            <Logo size="md" variant="text" className="text-white" />
+            <Logo
+              size="md"
+              variant="text"
+              className="text-sidebar-foreground"
+            />
           </Link>
           {isMounted && isMobile && (
             <button

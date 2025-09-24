@@ -36,9 +36,10 @@ export function AppProvider({ children, userProfile }: AppProviderProps) {
                   >
                     <ThemeProvider
                       attribute="class"
-                      defaultTheme="light"
+                      defaultTheme="system"
                       enableSystem
                       disableTransitionOnChange
+                      storageKey="bob-theme"
                     >
                       <SidebarProvider defaultOpen={false}>
                         <Toaster position="top-center" />
