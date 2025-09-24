@@ -60,7 +60,7 @@ export function Logo({ className, size = 'md', variant = 'text' }: LogoProps) {
 
   // Default text variant - using simple SVG
   return (
-    <div className={cn('flex items-center', className)}>
+    <div className={cn('flex items-center text-foreground', className)}>
       <Image
         src="/logo-simple.svg"
         alt="Bob"
