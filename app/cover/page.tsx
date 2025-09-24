@@ -1,6 +1,7 @@
 "use client"
 
 import { Logo } from "@/components/ui/logo"
+import { Robot, Lightning, ChartBar, Wrench } from "@phosphor-icons/react"
 
 export default function CoverPage() {
   return (
@@ -17,29 +18,29 @@ export default function CoverPage() {
         </div>
 
         {/* Tagline */}
-        <h1 className="text-3xl md:text-4xl font-medium text-center leading-normal whitespace-nowrap">
+        <h1 className="text-2xl md:text-3xl font-medium text-center leading-normal whitespace-nowrap">
           Intelligent automation dashboard & multi-model AI chat interface
         </h1>
 
         {/* Features */}
-        <div className="flex flex-wrap items-center justify-center gap-8 mt-12 text-base font-medium opacity-80">
-          <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-gradient-to-r from-violet-500 to-blue-500 rounded"></div>
+        <div className="flex items-center justify-center gap-16 mt-12 text-sm font-medium opacity-80">
+          <div className="flex items-center gap-2">
+            <Robot size={16} weight="bold" className="text-white" />
             <span>Multi-Model AI</span>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-gradient-to-r from-violet-500 to-blue-500 rounded"></div>
+          <div className="flex items-center gap-2">
+            <Lightning size={16} weight="bold" className="text-white" />
             <span>Real-time Chat</span>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-gradient-to-r from-violet-500 to-blue-500 rounded"></div>
+          <div className="flex items-center gap-2">
+            <ChartBar size={16} weight="bold" className="text-white" />
             <span>Smart Dashboard</span>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-gradient-to-r from-violet-500 to-blue-500 rounded"></div>
+          <div className="flex items-center gap-2">
+            <Wrench size={16} weight="bold" className="text-white" />
             <span>Automation Tools</span>
           </div>
         </div>
