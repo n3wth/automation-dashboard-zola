@@ -195,6 +195,13 @@ export function Chat() {
   )
 
   const hasMessages = messages.length > 0
+  const baseShowOnboarding = !chatId && !hasMessages
+  const showOnboarding = baseShowOnboarding
+  const shouldShowTour =
+    showOnboarding && isTourActive && !isOnboardingStateLoading && !hasCompletedTour
+  const shouldShowDefaultOnboarding = showOnboarding && !shouldShowTour
+  const shouldShowAuthNotice =
+    isSupabaseEnabled && !isAuthenticated && showOnboarding
 
   // Memoize the chat input props
   const chatInputProps = useMemo(
@@ -218,6 +225,7 @@ export function Chat() {
       enableSearch,
       quotedText,
       hasMessages,
+      showMainAuthNotice: shouldShowAuthNotice,
     }),
     [
       input,
@@ -239,6 +247,7 @@ export function Chat() {
       setEnableSearch,
       enableSearch,
       quotedText,
+      shouldShowAuthNotice,
     ]
   )
 
@@ -293,14 +302,7 @@ export function Chat() {
     redirect("/")
   }
 
-  const baseShowOnboarding = !chatId && !hasMessages
   const showLoadingForDirectFetch = chatId && fetchingDirectChat === chatId && !currentChat
-  const showOnboarding = baseShowOnboarding
-  const shouldShowTour =
-    showOnboarding && isTourActive && !isOnboardingStateLoading && !hasCompletedTour
-  const shouldShowDefaultOnboarding = showOnboarding && !shouldShowTour
-  const shouldShowAuthNotice =
-    isSupabaseEnabled && !isAuthenticated && showOnboarding
   const showInitialLoading =
     Boolean(chatId) && isChatsLoading && !showLoadingForDirectFetch && !hasMessages
 

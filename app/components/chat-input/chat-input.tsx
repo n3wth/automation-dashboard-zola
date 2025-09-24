@@ -46,6 +46,7 @@ type ChatInputProps = {
   setEnableSearch: (enabled: boolean) => void
   enableSearch: boolean
   quotedText?: { text: string; messageId: string } | null
+  showMainAuthNotice?: boolean
 }
 
 export function ChatInput({
@@ -67,6 +68,7 @@ export function ChatInput({
   enableSearch,
   quotedText,
   hasMessages,
+  showMainAuthNotice,
 }: ChatInputProps) {
   const selectModelConfig = getModelInfo(selectedModel)
   const hasSearchSupport = Boolean(selectModelConfig?.webSearch)
@@ -78,7 +80,7 @@ export function ChatInput({
 
   const hasAnyMessages = Boolean(hasMessages)
   const shouldShowAuthReminder =
-    isSupabaseEnabled && !isUserAuthenticated && !hasAnyMessages
+    isSupabaseEnabled && !isUserAuthenticated && !hasAnyMessages && !showMainAuthNotice
 
   const handleValueChange = useCallback(
     (nextValue: string) => {
