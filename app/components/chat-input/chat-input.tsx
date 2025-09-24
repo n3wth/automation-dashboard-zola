@@ -9,8 +9,10 @@ import {
 } from "@/components/prompt-kit/prompt-input"
 import { Button } from "@/components/ui/button"
 import { getModelInfo } from "@/lib/models"
+import { isSupabaseEnabled } from "@/lib/supabase/config"
 import { ArrowUpIcon, StopIcon } from "@phosphor-icons/react"
 import { useCallback, useEffect, useMemo, useRef } from "react"
+import Link from "next/link"
 import { PromptSystem } from "../suggestions/prompt-system"
 import { ButtonFileUpload } from "./button-file-upload"
 import { ButtonSearch } from "./button-search"
@@ -55,6 +57,7 @@ export function ChatInput({
   setEnableSearch,
   enableSearch,
   quotedText,
+  hasMessages,
 }: ChatInputProps) {
   const selectModelConfig = getModelInfo(selectedModel)
   const hasSearchSupport = Boolean(selectModelConfig?.webSearch)
@@ -63,6 +66,10 @@ export function ChatInput({
 
   // Fix hydration mismatch by using client-side state
   const placeholder = "Ask Bob..."
+
+  const hasAnyMessages = Boolean(hasMessages)
+  const shouldShowAuthReminder =
+    isSupabaseEnabled && !isUserAuthenticated && !hasAnyMessages
 
   const hasInput = value.length > 0 && !isOnlyWhitespace(value)
   const isStreaming = status === "streaming"
@@ -188,6 +195,26 @@ export function ChatInput({
           value={value}
           onValueChange={onValueChange}
         >
+          {shouldShowAuthReminder ? (
+            <div
+              className="border-white/15 bg-white/5 text-white/80 mb-2 flex flex-col gap-3 rounded-2xl border px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between"
+              role="status"
+              aria-live="polite"
+            >
+              <span className="text-left">
+                <span className="text-white font-medium">You&apos;re chatting as a guest.</span>{" "}
+                Sign in to save your conversations and unlock higher daily limits.
+              </span>
+              <Button
+                asChild
+                variant="secondary"
+                size="sm"
+                className="w-full sm:w-auto"
+              >
+                <Link href="/auth">Sign in to continue</Link>
+              </Button>
+            </div>
+          ) : null}
           <FileList files={files} onFileRemove={onFileRemove} />
           <PromptInputTextarea
             ref={textareaRef}

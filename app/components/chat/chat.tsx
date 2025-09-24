@@ -8,11 +8,13 @@ import { useChats } from "@/lib/chat-store/chats/provider"
 import { useMessages } from "@/lib/chat-store/messages/provider"
 import { useChatSession } from "@/lib/chat-store/session/provider"
 import { SYSTEM_PROMPT_DEFAULT } from "@/lib/config"
+import { isSupabaseEnabled } from "@/lib/supabase/config"
 import { useUserPreferences } from "@/lib/user-preference-store/provider"
 import { useUser } from "@/lib/user-store/provider"
 import { cn } from "@/lib/utils"
 import { AnimatePresence, motion } from "motion/react"
 import dynamic from "next/dynamic"
+import Link from "next/link"
 import { redirect } from "next/navigation"
 import { useCallback, useMemo, useState } from "react"
 import { useChatCore } from "./use-chat-core"
@@ -156,6 +158,8 @@ export function Chat() {
     ]
   )
 
+  const hasMessages = messages.length > 0
+
   // Memoize the chat input props
   const chatInputProps = useMemo(
     () => ({
@@ -168,7 +172,7 @@ export function Chat() {
       onFileUpload: handleFileUpload,
       onFileRemove: handleFileRemove,
       hasSuggestions:
-        preferences.promptSuggestions && !chatId && messages.length === 0,
+        preferences.promptSuggestions && !chatId && !hasMessages,
       onSelectModel: handleModelChange,
       selectedModel,
       isUserAuthenticated: isAuthenticated,
@@ -177,6 +181,7 @@ export function Chat() {
       setEnableSearch,
       enableSearch,
       quotedText,
+      hasMessages,
     }),
     [
       input,
@@ -189,7 +194,7 @@ export function Chat() {
       handleFileRemove,
       preferences.promptSuggestions,
       chatId,
-      messages.length,
+      hasMessages,
       handleModelChange,
       selectedModel,
       isAuthenticated,
@@ -252,9 +257,10 @@ export function Chat() {
     redirect("/")
   }
 
-  const showOnboarding = !chatId && messages.length === 0
+  const showOnboarding = !chatId && !hasMessages
   const showLoadingForDirectFetch = chatId && fetchingDirectChat === chatId && !currentChat
-  const hasMessages = messages.length > 0
+  const shouldShowAuthNotice =
+    isSupabaseEnabled && !isAuthenticated && showOnboarding
 
   return (
     <div
@@ -303,6 +309,18 @@ export function Chat() {
             <h1 className="mb-6 text-3xl font-medium tracking-tight">
               What&apos;s on your mind?
             </h1>
+            {shouldShowAuthNotice ? (
+              <p className="text-muted-foreground text-base leading-relaxed text-center md:text-left">
+                You&apos;re exploring Bob as a guest.{' '}
+                <Link
+                  href="/auth"
+                  className="text-white underline decoration-white/60 underline-offset-4 hover:text-white"
+                >
+                  Sign in
+                </Link>{' '}
+                to save your conversations and unlock higher daily limits, or start a quick chat below to try things out.
+              </p>
+            ) : null}
           </motion.div>
         )}
       </AnimatePresence>
