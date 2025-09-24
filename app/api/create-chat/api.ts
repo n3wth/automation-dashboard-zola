@@ -28,7 +28,7 @@ export async function createChatInDb({
     }
   }
 
-  await checkUsageByModel(supabase as any, userId, model, isAuthenticated)
+  await checkUsageByModel(supabase, userId, model, isAuthenticated)
 
   // Map dev users to anonymous UUID for database constraints
   const dbUserId = process.env.NODE_ENV === 'development' && userId.startsWith('dev-')
@@ -52,7 +52,7 @@ export async function createChatInDb({
 
   const { data, error } = await supabase
     .from("chats")
-    .insert(insertData as any)
+    .insert(insertData)
     .select("*")
     .single()
 
