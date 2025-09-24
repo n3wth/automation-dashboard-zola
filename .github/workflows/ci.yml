@@ -13,27 +13,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Type check
-        run: npm run type-check
+        run: pnpm run type-check
 
       # TODO: Re-enable after fixing 124 lint errors
       # - name: Lint
-      #   run: npm run lint
+      #   run: pnpm run lint
 
       - name: Unit tests
-        run: npm run test:coverage
+        run: pnpm run test:coverage
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
@@ -48,20 +53,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright
-        run: npm run test:install
+        run: pnpm run test:install
 
       - name: E2E tests
-        run: npm run test:e2e:chromium
+        run: pnpm run test:e2e:chromium
         env:
           CI: true
 
@@ -80,25 +90,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright
-        run: npm run test:install
+        run: pnpm run test:install
 
       - name: Performance tests
-        run: npm run test:performance
+        run: pnpm run test:performance
         env:
           CI: true
 
       - name: Visual tests
-        run: npm run test:visual
+        run: pnpm run test:visual
         env:
           CI: true
 
