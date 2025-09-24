@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import { MonitoringEvent } from '@/lib/monitoring'
 
 export const dynamic = 'force-dynamic'
@@ -13,14 +12,19 @@ export async function GET() {
       return NextResponse.json({ models: [] }, { status: 200 })
     }
 
-    const { data, error } = await (supabase as any)
-      .from('monitoring')
-      .select('value')
-      .eq('type', MonitoringEvent.AI_MODEL_USAGE)
+    // TODO: Implement monitoring table or remove this endpoint
+    // const { data, error } = await supabase
+    //   .from('monitoring')
+    //   .select('value')
+    //   .eq('type', MonitoringEvent.AI_MODEL_USAGE)
+
+    // Return mock data for now
+    const data: { value: string }[] = []
+    const error = null
 
     if (error) throw error
 
-    const modelCounts = (data as any[]).reduce((acc: Record<string, number>, { value }: any) => {
+    const modelCounts = (data || []).reduce((acc: Record<string, number>, { value }: { value: string }) => {
       if (value) {
         acc[value] = (acc[value] || 0) + 1
       }

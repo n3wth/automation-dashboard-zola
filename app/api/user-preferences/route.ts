@@ -34,7 +34,6 @@ export async function GET() {
       if (error.code === "PGRST116") {
         return NextResponse.json({
           layout: "fullscreen",
-          theme: "system",
           prompt_suggestions: true,
           show_tool_invocations: true,
           show_conversation_previews: true,
@@ -52,7 +51,6 @@ export async function GET() {
 
     return NextResponse.json({
       layout: data.layout,
-      theme: data.theme || "system",
       prompt_suggestions: data.prompt_suggestions,
       show_tool_invocations: data.show_tool_invocations,
       show_conversation_previews: data.show_conversation_previews,
@@ -93,7 +91,6 @@ export async function PUT(request: NextRequest) {
     const body = await request.json()
     const {
       layout,
-      theme,
       prompt_suggestions,
       show_tool_invocations,
       show_conversation_previews,
@@ -109,12 +106,6 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    if (theme && typeof theme !== "string") {
-      return NextResponse.json(
-        { error: "theme must be a string" },
-        { status: 400 }
-      )
-    }
 
     if (hidden_models && !Array.isArray(hidden_models)) {
       return NextResponse.json(
@@ -126,7 +117,6 @@ export async function PUT(request: NextRequest) {
     // Prepare update object with only provided fields
     const updateData: Record<string, unknown> = {}
     if (layout !== undefined) updateData.layout = layout
-    if (theme !== undefined) updateData.theme = theme
     if (prompt_suggestions !== undefined)
       updateData.prompt_suggestions = prompt_suggestions
     if (show_tool_invocations !== undefined)
@@ -163,7 +153,6 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({
       success: true,
       layout: data.layout,
-      theme: data.theme || "system",
       prompt_suggestions: data.prompt_suggestions,
       show_tool_invocations: data.show_tool_invocations,
       show_conversation_previews: data.show_conversation_previews,
