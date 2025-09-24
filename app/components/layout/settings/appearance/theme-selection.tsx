@@ -1,14 +1,37 @@
 "use client"
 
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { useUserPreferences, type ThemeType } from "@/lib/user-preference-store/provider"
 import { cn } from "@/lib/utils"
 import { useTheme } from "next-themes"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 export function ThemeSelection() {
   const { preferences, setTheme: setUserTheme } = useUserPreferences()
   const { setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+
+  const themeHeader = useMemo(
+    () => (
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h4 className="text-sm font-medium">Theme</h4>
+          <p className="text-xs text-muted-foreground">
+            Choose how Bob looks and feels.
+          </p>
+        </div>
+        {mounted ? (
+          <ThemeToggle className="pointer-events-auto" />
+        ) : (
+          <div
+            className="h-9 w-9 rounded-full bg-muted animate-pulse"
+            aria-hidden="true"
+          />
+        )}
+      </div>
+    ),
+    [mounted]
+  )
 
   // Ensure component is mounted to avoid hydration mismatches
   useEffect(() => {
@@ -50,8 +73,8 @@ export function ThemeSelection() {
 
   if (!mounted) {
     return (
-      <div>
-        <h4 className="mb-3 text-sm font-medium">Theme</h4>
+      <div className="glass-panel p-4">
+        {themeHeader}
         <div className="grid grid-cols-3 gap-3">
           {themes.map((theme) => (
             <div
@@ -76,7 +99,7 @@ export function ThemeSelection() {
 
   return (
     <div className="glass-panel p-4">
-      <h4 className="mb-3 text-sm font-medium">Theme</h4>
+      {themeHeader}
       <div className="space-y-2">
         {themes.map((themeOption) => (
           <label
