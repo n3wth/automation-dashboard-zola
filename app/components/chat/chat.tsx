@@ -369,18 +369,16 @@ export function Chat() {
               </h1>
             </div>
             {shouldShowAuthNotice ? (
-              <div className="bg-zinc-900/30 backdrop-blur-sm border border-white/10 rounded-2xl p-5 max-w-2xl mx-auto">
-                <p className="text-white/60 text-[15px] leading-relaxed text-center">
-                You&apos;re exploring Bob as a guest.{' '}
+              <p className="text-white/60 text-[15px] text-center max-w-2xl mx-auto">
+                Guest mode •{' '}
                 <Link
                   href="/auth"
                   className="text-white underline decoration-white/60 underline-offset-4 hover:text-white"
                 >
                   Sign in
                 </Link>{' '}
-                    to save your conversations and unlock higher daily limits, or start a quick chat below to try things out.
-                </p>
-              </div>
+                to save
+              </p>
             ) : null}
           </motion.div>
         ) : null}
