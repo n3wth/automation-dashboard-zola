@@ -7,9 +7,11 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  SidebarMenuSkeleton,
   useSidebar,
 } from "@/components/ui/sidebar"
 import { Logo } from "@/components/ui/logo"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useChats } from "@/lib/chat-store/chats/provider"
 import {
   ChatTeardropText,
@@ -96,7 +98,28 @@ export function AppSidebar() {
           </div>
           <SidebarProject />
           {isLoading ? (
-            <div className="h-full" />
+            <div className="space-y-6 py-2">
+              <div className="space-y-2">
+                <Skeleton className="mx-2 h-3 w-20 rounded-full" />
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <SidebarMenuSkeleton
+                    key={`sidebar-loading-${index}`}
+                    className="px-2"
+                    showIcon
+                  />
+                ))}
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="mx-2 h-3 w-24 rounded-full" />
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <SidebarMenuSkeleton
+                    key={`sidebar-loading-secondary-${index}`}
+                    className="px-2"
+                    showIcon
+                  />
+                ))}
+              </div>
+            </div>
           ) : hasChats ? (
             <div className="space-y-5">
               {pinnedChats.length > 0 && (
