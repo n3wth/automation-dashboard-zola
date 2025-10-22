@@ -22,6 +22,7 @@ import { useChatOperations } from "./use-chat-operations"
 import { useFileUpload } from "./use-file-upload"
 import { useOnboardingTour } from "@/app/hooks/use-onboarding-tour"
 import { PixelArtHome } from "@/components/ui/pixel-art-home"
+import { LandingWelcome } from "@/components/ui/landing-welcome"
 
 const FeedbackWidget = dynamic(
   () => import("./feedback-widget").then((mod) => mod.FeedbackWidget),
@@ -365,13 +366,9 @@ export function Chat() {
             }}
           >
             <PixelArtHome />
-            <div className="text-center mb-8 relative z-20">
-              <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight leading-tight">
-                What&apos;s on your mind?
-              </h1>
-            </div>
+            <LandingWelcome />
             {shouldShowAuthNotice ? (
-              <p className="text-white/60 text-[15px] text-center max-w-2xl mx-auto">
+              <p className="text-white/60 text-[15px] text-center max-w-2xl mx-auto mt-6">
                 Guest mode •{' '}
                 <Link
                   href="/auth"
